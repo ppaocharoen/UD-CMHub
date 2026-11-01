@@ -1,0 +1,29 @@
+{
+  "name": "UD-CM Hub — ระบบบริหารงานก่อสร้าง",
+  "short_name": "UD-CM Hub",
+  "description": "UD-CM Hub ระบบบริหารงานก่อสร้าง เทศบาลนครอุดรธานี — S-Curve / BOQ ปร.4 / ติดตามเอกสาร / รายงานราชการ (ข้อมูลเก็บในเบราว์เซอร์ของเครื่องนี้)",
+  "lang": "th",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f5fa",
+  "theme_color": "#0f766e",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
