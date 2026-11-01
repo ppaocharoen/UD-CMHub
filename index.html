@@ -333,6 +333,10 @@ tr:hover td{background:var(--gray-50)}
     </div>
   </div>
   <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <div class="bk-menu-wrap" id="cloud-wrap" style="display:none">
+      <button class="btn-secondary btn-sm" id="btn-cloud" onclick="clButton(event)">☁ เข้าสู่ระบบ</button>
+      <div class="bk-menu" id="cloud-menu"></div>
+    </div>
     <button class="btn-secondary btn-sm" id="btn-manual" onclick="openManual()">❓ คู่มือ</button>
     <div class="bk-menu-wrap">
       <button class="btn-secondary btn-sm" id="btn-backup-menu" onclick="toggleBackupMenu(event)">💾 สำรอง/กู้คืน ▾</button>
@@ -1148,11 +1152,11 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.0';
+const APP_VERSION='11.1';
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
 const STORE_KEY='scurve_v4';
 function load(){try{return JSON.parse(localStorage.getItem(STORE_KEY)||'[]')}catch(e){return[]}}
-function save(d){localStorage.setItem(STORE_KEY,JSON.stringify(d));try{scheduleFolderBackup()}catch(e){}}
+function save(d){localStorage.setItem(STORE_KEY,JSON.stringify(d));try{scheduleFolderBackup()}catch(e){}try{clSchedule()}catch(e){}}
 // สถานะสำรองอัตโนมัติลงโฟลเดอร์ (ดู fbInit / runFolderBackup)
 var _fb={handle:null,perm:'none',timer:null,pendingSince:0,running:false,dirty:false,lastErr:'',lastInfo:null,progress:'',dirCache:{},lastJson:{}};
 
@@ -2143,6 +2147,291 @@ async function runFolderBackup(manual){
   renderBackupReminder();
   if(_fb.dirty)scheduleFolderBackup(3000);
 }
+// ── ☁ ซิงก์ข้อมูลโครงการขึ้นคลาวด์ (Firebase Auth + Firestore) v11.1 ─────────────
+// ข้อมูลข้อความของโครงการเท่านั้น (รูป/ไฟล์แนบยังอยู่ในเครื่อง + สำรองลงโฟลเดอร์) · localStorage ยังเป็นที่เก็บหลัก (เร็ว ใช้ออฟไลน์ได้)
+// โครงสร้าง: users/{uid}/projects/{projectId} = {name, rev, updatedAt, device, appVersion, size, parts, data | parts/p000.., deleted}
+// กันทับกัน: เทียบ rev (เลขรุ่นบนคลาวด์ ไม่ขึ้นกับนาฬิกาเครื่อง) + hash ของข้อมูลตอนซิงก์ล่าสุด (รู้ว่าในเครื่องแก้หรือยัง)
+const UDCM_FIREBASE_CONFIG={apiKey:"AIzaSyCqcTpqm8BlqkC_eIfTyTN9q3T2LhNl5B4",authDomain:"ud-cm-hub.firebaseapp.com",projectId:"ud-cm-hub",storageBucket:"ud-cm-hub.firebasestorage.app",messagingSenderId:"871841202931",appId:"1:871841202931:web:59ebd55842fd6ccd972d86"}; // ← ค่า firebaseConfig ของโปรเจกต์ Firebase (เปิดเผยได้ ความปลอดภัยอยู่ที่ Firestore Rules)
+const FB_SDK_VER='10.14.1';
+const CL_META_KEY='udcm_cloud_meta',CL_ON_KEY='udcm_cloud_on',CL_DEV_KEY='udcm_device';
+const CL_PART=250000; // ตัวอักษรต่อส่วน (ไทย 3 ไบต์/ตัว → ไม่เกิน ~750KB < เพดาน 1MB ต่อเอกสาร)
+var _cl={ready:false,user:null,db:null,status:'off',msg:'',timer:null,running:false,again:false,lastAt:0,lastPull:0,remoteCount:0,queue:[]};
+function clConfigured(){return !!UDCM_FIREBASE_CONFIG}
+function clAvailable(){return clConfigured()&&/^https?:$/.test(location.protocol)}
+function clMeta(){try{const m=JSON.parse(localStorage.getItem(CL_META_KEY)||'{}');m.p=m.p||{};m.localOnly=m.localOnly||{};return m}catch(e){return{p:{},localOnly:{}}}}
+function clSaveMeta(m){try{localStorage.setItem(CL_META_KEY,JSON.stringify(m))}catch(e){}}
+function clDevice(){let d=null;try{d=localStorage.getItem(CL_DEV_KEY);if(!d){d=uid();localStorage.setItem(CL_DEV_KEY,d)}}catch(e){}return d||'x'}
+function clHash(str){let h=5381;for(let i=0;i<str.length;i++)h=((h<<5)+h+str.charCodeAt(i))|0;return (h>>>0).toString(36)+':'+str.length}
+function clLoadScript(src){return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=src;sc.onload=res;sc.onerror=()=>rej(new Error('โหลดไลบรารีคลาวด์ไม่ได้ (ตรวจการเชื่อมต่ออินเทอร์เน็ต)'));document.head.appendChild(sc)})}
+async function clInitSdk(){
+  if(_cl.ready)return;
+  if(!(window.firebase&&firebase.firestore&&firebase.auth)){
+    const b=`https://www.gstatic.com/firebasejs/${FB_SDK_VER}/`;
+    await clLoadScript(b+'firebase-app-compat.js');
+    await clLoadScript(b+'firebase-auth-compat.js');
+    await clLoadScript(b+'firebase-firestore-compat.js');
+  }
+  if(!firebase.apps.length)firebase.initializeApp(UDCM_FIREBASE_CONFIG);
+  _cl.db=firebase.firestore();
+  _cl.ready=true;
+  firebase.auth().onAuthStateChanged(u=>{clOnAuth(u).catch(e=>{_cl.status='error';_cl.msg=e.message||String(e);clRenderButton()})});
+}
+async function clBoot(){
+  const wrap=document.getElementById('cloud-wrap');
+  if(wrap)wrap.style.display=clConfigured()?'':'none';
+  clRenderButton();
+  if(!clAvailable())return;
+  window.addEventListener('online',()=>{if(_cl.user)clSyncNow()});
+  window.addEventListener('focus',()=>{if(_cl.user&&Date.now()-_cl.lastPull>60000)clSyncNow()});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&_cl.timer){clearTimeout(_cl.timer);_cl.timer=null;clSyncNow()}});
+  let on=null;try{on=localStorage.getItem(CL_ON_KEY)}catch(e){}
+  if(on!=='1')return;
+  try{_cl.status='connecting';clRenderButton();await clInitSdk()}catch(e){_cl.status='error';_cl.msg=e.message;clRenderButton()}
+}
+async function clLogin(){
+  closeCloudMenu();
+  if(!clAvailable()){alert('เข้าสู่ระบบได้เฉพาะเมื่อเปิดผ่านเว็บไซต์ https://ppaocharoen.github.io/UD-CMHub/ — เปิดจากไฟล์ในเครื่องไม่ได้');return}
+  try{
+    _cl.status='connecting';clRenderButton();
+    await clInitSdk();
+    const prov=new firebase.auth.GoogleAuthProvider();
+    prov.setCustomParameters({prompt:'select_account'});
+    await firebase.auth().signInWithPopup(prov);
+  }catch(e){
+    _cl.status=_cl.user?'ok':'off';clRenderButton();
+    const code=e&&e.code||'';
+    if(code==='auth/popup-closed-by-user'||code==='auth/cancelled-popup-request')return;
+    if(code==='auth/popup-blocked'){alert('เบราว์เซอร์บล็อกหน้าต่างเข้าสู่ระบบ — กดอนุญาต pop-up ของเว็บนี้ แล้วลองอีกครั้ง');return}
+    if(code==='auth/unauthorized-domain'){alert('โดเมนนี้ยังไม่ได้รับอนุญาตใน Firebase (Authentication → Settings → Authorized domains)');return}
+    alert('เข้าสู่ระบบไม่สำเร็จ: '+(e.message||e));
+  }
+}
+async function clOnAuth(u){
+  _cl.user=u;
+  if(!u){_cl.status='off';clRenderButton();return}
+  try{localStorage.setItem(CL_ON_KEY,'1')}catch(e){}
+  const m=clMeta();
+  if(m.uid!==u.uid){clSaveMeta({uid:u.uid,p:{},localOnly:{},firstDone:false})} // บัญชีใหม่บนเครื่องนี้ → ยังไม่เคยซิงก์กับบัญชีนี้
+  await clSyncNow();
+}
+function clRef(){return _cl.db.collection('users').doc(_cl.user.uid).collection('projects')}
+async function clReadJson(id,d){
+  if(!d||d.deleted)return null;
+  const n=Number(d.parts)||1;
+  if(n<=1)return d.data||null;
+  const ref=clRef().doc(id).collection('parts');
+  const snaps=await Promise.all(Array.from({length:n},(_,i)=>ref.doc('p'+String(i).padStart(3,'0')).get()));
+  return snaps.map(x=>{const v=x.data();return v?v.d:''}).join('');
+}
+async function clWrite(p,json,rev){
+  const ref=clRef().doc(p.id),n=Math.max(1,Math.ceil(json.length/CL_PART)),now=Date.now();
+  const base={name:p.name||'',rev,updatedAt:now,device:clDevice(),appVersion:APP_VERSION,size:json.length,parts:n,deleted:false};
+  const batch=_cl.db.batch();
+  if(n===1)batch.set(ref,{...base,data:json});
+  else{
+    for(let i=0;i<n;i++)batch.set(ref.collection('parts').doc('p'+String(i).padStart(3,'0')),{d:json.slice(i*CL_PART,(i+1)*CL_PART)});
+    batch.set(ref,base);
+  }
+  await batch.commit();
+  return now;
+}
+async function clWriteTombstone(id,name,rev){
+  await clRef().doc(id).set({name:name||'',rev,updatedAt:Date.now(),device:clDevice(),deleted:true,parts:0});
+}
+function clSchedule(){
+  if(!_cl.user||!_cl.db)return;
+  if(_cl.timer)clearTimeout(_cl.timer);
+  if(_cl.status==='ok'){_cl.status='pending';clRenderButton()}
+  _cl.timer=setTimeout(()=>{_cl.timer=null;clSyncNow()},4000);
+}
+function clOnDelete(p){
+  if(!_cl.user||!_cl.db)return;
+  const m=clMeta(),M=m.p[p.id];
+  if(!M)return;
+  const rev=(M.rev||0)+1;
+  clWriteTombstone(p.id,p.name,rev).then(()=>{const mm=clMeta();delete mm.p[p.id];clSaveMeta(mm)}).catch(()=>{/* ออฟไลน์ → ซิงก์ครั้งหน้าจัดการ (โครงการหายจากเครื่อง แต่ meta ยังอยู่) */});
+}
+// ซิงก์: ดึงรายการบนคลาวด์ → เทียบทีละโครงการ → ดึงลง / ส่งขึ้น / ถามเมื่อแก้ทั้งสองฝั่ง
+async function clSyncNow(){
+  if(!_cl.user||!_cl.db)return;
+  if(_cl.running){_cl.again=true;return}
+  _cl.running=true;_cl.status='syncing';clRenderButton();
+  try{
+    if(navigator.onLine===false)throw Object.assign(new Error('offline'),{offline:true});
+    const snap=await clRef().get();
+    const remote={};snap.forEach(d=>{remote[d.id]=d.data()});
+    _cl.lastPull=Date.now();
+    _cl.remoteCount=Object.values(remote).filter(d=>!d.deleted).length;
+    const m=clMeta();
+    let local=load();
+    const byId={};local.forEach(p=>{byId[p.id]=p});
+    // ครั้งแรกของบัญชีนี้บนเครื่องนี้: ถามก่อนอัปโหลดโครงการในเครื่องที่ยังไม่มีบนคลาวด์
+    if(!m.firstDone){
+      const fresh=local.filter(p=>!remote[p.id]&&!m.p[p.id]);
+      if(fresh.length){
+        const ok=confirm(`อัปโหลดโครงการในเครื่องนี้ ${fresh.length} โครงการ ขึ้นบัญชี ${_cl.user.email||''} ?\n\n${fresh.slice(0,8).map(p=>'• '+p.name).join('\n')}${fresh.length>8?'\n…':''}\n\n(อัปโหลดเฉพาะข้อมูลข้อความ — รูปและไฟล์แนบยังอยู่ในเครื่องนี้)\nกด "ยกเลิก" = เก็บไว้ในเครื่องนี้เท่านั้น ไม่ซิงก์`);
+        if(!ok)fresh.forEach(p=>{m.localOnly[p.id]=true});
+      }
+      m.firstDone=true;clSaveMeta(m);
+    }
+    const ids=new Set([...Object.keys(remote),...local.map(p=>p.id),...Object.keys(m.p)]);
+    let changedLocal=false;const pulledNames=[],removedNames=[],conflicts=[];let pushed=0;
+    for(const id of ids){
+      if(m.localOnly[id]&&byId[id])continue;
+      const L=byId[id],R=remote[id],M=m.p[id];
+      const lj=L?JSON.stringify(L):null,lh=lj?clHash(lj):null;
+      const dirty=L&&(!M||M.hash!==lh);
+      const rRev=R?Number(R.rev)||0:0;
+      const remoteNewer=R&&(!M||rRev!==M.rev);
+      if(L&&!R){ // มีแต่ในเครื่อง → ส่งขึ้น
+        const rev=(M&&M.rev||0)+1;await clWrite(L,lj,rev);m.p[id]={rev,hash:lh};pushed++;continue;
+      }
+      if(!L&&R){
+        if(R.deleted){delete m.p[id];continue}
+        if(M&&rRev===M.rev){ // ลบในเครื่องนี้ตอนออฟไลน์ → ส่งการลบขึ้น
+          await clWriteTombstone(id,R.name,rRev+1);delete m.p[id];continue;
+        }
+        const j=await clReadJson(id,R); // โครงการใหม่จากเครื่องอื่น (หรือแก้หลังเราลบ → เก็บไว้ ไม่ทิ้งข้อมูล)
+        if(!j)continue;
+        const p=JSON.parse(j);local.push(p);byId[id]=p;m.p[id]={rev:rRev,hash:clHash(JSON.stringify(p))};changedLocal=true;pulledNames.push(p.name);continue;
+      }
+      if(!L)continue;
+      if(R.deleted){
+        if(!dirty&&M){local=local.filter(x=>x.id!==id);delete byId[id];delete m.p[id];changedLocal=true;removedNames.push(L.name);}
+        else{const rev=rRev+1;await clWrite(L,lj,rev);m.p[id]={rev,hash:lh};pushed++;} // ถูกลบที่เครื่องอื่น แต่เครื่องนี้แก้ต่อ → เก็บของเครื่องนี้
+        continue;
+      }
+      if(!remoteNewer){
+        if(dirty){const rev=rRev+1;await clWrite(L,lj,rev);m.p[id]={rev,hash:lh};pushed++;}
+        continue;
+      }
+      const j=await clReadJson(id,R);
+      if(j===null)continue;
+      if(!M&&j===lj){m.p[id]={rev:rRev,hash:lh};continue} // ข้อมูลเหมือนกันอยู่แล้ว
+      if(M&&!dirty){ // เครื่องอื่นแก้ เครื่องนี้ไม่ได้แก้ → ดึงลง
+        const p=JSON.parse(j);local=local.map(x=>x.id===id?p:x);byId[id]=p;m.p[id]={rev:rRev,hash:clHash(JSON.stringify(p))};changedLocal=true;pulledNames.push(p.name);continue;
+      }
+      conflicts.push({id,L,R,j}); // แก้ทั้งสองฝั่ง
+    }
+    clSaveMeta(m);
+    _cl.remoteCount=Object.keys(m.p).length;
+    if(changedLocal){localStorage.setItem(STORE_KEY,JSON.stringify(local));try{scheduleFolderBackup()}catch(e){}clRefreshUi()}
+    _cl.lastAt=Date.now();_cl.status='ok';_cl.msg='';
+    if(pulledNames.length)toast(`☁ ได้ข้อมูลจากคลาวด์ ${pulledNames.length} โครงการ`);
+    if(removedNames.length)toast(`☁ โครงการที่ถูกลบจากเครื่องอื่น: ${removedNames.join(', ')}`);
+    if(conflicts.length){_cl.queue.push(...conflicts);clNextConflict()}
+  }catch(e){
+    _cl.status=e&&e.offline?'offline':'error';
+    _cl.msg=e&&e.offline?'ออฟไลน์ — จะซิงก์เมื่อกลับมาออนไลน์':(e&&e.code==='permission-denied'?'ไม่มีสิทธิ์เขียนข้อมูล (ตรวจ Firestore Rules)':(e&&e.message)||String(e));
+    console.warn('cloud sync',e);
+  }finally{
+    _cl.running=false;clRenderButton();
+    if(_cl.again){_cl.again=false;setTimeout(clSyncNow,300)}
+  }
+}
+function clRefreshUi(){
+  projects=load();
+  const anyOpen=[...document.querySelectorAll('.modal-overlay.open')].length>0;
+  const onList=document.getElementById('page-list')&&document.getElementById('page-list').classList.contains('active');
+  if(onList){renderList();return}
+  if(currentId&&!anyOpen&&document.getElementById('page-dashboard').classList.contains('active')){
+    if(projects.some(x=>x.id===currentId))openDashboard(currentId);else goList();
+  }
+}
+// แก้ทั้งในเครื่องนี้และเครื่องอื่น → ให้ผู้ใช้เลือก (ไม่ทับเงียบ ๆ)
+function clNextConflict(){
+  if(document.getElementById('cl-conflict'))return;
+  const c=_cl.queue.shift();
+  if(!c)return;
+  const ov=document.createElement('div');
+  ov.className='modal-overlay open';ov.id='cl-conflict';ov.style.zIndex=10001;
+  const when=new Date(Number(c.R.updatedAt)||0);
+  ov.innerHTML=`<div class="modal" style="max-width:560px">
+    <div class="modal-title">☁ ข้อมูลไม่ตรงกัน</div>
+    <div class="modal-sub">${escH(c.L.name)}</div>
+    <div style="font-size:13px;line-height:1.7;margin:6px 0 12px">โครงการนี้ถูกแก้ไข <b>ทั้งในเครื่องนี้</b> และ <b>บนคลาวด์จากเครื่องอื่น</b> (${when.getTime()?thD(when)+' '+when.toTimeString().slice(0,5):'-'}) หลังการซิงก์ครั้งล่าสุด — เลือกว่าจะใช้ข้อมูลชุดไหน</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn-primary" onclick="clResolve('local')">ใช้ข้อมูลของเครื่องนี้ <span style="font-weight:400;opacity:.85">(ส่งขึ้นแทนบนคลาวด์)</span></button>
+      <button class="btn-secondary" onclick="clResolve('cloud')">ใช้ข้อมูลบนคลาวด์ <span style="color:var(--gray-500)">(ดาวน์โหลดไฟล์สำรองของเครื่องนี้ไว้ก่อน)</span></button>
+      <button class="btn-secondary" onclick="clResolve('both')">เก็บทั้งสองชุด <span style="color:var(--gray-500)">(ของเครื่องนี้เป็นโครงการสำเนา)</span></button>
+    </div></div>`;
+  ov._c=c;
+  document.body.appendChild(ov);
+}
+async function clResolve(choice){
+  const ov=document.getElementById('cl-conflict');if(!ov)return;
+  const c=ov._c;ov.remove();
+  const m=clMeta();let local=load();
+  try{
+    if(choice==='local'){
+      const lj=JSON.stringify(c.L),rev=(Number(c.R.rev)||0)+1;
+      await clWrite(c.L,lj,rev);m.p[c.id]={rev,hash:clHash(lj)};
+    }else{
+      const p=JSON.parse(c.j);
+      if(choice==='cloud')downloadProjectBackup(c.L,'ก่อนใช้ข้อมูลคลาวด์');
+      else{const cp=JSON.parse(JSON.stringify(c.L));cp.id=uid();cp.name=c.L.name+' (สำเนาจากเครื่องนี้)';local.push(cp);}
+      local=local.map(x=>x.id===c.id?p:x);
+      m.p[c.id]={rev:Number(c.R.rev)||0,hash:clHash(JSON.stringify(p))};
+      clSaveMeta(m);
+      save(local); // สำเนา (ถ้ามี) จะถูกส่งขึ้นในการซิงก์ถัดไป
+      clRefreshUi();
+    }
+    clSaveMeta(m);
+  }catch(e){alert('ซิงก์ไม่สำเร็จ: '+(e.message||e))}
+  clNextConflict();
+}
+async function clLogout(){
+  closeCloudMenu();
+  if(!_cl.user)return;
+  const clear=confirm(`ออกจากระบบ ${_cl.user.email||''}\n\nลบข้อมูลโครงการออกจากเครื่องนี้ด้วยหรือไม่? (ใช้เครื่องร่วมกับคนอื่น/เครื่องสาธารณะ)\n\n• ตกลง = ออกจากระบบ และลบข้อมูลข้อความของโครงการที่ซิงก์แล้วออกจากเครื่องนี้ (ยังอยู่บนคลาวด์ — ล็อกอินใหม่ก็กลับมา)\n• ยกเลิก = ออกจากระบบอย่างเดียว ข้อมูลยังอยู่ในเครื่องนี้`);
+  if(_cl.timer){clearTimeout(_cl.timer);_cl.timer=null}
+  try{await clSyncNow()}catch(e){}
+  try{await firebase.auth().signOut()}catch(e){}
+  try{localStorage.removeItem(CL_ON_KEY)}catch(e){}
+  if(clear){
+    const m=clMeta();
+    const keep=load().filter(p=>!m.p[p.id]); // เก็บเฉพาะโครงการที่ไม่ได้ซิงก์ (กันข้อมูลหาย)
+    localStorage.setItem(STORE_KEY,JSON.stringify(keep));
+    clSaveMeta({p:{},localOnly:{}});
+    projects=keep;goList();
+    toast(keep.length?`ออกจากระบบแล้ว · เหลือโครงการที่ไม่ได้ซิงก์ ${keep.length} โครงการในเครื่องนี้`:'ออกจากระบบและลบข้อมูลในเครื่องนี้แล้ว');
+  }else toast('ออกจากระบบแล้ว');
+  _cl.user=null;_cl.status='off';clRenderButton();
+}
+function clRenderButton(){
+  const b=document.getElementById('btn-cloud');if(!b)return;
+  const hm=t=>{const d=new Date(t);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+  let txt='☁ เข้าสู่ระบบ',cls='btn-secondary btn-sm',title='เข้าสู่ระบบด้วยบัญชี Google เพื่อเก็บข้อมูลโครงการบนคลาวด์ (เปิดเครื่องอื่นก็เห็นโครงการเดิม)';
+  if(!clAvailable()){title='เข้าสู่ระบบได้เฉพาะเมื่อเปิดผ่านเว็บไซต์ UD-CM Hub';}
+  else if(_cl.status==='connecting'){txt='☁ กำลังเชื่อมต่อ…'}
+  else if(_cl.user){
+    const st=_cl.status;
+    if(st==='syncing')txt='☁ กำลังซิงก์…';
+    else if(st==='pending')txt='☁ รอซิงก์…';
+    else if(st==='offline'){txt='☁ ออฟไลน์';title=_cl.msg}
+    else if(st==='error'){txt='⚠ ซิงก์ไม่ได้';cls='btn-warning btn-sm';title=_cl.msg}
+    else{txt='☁ ซิงก์แล้ว'+(_cl.lastAt?' '+hm(_cl.lastAt):'');title='ข้อมูลโครงการซิงก์กับบัญชี '+(_cl.user.email||'')}
+  }else if(_cl.status==='error'){txt='⚠ คลาวด์';cls='btn-warning btn-sm';title=_cl.msg}
+  b.textContent=txt;b.className=cls;b.title=title;
+}
+function clButton(e){
+  e.stopPropagation();
+  if(!_cl.user){clLogin();return}
+  const m=document.getElementById('cloud-menu');
+  const meta=clMeta(),localOnly=load().filter(p=>meta.localOnly[p.id]).length;
+  m.innerHTML=`<div class="bk-hint" style="padding:6px 10px 4px">เข้าสู่ระบบด้วย<br><b style="color:var(--gray-800)">${escH(_cl.user.email||_cl.user.displayName||'')}</b></div>
+    <div class="bk-hint">โครงการบนคลาวด์ ${_cl.remoteCount} โครงการ${localOnly?` · เก็บในเครื่องนี้อย่างเดียว ${localOnly}`:''}${_cl.msg?`<br><span style="color:var(--amber)">${escH(_cl.msg)}</span>`:''}</div>
+    <div class="bk-sep"></div>
+    <button onclick="closeCloudMenu();clSyncNow()">🔄 ซิงก์ตอนนี้</button>
+    ${localOnly?`<button onclick="closeCloudMenu();clUploadLocalOnly()">⬆ อัปโหลดโครงการที่เก็บในเครื่องอย่างเดียว (${localOnly})</button>`:''}
+    <button onclick="clLogout()">🚪 ออกจากระบบ</button>
+    <div class="bk-hint" style="padding-top:6px">ซิงก์เฉพาะข้อมูลข้อความ — รูปและไฟล์แนบยังเก็บในเครื่อง ใช้ 💾 สำรอง/กู้คืน ตามเดิม</div>`;
+  m.classList.toggle('open');
+}
+function closeCloudMenu(){const m=document.getElementById('cloud-menu');if(m)m.classList.remove('open')}
+function clUploadLocalOnly(){const m=clMeta();m.localOnly={};clSaveMeta(m);clSyncNow()}
+document.addEventListener('click',e=>{if(!e.target.closest('#cloud-wrap'))closeCloudMenu()});
+
 async function fbInit(){
   if(!fbSupported()){fbRenderAll();return}
   try{
@@ -2541,6 +2830,20 @@ const MANUAL_SECTIONS=[
 </ol>
 <div class="tip">ถ้ากดพิมพ์แล้วไม่มีหน้าต่างใหม่ขึ้นมา เบราว์เซอร์อาจบล็อกป๊อปอัป — อนุญาตป๊อปอัปสำหรับหน้านี้ (ไอคอนที่แถบที่อยู่) แล้วกดใหม่</div>`},
 
+{id:'cloud',title:'เข้าสู่ระบบ และซิงก์ข้อมูลบนคลาวด์',html:`
+<p>เข้าสู่ระบบด้วยบัญชี Google เพื่อเก็บ <b>ข้อมูลข้อความของโครงการ</b> (รายการงาน แผน ความก้าวหน้า เอกสาร รายงาน ฯลฯ) ไว้บนคลาวด์ — เปิดเครื่องอื่นแล้วเข้าสู่ระบบ ก็เห็นโครงการเดิมทั้งหมด</p>
+<ul>
+<li>ใช้ได้เฉพาะเมื่อเปิดผ่านเว็บไซต์ <b>https://ppaocharoen.github.io/UD-CMHub/</b> (เปิดจากไฟล์ในเครื่องเข้าสู่ระบบไม่ได้)</li>
+<li>กด <span class="k">☁ เข้าสู่ระบบ</span> ที่แถบด้านบน → เลือกบัญชี Google — ครั้งแรกระบบถามว่าจะอัปโหลดโครงการในเครื่องนี้ขึ้นบัญชีหรือไม่</li>
+<li>หลังจากนั้น <b>ซิงก์อัตโนมัติ</b> ทุกครั้งที่บันทึก (หน่วงไม่กี่วินาที) ปุ่มด้านบนแสดง "☁ ซิงก์แล้ว 14:52" · ถ้าออฟไลน์ ระบบยังใช้งานได้ตามปกติ และส่งขึ้นเมื่อกลับมาออนไลน์</li>
+<li>แต่ละบัญชีเห็นได้เฉพาะข้อมูลของตัวเอง (คนอื่นที่เปิดเว็บเดียวกันไม่เห็น)</li>
+<li><b>รูปภาพและไฟล์แนบไม่ขึ้นคลาวด์</b> — ยังเก็บในเครื่อง ใช้ 💾 สำรอง/กู้คืน (โฟลเดอร์สำรอง หรือ ZIP) ย้ายไปเครื่องใหม่ตามเดิม ในเครื่องใหม่ไฟล์แนบจะขึ้นป้าย ⚠ ไม่พบตัวไฟล์ จนกว่าจะกู้คืน</li>
+<li>ถ้าโครงการถูกแก้ <b>ทั้งในเครื่องนี้และในเครื่องอื่น</b> ก่อนซิงก์ ระบบจะถามให้เลือก: ใช้ของเครื่องนี้ / ใช้ของคลาวด์ (ดาวน์โหลดไฟล์สำรองของเครื่องนี้ให้ก่อน) / เก็บทั้งสองชุด — ไม่ทับกันเงียบ ๆ</li>
+<li>ลบโครงการ = ลบจากคลาวด์ด้วย (เครื่องอื่นจะลบตามเมื่อซิงก์)</li>
+<li><span class="k">🚪 ออกจากระบบ</span> เลือกได้ว่าจะลบข้อมูลโครงการออกจากเครื่องนี้ด้วย (เหมาะกับเครื่องที่ใช้ร่วมกับคนอื่น) — ข้อมูลยังอยู่บนคลาวด์</li>
+</ul>
+<div class="tip">การซิงก์ไม่ได้แทนการสำรองข้อมูล — ยังควรตั้ง 📁 สำรองอัตโนมัติลงโฟลเดอร์ไว้ (รูปและไฟล์แนบอยู่ในนั้น)</div>`},
+
 {id:'backup',title:'สำรองและกู้คืนข้อมูล',html:`
 <div class="warn"><b>ทำข้อ 1 ตั้งแต่วันแรก</b> — เพราะข้อมูลอยู่ในเบราว์เซอร์ หากล้างข้อมูลไซต์หรือเครื่องมีปัญหา ข้อมูลหายทั้งหมด กู้คืนไม่ได้ถ้าไม่มีสำเนา</div>
 <p>ปุ่มสำรอง/กู้คืนทั้งหมดอยู่ในเมนู <span class="k">💾 สำรอง/กู้คืน</span> ที่แถบด้านบน (มี ✓ เมื่อสำรองอัตโนมัติทำงานอยู่ · เปลี่ยนเป็น ⚠ สีส้มเมื่อหยุดหรือมีปัญหา)</p>
@@ -2637,6 +2940,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.1</b> — ☁ เข้าสู่ระบบด้วยบัญชี Google และซิงก์ข้อมูลข้อความของโครงการขึ้นคลาวด์อัตโนมัติ (เปิดเครื่องอื่นเห็นโครงการเดิม · แต่ละบัญชีเห็นเฉพาะของตัวเอง · ถามเมื่อแก้ทั้งสองเครื่อง · ออกจากระบบแล้วล้างข้อมูลในเครื่องได้) · รูป/ไฟล์แนบยังเก็บในเครื่องตามเดิม</li>
 <li><b>v11.0</b> — เปลี่ยนชื่อเป็น <b>UD-CM Hub</b> (ระบบในเครือ UD ร่วมกับ UD-Cost Hub) · โลโก้ UD สีเขียวหัวเป็ด · ธีมและพื้นหลังตราเทศบาลแบบเดียวกับ UD-Cost Hub · ใช้ฟอนต์ Sarabun ทั้งหน้าจอ · เปิดใช้งานผ่านเว็บไซต์ได้ (ข้อมูลยังเก็บในเครื่อง) · รายงานราชการที่พิมพ์ออกไม่เปลี่ยนรูปแบบ</li>
 <li><b>v10.10</b> — วัสดุในหัวข้อ 🧱 แสดงเป็นชื่ออย่างเดียวเป็นค่าเริ่มต้น (ตั้งค่าเริ่มต้นของโครงการได้) ลิงก์ "ชื่อทั้งหมด / ปริมาณทั้งหมด / %ทั้งหมด" และพับตัวเลือกรายตัวไว้ · รายการวัสดุที่อยู่ในหัวข้อ 🧱 ครบแล้วไม่แสดงซ้ำในรายการอัตโนมัติ · รายงานประจำสัปดาห์ล้นหน้า → ลบบรรทัดว่างของงานที่ดำเนินการให้อยู่ 1 หน้า (ยังไม่พอจึงย่อตัวอักษรตารางงาน) และวัดหลังฟอนต์โหลดเสร็จ</li>
 <li><b>v10.9</b> — บันทึกความก้าวหน้ารายวัน: กรอบ 🧱 ชิ้นส่วนที่ลงวันนี้ แสดงปริมาณแยกตามชิ้นส่วน เอาชิ้นส่วนออกได้ · ใส่ STA./GL. ต่อชิ้นส่วน (ตอนเพิ่ม หรือในกรอบ) แล้วดึงไปช่อง STA. ของรายงานประจำวัน และช่องหมายเหตุของรายงานประจำสัปดาห์</li>
@@ -6824,6 +7128,7 @@ function deleteCurrentProject(){
   projects=projects.filter(x=>x.id!==currentId);
   save(projects);
   deleteBlobsIfUnused(blobIds);
+  try{clOnDelete(p)}catch(e){}
   toast('ลบโครงการแล้ว');
   goList();
   renderStorageUsage();
@@ -8528,6 +8833,7 @@ renderList();
 requestPersistentStorage();
 renderStorageUsage();
 fbInit();
+try{clBoot()}catch(e){}
 migratePhotosToIdb().then(n=>{if(n){toast(`ย้ายรูปภาพ ${n} รูปไปพื้นที่จัดเก็บใหม่แล้ว`);renderList()}});
 </script>
 </body>
