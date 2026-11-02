@@ -18,6 +18,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='white'%3EUD%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='white'%3EUD%3C/text%3E%3C/svg%3E">
 <script data-lib="Chart.js 4.4.1">/* Chart.js 4.4.1 — ฝังในไฟล์เพื่อใช้งานออฟไลน์ (ลิขสิทธิ์ตามสัญญาอนุญาตของไลบรารี) */
 /*!
  * Chart.js v4.4.1
@@ -1175,7 +1179,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.5';
+const APP_VERSION='11.6';
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
 const STORE_KEY='scurve_v4';
@@ -2761,6 +2765,7 @@ const MANUAL_SECTIONS=[
 <h4>อ่านแท็บ S-Curve</h4>
 <ul>
 <li><b>% แผนเดิม / แผน REV / % จริง / ผลต่าง</b> — % ความก้าวหน้ารวมถ่วงน้ำหนักด้วยมูลค่า ณ สัปดาห์ที่เลือก ผลต่างติดลบ = ล่าช้ากว่าแผน</li>
+<li><b>กราฟ</b> — ชี้ที่จุดใดก็ได้ จะแสดงสัปดาห์และช่วงวันที่ของสัปดาห์นั้น (เช่น W3 · 19–25 ต.ค. 2569) พร้อม % ของแต่ละเส้นที่มีข้อมูล ใต้แกน X มีแถบบอกเดือน (สัปดาห์ที่คร่อมสองเดือนนับเข้าเดือนที่มีวันมากกว่า)</li>
 <li><b>ก้าวหน้าประจำสัปดาห์</b> — % ที่เพิ่มขึ้นในสัปดาห์นั้น (แผน/จริง)</li>
 <li><b>แสดงข้อมูล ณ :</b> เลือกสัปดาห์ที่ต้องการดู · ปุ่ม <span class="k">ล่าสุด</span> = สัปดาห์ล่าสุดที่มีการบันทึก · <span class="k">ปัจจุบัน</span> = สัปดาห์ตามปฏิทินวันนี้</li>
 <li><b>เฝ้าระวังเร่งรัดงาน</b> — วันที่ถึง 1/4, 1/2 และ 3/4 ของสัญญา</li>
@@ -2979,6 +2984,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.6</b> — กราฟ S-Curve: ชี้ที่กราฟแล้วแสดงช่วงวันที่ของสัปดาห์นั้น (เช่น W3 · 19–25 ต.ค. 2569) · เพิ่มแถบเดือนใต้แกน X</li>
 <li><b>v11.5</b> — หน้าแผนงาน แท็บ "กำหนดเอง": หมวดงานที่มีงานย่อยกรอกที่หมวดหลักบรรทัดเดียวได้ (ค่าเริ่มต้น) งานย่อยแสดงสีจาง "ตามหมวดหลัก" · ปุ่ม "แยกงานย่อย" สำหรับกรอกทีละงานย่อย · "เลือกทั้งหมด" ไม่ติ๊กงานย่อยที่ตามหมวดหลัก · งานย่อยที่ไม่ได้กรอกใช้ %/W ของหมวดหลักด้วย (เดิมใช้แค่ระยะเวลา/เริ่ม W)</li>
 <li><b>v11.4</b> — หน้าโครงการใหม่ / แก้ไขโครงการ: เพิ่มแถบ "ปรับลดราคาทุกรายการจากราคากลาง (%)" ใต้ปุ่มนำเข้า Excel · กรอกวงเงินค่าจ้างแล้วระบบคำนวณ % ที่ต่ำกว่าราคากลาง (รวม Factor F / VAT) และเสนอให้ปรับทั้งหมดในคลิกเดียว · เก็บราคากลางไว้อ้างอิง ส่วนลดคิดจากราคากลางเสมอ (ไม่ลดทบ) · ถามก่อนปรับทับรายการที่แก้ราคาเอง · แก้ปุ่ม "ปรับราคาตามส่วนลดผู้รับจ้าง" ให้เทียบวงเงินกับมูลค่ารวม Factor F / VAT (เดิมเทียบกับต้นทุนก่อนคูณ) และปรับแผนแก้ไขที่ราคาตรงกันตามไปด้วย · แก้บรรทัดพื้นที่จัดเก็บในหน้าโครงการทั้งหมดที่แสดงโค้ดไอคอนแทนสัญลักษณ์</li>
 <li><b>v11.3</b> — บันทึกความก้าวหน้ารายวัน: เพิ่มตัวเลือก "งานอื่นนอกรายการ (พิมพ์รายละเอียดเอง)" ใส่ปริมาณ/หน่วยได้ แสดงในรายงานประจำวันและประจำสัปดาห์ (ไม่นับ % ความก้าวหน้า)</li>
@@ -3577,8 +3583,9 @@ function renderScurve(p){
       });
       if(!lines.length)return;
       ctx.save();
-      const pad=8,lineH=16,titleH=18;
-      const boxW=150,boxH=titleH+lines.length*lineH+pad;
+      const rng=wkRange(dw);
+      const pad=8,lineH=16,titleH=rng?31:18;
+      const boxW=rng?172:150,boxH=titleH+lines.length*lineH+pad;
       // ข้อ 2: วางมุมซ้ายบน
       const bx=chartArea.left+6;
       const by=chartArea.top+6;
@@ -3593,6 +3600,7 @@ function renderScurve(p){
       ctx.font='bold 10px Segoe UI,sans-serif';
       ctx.textAlign='left';
       ctx.fillText(`W${dw} — สัปดาห์ที่เลือก`,bx+pad,by+13);
+      if(rng){ctx.fillStyle='#6b7480';ctx.font='10px Segoe UI,sans-serif';ctx.fillText(rng,bx+pad,by+26);}
       ctx.strokeStyle='rgba(26,111,196,0.2)';
       ctx.beginPath();ctx.moveTo(bx+pad,by+titleH);ctx.lineTo(bx+boxW-pad,by+titleH);ctx.stroke();
       lines.forEach((l,i)=>{
@@ -3612,13 +3620,42 @@ function renderScurve(p){
     }
   };
 
+  // v11.6 ช่วงวันที่ของแต่ละสัปดาห์ (tooltip) + แถบเดือนใต้แกน X
+  const wkRange=w=>{const a=wkStart(p.startDate,w),b=wkEnd(p.startDate,w);if(!a||!b)return'';
+    return a.getMonth()===b.getMonth()&&a.getFullYear()===b.getFullYear()?`${a.getDate()}–${b.getDate()} ${TM[b.getMonth()]} ${b.getFullYear()+543}`:`${thD(a)} – ${thD(b)}`;};
+  const monthGroups=[];
+  for(let i=0;i<maxT;i++){
+    const a=wkStart(p.startDate,i+1),b=wkEnd(p.startDate,i+1);
+    if(!a||!b)break;
+    const mid=new Date((a.getTime()+b.getTime())/2),key=mid.getFullYear()*12+mid.getMonth();
+    const g=monthGroups[monthGroups.length-1];
+    if(g&&g.key===key)g.to=i;else monthGroups.push({key,from:i,to:i,label:TM[mid.getMonth()]+' '+String(mid.getFullYear()+543).slice(-2)});
+  }
+  const MONTH_BAND=18;
+  const monthBandPlugin={id:'monthBand',
+    afterDraw(chart){
+      const xs=chart.scales.x;if(!xs||!monthGroups.length)return;
+      const {ctx}=chart,y0=xs.bottom-MONTH_BAND,step=maxT>1?xs.getPixelForValue(1)-xs.getPixelForValue(0):xs.width;
+      ctx.save();ctx.font='10.5px Sarabun, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.strokeStyle='rgba(0,0,0,0.12)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(xs.left,y0+0.5);ctx.lineTo(xs.right,y0+0.5);ctx.stroke();
+      monthGroups.forEach((g,gi)=>{
+        const L=Math.max(xs.left,xs.getPixelForValue(g.from)-step/2),R=Math.min(xs.right,xs.getPixelForValue(g.to)+step/2);
+        if(gi>0){ctx.beginPath();ctx.moveTo(Math.round(L)+0.5,y0);ctx.lineTo(Math.round(L)+0.5,y0+MONTH_BAND);ctx.stroke();}
+        const w=R-L;let t=g.label;
+        if(ctx.measureText(t).width>w-4)t=t.split(' ')[0];
+        if(ctx.measureText(t).width>w-2)return;
+        ctx.fillStyle=gi%2?'#7a838e':'#5b6570';ctx.fillText(t,(L+R)/2,y0+MONTH_BAND/2+1);
+      });
+      ctx.restore();
+    }};
   scurveChart=new Chart(canvas.getContext('2d'),{
     type:'line',data:{labels,datasets},
-    plugins:[verticalLinesPlugin,selectedWeekInfoPlugin],
+    plugins:[verticalLinesPlugin,selectedWeekInfoPlugin,monthBandPlugin],
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:true,position:'bottom',labels:{font:{size:11},boxWidth:20,padding:12}},
-        tooltip:{mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': '+fmt(c.parsed.y)+'%'}}},
-      scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9098a3',maxTicksLimit:22,font:{size:10}},border:{display:false}},
+        tooltip:{mode:'index',intersect:false,callbacks:{title:it=>{if(!it.length)return'';const w=it[0].dataIndex+1,r=wkRange(w);return r?`W${w} · ${r}`:`W${w}`},label:c=>c.dataset.label+': '+fmt(c.parsed.y)+'%'}}},
+      scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9098a3',maxTicksLimit:22,font:{size:10}},border:{display:false},afterFit:sc=>{if(monthGroups.length)sc.height+=MONTH_BAND}},
         y:{min:0,max:100,grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9098a3',callback:v=>v+'%',font:{size:11}},border:{display:false}}}}});
 }
 
