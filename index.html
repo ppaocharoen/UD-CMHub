@@ -10,6 +10,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='white'%3EUD%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='white'%3EUD%3C/text%3E%3C/svg%3E">
 <script data-lib="Chart.js 4.4.1">/* Chart.js 4.4.1 — ฝังในไฟล์เพื่อใช้งานออฟไลน์ (ลิขสิทธิ์ตามสัญญาอนุญาตของไลบรารี) */
 /*!
  * Chart.js v4.4.1
@@ -614,15 +618,16 @@ tr:hover td{background:var(--gray-50)}
     <div class="form-row-4">
       <div><label>วันเริ่มสัญญา</label><input id="f-start" type="date"></div>
       <div><label>วันสิ้นสุดสัญญา</label><input id="f-end" type="date"></div>
-      <div><label>Factor F</label><input id="f-factor" type="number" step="0.001" value="1.302" min="1"></div>
-      <div><label>VAT (%)</label><input id="f-vat" type="number" step="0.01" value="7.00" min="0"></div>
+      <div><label>Factor F</label><input id="f-factor" type="number" step="0.001" value="1.302" min="1" oninput="onContractValInput();updateFormDiscountNote()"></div>
+      <div><label>VAT (%)</label><input id="f-vat" type="number" step="0.01" value="7.00" min="0" oninput="onContractValInput();updateFormDiscountNote()"></div>
     </div>
     <div class="form-row">
       <div><label>อัตราค่าปรับ (%/วัน) <span style="font-weight:400;color:var(--gray-400)">สำหรับคำนวณเงื่อนไขบอกเลิกสัญญา</span></label>
         <input id="f-fine-rate" type="number" step="0.01" value="0.10" min="0" max="1" placeholder="0.10"></div>
       <div><label>วงเงินค่าจ้าง (บาท) <span style="font-weight:400;color:var(--gray-400)">สำหรับคำนวณค่าปรับสูงสุด 10%</span></label>
-        <input id="f-contract-val" type="number" step="1" value="" placeholder="ปกติระบบคำนวณให้อัตโนมัติ"></div>
+        <input id="f-contract-val" type="number" step="0.01" value="" placeholder="ปกติระบบคำนวณให้อัตโนมัติ" oninput="fdDismissed=false;onContractValInput()"></div>
     </div>
+    <div id="f-discount-suggest" style="display:none;font-size:12px;border-radius:var(--radius-sm);padding:9px 12px;margin-top:10px"></div>
     <div style="display:flex;align-items:flex-start;gap:10px;background:var(--amber-light);border:1px solid #f0d9a0;border-radius:var(--radius-sm);padding:10px 14px;margin-top:14px">
       <input type="checkbox" id="f-plan-not-submitted" style="width:16px;height:16px;margin-top:2px;cursor:pointer;flex-shrink:0">
       <div>
@@ -637,6 +642,12 @@ tr:hover td{background:var(--gray-50)}
         <button class="btn-purple btn-sm" type="button" onclick="triggerBoqImport()"><svg class=ic aria-hidden=true><use href=#i-download></use></svg> นำเข้าจาก Excel (ปร.4)</button>
         <button class="btn-secondary btn-sm" type="button" onclick="addProjectItemRow('item-rows')">+ เพิ่มรายการ</button>
       </div>
+    </div>
+    <div id="f-discount-bar" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:12px">
+      <svg class=ic aria-hidden=true><use href=#i-tag></use></svg><span style="font-weight:600">ปรับลดราคาทุกรายการจากราคากลาง</span>
+      <input id="f-discount-pct" type="number" step="0.0001" min="0" max="99.99" placeholder="0" style="width:96px;padding:4px 6px;margin:0;text-align:right" onkeydown="if(event.key==='Enter'){event.preventDefault();applyFormDiscount()}"><span>%</span>
+      <button class="btn-secondary btn-sm" type="button" onclick="applyFormDiscount()">ปรับราคา</button>
+      <span id="f-discount-note" style="color:var(--gray-500);flex-basis:100%"></span>
     </div>
     <div id="boq-import-note" style="display:none;font-size:11px;color:var(--purple);background:var(--purple-light);border:1px solid #d4c8f5;border-radius:6px;padding:6px 10px;margin-bottom:8px"></div>
     <div style="font-size:11px;color:var(--gray-400);margin-bottom:8px">หน้านี้กำหนดเฉพาะชื่อและมูลค่ารายการงาน<span class="help-hint" title="ระยะเวลาและร้อยละความก้าวหน้าตามแผนงาน กำหนดได้ที่หน้า &quot;แผนงาน&quot; ของโครงการ">?</span></div>
@@ -1120,14 +1131,14 @@ tr:hover td{background:var(--gray-50)}
 <div class="modal-overlay" id="modal-price-adjust">
   <div class="modal">
     <div class="modal-title"><svg class=ic aria-hidden=true><use href=#i-tag></use></svg> ปรับราคาตามส่วนลดผู้รับจ้าง</div>
-    <div class="modal-sub">ใช้เมื่อราคาที่นำเข้าจาก BOQ เป็นราคากลาง แต่ผู้รับจ้างเสนอราคาต่ำกว่า ระบบจะปรับ "มูลค่าต้นทุน" ของทุกรายการที่มีอยู่ ณ ตอนนี้ลงตามเปอร์เซ็นต์เดียวกัน (รายการที่เพิ่มภายหลังจะไม่ถูกปรับ และแก้ไขราคาแต่ละรายการเองภายหลังได้อิสระ)</div>
+    <div class="modal-sub">ใช้เมื่อราคาที่นำเข้าจาก BOQ เป็นราคากลาง แต่ผู้รับจ้างเสนอราคาต่ำกว่า ระบบคิดส่วนลดจาก <b>ราคากลาง</b> เสมอ (ปรับซ้ำได้ ไม่ลดทบ) แล้วใช้ราคาหลังลดเป็นมูลค่าจริงทุกส่วน ทั้งแผนเดิมและแผนแก้ไขที่ราคายังตรงกัน แก้ราคาแต่ละรายการเองภายหลังได้อิสระ</div>
     <div style="background:var(--gray-50);border-radius:8px;padding:10px 14px;margin-bottom:10px">
-      <div style="font-size:12px;color:var(--gray-400)">มูลค่าต้นทุนรวมปัจจุบัน (เฉพาะรายการที่มีอยู่ตอนนี้)</div>
+      <div style="font-size:12px;color:var(--gray-400)">ราคากลางรวม (คูณ Factor F / VAT แล้ว) เทียบกับวงเงินค่าจ้าง</div>
       <div style="font-size:18px;font-weight:700" id="pa-current-total">0.00 บาท</div>
     </div>
-    <label style="margin-top:0">วิธีที่ 1: กรอกวงเงินที่ผู้รับจ้างเสนอ (บาท)</label>
+    <label style="margin-top:0">วิธีที่ 1: กรอกวงเงินที่ผู้รับจ้างเสนอ / วงเงินค่าจ้าง (บาท รวม Factor F / VAT)</label>
     <input id="pa-bid-total" type="number" step="0.01" placeholder="เช่น 6,910,000.00" oninput="onPaBidTotalInput()">
-    <label>วิธีที่ 2: หรือกรอกเปอร์เซ็นต์ส่วนลดโดยตรง (%)</label>
+    <label>วิธีที่ 2: หรือกรอกเปอร์เซ็นต์ส่วนลดจากราคากลางโดยตรง (%)</label>
     <input id="pa-pct" type="number" step="0.01" placeholder="เช่น 3.5" oninput="onPaPctInput()">
     <div id="pa-preview" style="display:none;background:#eef6ff;border-radius:8px;padding:10px 14px;margin-top:10px">
       <div style="font-size:12px;color:var(--gray-400)">ตัวอย่างผลลัพธ์</div>
@@ -1156,7 +1167,8 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.3';
+const APP_VERSION='11.4';
+document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
 const STORE_KEY='scurve_v4';
 function load(){try{return JSON.parse(localStorage.getItem(STORE_KEY)||'[]')}catch(e){return[]}}
@@ -2676,7 +2688,16 @@ const MANUAL_SECTIONS=[
 <ul>
 <li>ปุ่มตัวเลขในคอลัมน์ "งานย่อย" ดู/แก้ไขงานย่อยได้ (ใช้คำนวณ % ถ่วงน้ำหนักด้วยมูลค่า)</li>
 <li>ระยะเวลา (W) และ "เริ่ม W ที่" ของแต่ละหมวดตั้งที่ <span class="k"><svg class=ic aria-hidden=true><use href=#i-plan></use></svg> แผนงาน</span> หลังบันทึกโครงการ (ไฟล์ BOQ ไม่มีข้อมูลนี้)</li>
-<li>ถ้าราคาใน BOQ เป็นราคากลาง แต่ผู้รับจ้างเสนอราคาต่ำกว่า ใช้ปุ่ม <span class="k"><svg class=ic aria-hidden=true><use href=#i-tag></use></svg> ปรับราคาตามส่วนลดผู้รับจ้าง</span> (แท็บ "รายการงาน") กรอกวงเงินที่เสนอ หรือ % ส่วนลด ระบบปรับมูลค่าต้นทุนทุกรายการที่มีอยู่ตอนนี้ (รวมราคาต่อหน่วยของงานย่อย) ตามสัดส่วนเดียวกัน</li>
+</ul>
+<h4>ปรับลดราคาจากราคากลาง (ผู้รับจ้างเสนอราคาต่ำกว่า)</h4>
+<ul>
+<li>ราคาที่นำเข้าจาก BOQ คือ <b>ราคากลาง</b> ระบบเก็บไว้อ้างอิงเสมอ ส่วนลดคิดจากราคากลางทุกครั้ง ปรับซ้ำกี่ครั้งก็ไม่ลดทบ</li>
+<li><b>วิธีที่ง่ายที่สุด:</b> กรอก <b>วงเงินค่าจ้าง</b> ในหน้าโครงการใหม่ / แก้ไขโครงการ ระบบเทียบกับราคากลางรวม (คูณ Factor F / VAT แล้ว) และบอกว่าต่ำกว่ากี่ % พร้อมปุ่ม <b>ปรับราคาทุกรายการลง X%</b> หรือกด <b>ไม่ใช้</b></li>
+<li>หรือพิมพ์ % เองในแถบ <span class="k"><svg class=ic aria-hidden=true><use href=#i-tag></use></svg> ปรับลดราคาทุกรายการจากราคากลาง</span> ใต้ปุ่มนำเข้า แล้วกด <b>ปรับราคา</b> (ใส่ 0 = คืนเป็นราคากลาง) — ราคาในรายการและราคาต่อหน่วยของงานย่อยเปลี่ยนทันที กด "บันทึก" เพื่อยืนยัน</li>
+<li>ยังแก้ราคาแต่ละรายการเองได้เหมือนเดิม ถ้าปรับ % ใหม่ภายหลัง ระบบจะถามก่อนว่าจะปรับทับรายการที่แก้เองหรือคงไว้</li>
+<li>ราคาหลังลดคือมูลค่าจริงที่ใช้ทุกส่วน (S-Curve ร้อยละ งวดงาน รายงาน) รวมถึงแผนแก้ไขที่ราคารายการยังเท่าแผนเดิม</li>
+<li>โครงการที่บันทึกแล้วใช้ปุ่ม <span class="k"><svg class=ic aria-hidden=true><use href=#i-tag></use></svg> ปรับราคาตามส่วนลดผู้รับจ้าง</span> ในแท็บ "รายการงาน" ได้ด้วย (กรอกวงเงินรวม Factor F / VAT หรือ %)</li>
+<li>นำเข้า BOQ ใหม่ (รวม BOQ ฉบับแก้ไขสัญญา) ระบบถือราคาในไฟล์เป็นราคาที่ใช้ และตั้งส่วนลดกลับเป็น 0</li>
 </ul>
 <h4>นำเข้า BOQ ฉบับแก้ไข (แก้ไขสัญญา) ในโครงการที่บันทึกความก้าวหน้าไปแล้ว</h4>
 <p>ในหน้า <b>แก้ไขโครงการ</b> กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-download></use></svg> นำเข้าจาก Excel (ปร.4)</span> แล้วเลือกไฟล์ฉบับแก้ไข ระบบจะเปิดหน้า <b>ตรวจการจับคู่</b> แทนการแทนที่ทั้งหมด</p>
@@ -2945,6 +2966,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.4</b> — หน้าโครงการใหม่ / แก้ไขโครงการ: เพิ่มแถบ "ปรับลดราคาทุกรายการจากราคากลาง (%)" ใต้ปุ่มนำเข้า Excel · กรอกวงเงินค่าจ้างแล้วระบบคำนวณ % ที่ต่ำกว่าราคากลาง (รวม Factor F / VAT) และเสนอให้ปรับทั้งหมดในคลิกเดียว · เก็บราคากลางไว้อ้างอิง ส่วนลดคิดจากราคากลางเสมอ (ไม่ลดทบ) · ถามก่อนปรับทับรายการที่แก้ราคาเอง · แก้ปุ่ม "ปรับราคาตามส่วนลดผู้รับจ้าง" ให้เทียบวงเงินกับมูลค่ารวม Factor F / VAT (เดิมเทียบกับต้นทุนก่อนคูณ) และปรับแผนแก้ไขที่ราคาตรงกันตามไปด้วย · แก้บรรทัดพื้นที่จัดเก็บในหน้าโครงการทั้งหมดที่แสดงโค้ดไอคอนแทนสัญลักษณ์</li>
 <li><b>v11.3</b> — บันทึกความก้าวหน้ารายวัน: เพิ่มตัวเลือก "งานอื่นนอกรายการ (พิมพ์รายละเอียดเอง)" ใส่ปริมาณ/หน่วยได้ แสดงในรายงานประจำวันและประจำสัปดาห์ (ไม่นับ % ความก้าวหน้า)</li>
 <li><b>v11.2</b> — เลิกใช้อีโมจิทั้งระบบ เปลี่ยนเป็นชุดไอคอนเส้นที่ออกแบบเฉพาะ (แบบเดียวกับ UD-Cost Hub) ในปุ่ม หัวข้อ ป้ายสถานะ คู่มือ และหน้าพิมพ์ · ข้อความแจ้งเตือน/ยืนยันใช้ตัวอักษรล้วน</li>
 <li><b>v11.1</b> — <svg class=ic aria-hidden=true><use href=#i-cloud></use></svg> เข้าสู่ระบบด้วยบัญชี Google และซิงก์ข้อมูลข้อความของโครงการขึ้นคลาวด์อัตโนมัติ (เปิดเครื่องอื่นเห็นโครงการเดิม · แต่ละบัญชีเห็นเฉพาะของตัวเอง · ถามเมื่อแก้ทั้งสองเครื่อง · ออกจากระบบแล้วล้างข้อมูลในเครื่องได้) · รูป/ไฟล์แนบยังเก็บในเครื่องตามเดิม</li>
@@ -3587,63 +3609,202 @@ function renderScurve(p){
 }
 
 // ── ปรับราคาตามส่วนลดผู้รับจ้าง ────────────────────────────────
-function currentItemsTotal(){
-  const p=projects.find(x=>x.id===currentId);
-  if(!p)return 0;
-  return p.items.reduce((s,it)=>s+(Number(it.value)||0),0);
+// ── v11.4 ราคากลาง / ส่วนลดผู้รับจ้าง ─────────────────────────────
+// ราคากลาง (ราคา BOQ เดิม) เก็บไว้ที่ item.baseValue และงานย่อย baseMat/baseLabor/baseAmount
+// ส่วนลดคิดจากราคากลางเสมอ (ไม่ลดทบ) — ราคาหลังลด (value/matPrice/laborPrice/amount) คือมูลค่าจริงที่ใช้ทุกส่วน
+const r2s=v=>Math.round((Number(v)||0)*100)/100;
+function ensureItemBase(it,pct){
+  pct=Number(pct)||0;
+  const k=1-pct/100,inv=v=>k>0?r2s((Number(v)||0)/k):r2s(v);
+  const force=!pct; // ยังไม่มีส่วนลด → ราคากลาง = ราคาปัจจุบัน (รวมกรณีแก้ราคากลางเอง)
+  if(it.subItems&&it.subItems.length){
+    let sat=0;
+    it.subItems.forEach(x=>{
+      if(force||x.baseMat==null)x.baseMat=inv(x.matPrice);
+      if(force||x.baseLabor==null)x.baseLabor=inv(x.laborPrice);
+      if(force||x.baseAmount==null)x.baseAmount=inv(x.amount);
+      sat+=Math.round(x.baseAmount*100);
+    });
+    if(force||it.baseValue==null)it.baseValue=sat/100;
+  }else if(force||it.baseValue==null)it.baseValue=inv(it.value);
+  return it;
 }
-function openPriceAdjustModal(){
+function discountedValueOf(it,pct){
+  const f=1-pct/100;
+  if(it.subItems&&it.subItems.length)return it.subItems.reduce((s,x)=>s+Math.round(r2s(x.baseAmount*f)*100),0)/100;
+  return r2s(it.baseValue*f);
+}
+function discountItemFromBase(it,pct){
+  const f=1-pct/100;
+  if(it.subItems&&it.subItems.length){
+    let sat=0;
+    it.subItems.forEach(x=>{x.matPrice=r2s(x.baseMat*f);x.laborPrice=r2s(x.baseLabor*f);x.amount=r2s(x.baseAmount*f);sat+=Math.round(x.amount*100)});
+    it.value=sat/100;
+  }else it.value=r2s(it.baseValue*f);
+  return it;
+}
+function isItemPriceEdited(it,pct){return Math.abs((Number(it.value)||0)-discountedValueOf(it,pct))>0.005}
+// ราคากลางรวมหลังคูณ Factor F / VAT (pObj = {factorF,vatRate})
+function baseConTotal(items,pObj){return items.reduce((s,it)=>s+conVal({value:it.baseValue,valueType:it.valueType},pObj),0)}
+// ถามก่อนปรับทับรายการที่แก้ราคาเอง → คืน Set ของรายการที่ให้ข้าม
+function askEditedItems(list,pct){
+  const edited=pct?list.filter(it=>isItemPriceEdited(it,pct)):[];
+  if(!edited.length)return new Set();
+  const names=edited.slice(0,5).map(it=>'• '+(it.name||'(ไม่มีชื่อ)')).join('\n')+(edited.length>5?`\n… และอีก ${edited.length-5} รายการ`:'');
+  const over=confirm(`มี ${edited.length} รายการที่แก้ราคาเองหลังปรับลด ${fmtPct4(pct)}%:\n${names}\n\nกด "ตกลง" = ปรับทับทุกรายการตามราคากลาง\nกด "ยกเลิก" = คงราคาที่แก้เองไว้ ปรับเฉพาะรายการอื่น`);
+  return over?new Set():new Set(edited);
+}
+function fmtPct4(v){return (Math.round((Number(v)||0)*10000)/10000).toLocaleString('th-TH',{maximumFractionDigits:4})}
+// แผนแก้ไขที่คัดลอกรายการไปแล้ว: ถ้าราคายังเท่าของเดิม ให้ใช้ราคาใหม่ตาม (ราคาหลังลดเป็นมูลค่าจริงทุกแผน)
+function propagatePricesToRevisions(p,oldById){
+  const newById={};p.items.forEach(it=>{newById[it.id]=it});
+  (p.revisions||[]).forEach(r=>(r.items||[]).forEach(ri=>{
+    const o=oldById[ri.id],n=newById[ri.id];
+    if(!o||!n||Math.abs((Number(o.value)||0)-(Number(n.value)||0))<0.005)return;
+    if(Math.abs((Number(ri.value)||0)-(Number(o.value)||0))>0.005)return; // แผนนั้นแก้ราคาเอง → ไม่แตะ
+    ri.value=n.value;ri.baseValue=n.baseValue;
+    const ns={};(n.subItems||[]).forEach(x=>{ns[x.id]=x});
+    (ri.subItems||[]).forEach(x=>{const m=ns[x.id];if(!m)return;
+      ['matPrice','laborPrice','amount','baseMat','baseLabor','baseAmount'].forEach(f=>{if(m[f]!=null)x[f]=m[f]});});
+  }));
+}
+const cloneItems=items=>JSON.parse(JSON.stringify(items||[]));
+
+// ── ปุ่ม "ปรับราคาตามส่วนลดผู้รับจ้าง" (แท็บรายการงาน) ──
+function paState(){
   const p=projects.find(x=>x.id===currentId);
-  if(!p)return;
-  if(!p.items.length){toast('ยังไม่มีรายการงาน');return}
-  document.getElementById('pa-current-total').textContent=fmtMoney(currentItemsTotal())+' บาท';
-  document.getElementById('pa-bid-total').value='';
+  if(!p)return null;
+  const items=cloneItems(p.items).map(it=>ensureItemBase(it,p.discountPct||0));
+  return {p,items,baseCon:baseConTotal(items,p)};
+}
+function currentItemsTotal(){const st=paState();return st?st.baseCon:0}
+function openPriceAdjustModal(){
+  const st=paState();
+  if(!st)return;
+  if(!st.p.items.length){toast('ยังไม่มีรายการงาน');return}
+  const cur=totalConVal(st.p.items,st.p),d=st.p.discountPct||0;
+  document.getElementById('pa-current-total').innerHTML=fmtMoney(st.baseCon)+' บาท'
+    +`<div style="font-size:12px;font-weight:400;color:var(--gray-500)">ราคาปัจจุบัน ${fmtMoney(cur)} บาท${d?` (ลดจากราคากลาง ${fmtPct4(d)}%)`:''}</div>`;
+  document.getElementById('pa-bid-total').value=st.p.contractVal&&!d?st.p.contractVal:'';
   document.getElementById('pa-pct').value='';
   document.getElementById('pa-preview').style.display='none';
   document.getElementById('modal-price-adjust').classList.add('open');
+  if(document.getElementById('pa-bid-total').value)onPaBidTotalInput();
 }
 function onPaBidTotalInput(){
-  const total=currentItemsTotal();
-  const bid=Number(document.getElementById('pa-bid-total').value);
-  if(!total||!document.getElementById('pa-bid-total').value){document.getElementById('pa-preview').style.display='none';return}
-  const pct=(total-bid)/total*100;
+  const st=paState();if(!st)return;
+  const raw=document.getElementById('pa-bid-total').value,bid=Number(raw);
+  if(!st.baseCon||!raw){document.getElementById('pa-preview').style.display='none';return}
+  const pct=(st.baseCon-bid)/st.baseCon*100;
   document.getElementById('pa-pct').value=pct.toFixed(4);
-  showPaPreview(pct,total);
+  showPaPreview(pct,st);
 }
 function onPaPctInput(){
-  const total=currentItemsTotal();
-  const pct=Number(document.getElementById('pa-pct').value);
-  if(!total||!document.getElementById('pa-pct').value||isNaN(pct)){document.getElementById('pa-preview').style.display='none';return}
-  document.getElementById('pa-bid-total').value=(total*(1-pct/100)).toFixed(2);
-  showPaPreview(pct,total);
+  const st=paState();if(!st)return;
+  const raw=document.getElementById('pa-pct').value,pct=Number(raw);
+  if(!st.baseCon||!raw||isNaN(pct)){document.getElementById('pa-preview').style.display='none';return}
+  document.getElementById('pa-bid-total').value=(st.baseCon*(1-pct/100)).toFixed(2);
+  showPaPreview(pct,st);
 }
-function showPaPreview(pct,total){
-  const newTotal=total*(1-pct/100);
-  const p=projects.find(x=>x.id===currentId);
+function showPaPreview(pct,st){
+  st=st&&st.items?st:paState();
+  const sim=cloneItems(st.items).map(it=>discountItemFromBase(it,pct));
+  const newTotal=totalConVal(sim,st.p);
   document.getElementById('pa-preview').style.display='';
-  document.getElementById('pa-preview-text').innerHTML=`${pct>=0?'ลดลง':'เพิ่มขึ้น'} <b>${fmt(Math.abs(pct))}%</b> จาก ${fmtMoney(total)} บาท → เหลือ <b>${fmtMoney(newTotal)}</b> บาท (เฉพาะรายการที่มีอยู่ตอนนี้ ${p?p.items.length:0} รายการ)`;
+  document.getElementById('pa-preview-text').innerHTML=`${pct>=0?'ลดลง':'เพิ่มขึ้น'} <b>${fmtPct4(Math.abs(pct))}%</b> จากราคากลาง ${fmtMoney(st.baseCon)} บาท → เหลือ <b>${fmtMoney(newTotal)}</b> บาท (รวม Factor F / VAT · ปัดเศษรายสตางค์ทีละรายการ · ${st.p.items.length} รายการ)`;
 }
 function applyPriceAdjust(){
   const p=projects.find(x=>x.id===currentId);
   if(!p)return;
-  const pct=Number(document.getElementById('pa-pct').value);
-  if(!document.getElementById('pa-pct').value||isNaN(pct)){toast('กรุณากรอกวงเงินที่เสนอ หรือเปอร์เซ็นต์ส่วนลด');return}
-  if(!confirm(`ยืนยันปรับราคาลง ${fmt(pct)}% สำหรับรายการงานทั้งหมด ${p.items.length} รายการที่มีอยู่ตอนนี้?\n(รายการที่เพิ่มภายหลังจะไม่ถูกปรับ และยังแก้ไขราคาแต่ละรายการเองได้อิสระในภายหลัง)`))return;
-  const f=1-pct/100,r2=v=>Math.round((Number(v)||0)*f*100)/100;
-  p.items.forEach(it=>{
-    if(it.subItems&&it.subItems.length){
-      // ลดราคาต่อหน่วยและมูลค่างานย่อยด้วย — ไม่เช่นนั้นเปิดแก้งานย่อยแล้วกดบันทึก ยอดหมวดจะกลับเป็นราคากลาง
-      let sat=0;
-      it.subItems.forEach(si=>{si.matPrice=r2(si.matPrice);si.laborPrice=r2(si.laborPrice);si.amount=r2(si.amount);sat+=Math.round(si.amount*100)});
-      it.value=sat/100;
-    }else it.value=r2(it.value);
-  });
+  const raw=document.getElementById('pa-pct').value,pct=Number(raw);
+  if(!raw||isNaN(pct)){toast('กรุณากรอกวงเงินที่เสนอ หรือเปอร์เซ็นต์ส่วนลด');return}
+  if(pct>=100){toast('เปอร์เซ็นต์ส่วนลดต้องน้อยกว่า 100');return}
+  if(!confirm(`ยืนยันปรับราคาทุกรายการ (${p.items.length} รายการ) เป็น ราคากลาง ลด ${fmtPct4(pct)}% ?\n(คิดจากราคากลางเสมอ ไม่ลดทบจากราคาปัจจุบัน)`))return;
+  const oldById={};cloneItems(p.items).forEach(it=>{oldById[it.id]=it});
+  p.items.forEach(it=>ensureItemBase(it,p.discountPct||0));
+  const skip=askEditedItems(p.items,p.discountPct||0);
+  p.items.forEach(it=>{if(!skip.has(it))discountItemFromBase(it,pct)});
+  p.discountPct=pct;
+  propagatePricesToRevisions(p,oldById);
   save(projects);
   closeModal('modal-price-adjust');
   renderItemsTab(p);
   renderScurve(p);
   renderMetrics(p);
-  toast(`ปรับราคาลง ${fmt(pct)}% ในรายการงาน ${p.items.length} รายการแล้ว`);
+  toast(`ปรับราคาเป็นราคากลาง ลด ${fmtPct4(pct)}% แล้ว (${p.items.length-skip.size} รายการ)`);
+}
+
+// ── ฟอร์มโครงการใหม่ / แก้ไขโครงการ ──
+let formDiscountPct=0,fdDismissed=false;
+function fdPObj(){return {factorF:parseFloat(document.getElementById('f-factor').value)||1,vatRate:parseFloat(document.getElementById('f-vat').value)||7}}
+function fdRows(){return [...document.querySelectorAll('#item-rows .item-row')].filter(r=>r.querySelector('[data-field=name]').value.trim()||parseFloat(r.querySelector('[data-field=value]').value))}
+function rowToItem(row){
+  let subItems=[];try{subItems=JSON.parse(row.dataset.subItems||'[]')}catch(e){}
+  const it={name:row.querySelector('[data-field=name]').value.trim(),
+    value:parseFloat(row.querySelector('[data-field=value]').value)||0,
+    valueType:row.querySelector('[data-field=valueType]').value||'factorF',subItems};
+  if(row.dataset.baseValue!=null&&row.dataset.baseValue!=='')it.baseValue=Number(row.dataset.baseValue);
+  return it;
+}
+function itemToRow(row,it){
+  row.querySelector('[data-field=value]').value=Number(it.value||0).toFixed(2);
+  row.dataset.baseValue=it.baseValue;
+  row.dataset.subItems=JSON.stringify(it.subItems||[]);
+}
+function fdItems(){return fdRows().map(r=>ensureItemBase(rowToItem(r),formDiscountPct))}
+function applyFormDiscount(pctArg){
+  const inp=document.getElementById('f-discount-pct');
+  const pct=pctArg!=null?Number(pctArg):(inp.value===''?0:Number(inp.value));
+  if(isNaN(pct)||pct<0||pct>=100){toast('ระบุเปอร์เซ็นต์ส่วนลด 0 ถึงน้อยกว่า 100');return}
+  const rows=fdRows();
+  if(!rows.length){toast('ยังไม่มีรายการงาน — นำเข้าจาก Excel หรือเพิ่มรายการก่อน');return}
+  const pairs=rows.map(r=>({row:r,it:ensureItemBase(rowToItem(r),formDiscountPct)}));
+  const skip=askEditedItems(pairs.map(x=>x.it),formDiscountPct);
+  pairs.forEach(x=>{if(!skip.has(x.it))discountItemFromBase(x.it,pct);itemToRow(x.row,x.it)});
+  formDiscountPct=pct;
+  inp.value=pct?String(Math.round(pct*1e6)/1e6):'';
+  updateFormDiscountNote();onContractValInput();
+  toast(pct?`ปรับราคาทุกรายการเป็น ราคากลาง ลด ${fmtPct4(pct)}% แล้ว (ยังไม่บันทึก)`:'คืนราคาทุกรายการเป็นราคากลางแล้ว (ยังไม่บันทึก)');
+}
+function updateFormDiscountNote(){
+  const el=document.getElementById('f-discount-note');if(!el)return;
+  const items=fdItems();
+  if(!items.length){el.textContent='';return}
+  const po=fdPObj(),bc=baseConTotal(items,po),cur=totalConVal(items,po);
+  el.textContent=formDiscountPct
+    ?`ราคาในรายการ = ราคากลาง ลด ${fmtPct4(formDiscountPct)}% · ราคากลางรวม ${fmtMoney(bc)} บาท → หลังลด ${fmtMoney(cur)} บาท (รวม Factor F / VAT) · ยังแก้ราคาแต่ละรายการเองได้`
+    :`ราคาในรายการ = ราคากลาง · รวม ${fmtMoney(cur)} บาท (รวม Factor F / VAT)`;
+}
+function onContractValInput(){
+  const box=document.getElementById('f-discount-suggest');if(!box)return;
+  const raw=document.getElementById('f-contract-val').value,bid=Number(raw);
+  const items=fdItems(),po=fdPObj(),bc=baseConTotal(items,po);
+  if(!raw||!bid||!bc||fdDismissed){box.style.display='none';return}
+  const pct=Math.round((bc-bid)/bc*100*1e6)/1e6;
+  const cur=totalConVal(items,po);
+  box.style.display='block';
+  const set=(bg,bd,col)=>{box.style.background=bg;box.style.border='1px solid '+bd;box.style.color=col};
+  if(Math.abs(pct-formDiscountPct)<0.00005){
+    set('var(--green-light,#e8f5ee)','#b9dfc9','#1d6b45');
+    box.innerHTML=`<svg class=ic aria-hidden=true><use href=#i-tag></use></svg> ราคารายการตรงกับวงเงินค่าจ้างแล้ว — ราคากลาง${pct?` ลด ${fmtPct4(pct)}%`:''} · รวมหลังปัดเศษ ${fmtMoney(cur)} บาท${Math.abs(cur-bid)>=0.01?` (ต่างจากวงเงิน ${fmtMoney(cur-bid)} บาท จากการปัดเศษรายสตางค์)`:''}`;
+    return;
+  }
+  if(pct<0){
+    set('var(--amber-light)','#f0d9a0','#7a5200');
+    box.innerHTML=`<svg class=ic aria-hidden=true><use href=#i-alert></use></svg> วงเงินค่าจ้างสูงกว่าราคากลาง ${fmtPct4(-pct)}% (ราคากลางรวม Factor F / VAT = ${fmtMoney(bc)} บาท) — ตรวจตัวเลขอีกครั้ง ระบบไม่ปรับราคาให้`;
+    return;
+  }
+  const sim=items.map(it=>discountItemFromBase(JSON.parse(JSON.stringify(it)),pct));
+  const after=totalConVal(sim,po);
+  set('#eef6ff','#c7dcf5','#1f4e85');
+  box.innerHTML=`<div><svg class=ic aria-hidden=true><use href=#i-tag></use></svg> วงเงินค่าจ้างต่ำกว่าราคากลาง <b>${fmtPct4(pct)}%</b> (ราคากลางรวม Factor F / VAT = ${fmtMoney(bc)} บาท) — ปรับราคาทุกรายการลงตามนี้หรือไม่? หลังปรับรวม ${fmtMoney(after)} บาท</div>`
+    +`<div style="margin-top:6px;display:flex;gap:6px"><button class="btn-primary btn-sm" type="button" onclick="applyFormDiscount(${pct})">ปรับราคาทุกรายการลง ${fmtPct4(pct)}%</button>`
+    +`<button class="btn-secondary btn-sm" type="button" onclick="fdDismissed=true;onContractValInput()">ไม่ใช้</button></div>`;
+}
+function resetFormDiscountUI(pct){
+  formDiscountPct=Number(pct)||0;fdDismissed=false;
+  document.getElementById('f-discount-pct').value=formDiscountPct?String(formDiscountPct):'';
+  updateFormDiscountNote();onContractValInput();
 }
 function renderItemsTab(p){
   const dw=getDisplayWeek(p);
@@ -4175,7 +4336,7 @@ async function renderStorageUsage(){
   const pct=Math.round(textAll/LOCALSTORAGE_LIMIT_CHARS*100);
   const color=pct>=85?'var(--red,#c0392b)':pct>=60?'#b9770e':'inherit';
   const line2=`<div style="color:${color}"><svg class=ic aria-hidden=true><use href=#i-database></use></svg> ข้อมูลข้อความของโครงการ (localStorage): ${(textAll/1e6).toFixed(2)} ล้านตัวอักษร จากเพดานประมาณ 5 ล้าน (${pct}%)${pct>=85?' — ใกล้เต็ม กรุณาสำรองข้อมูลและแจ้งผู้พัฒนา':''}</div>`;
-  el.innerHTML=(line1?`<div>${escH(line1)}</div>`:'')+line2+'<div id="storage-usage-detail"></div>';
+  el.innerHTML=(line1?`<div>${line1}</div>`:'')+line2+'<div id="storage-usage-detail"></div>';
   const det=document.getElementById('storage-usage-detail');
   try{
     const rows=[];
@@ -5593,6 +5754,7 @@ function bmApply(){
     +`• หมวดงาน ${S.cats.length} หมวด (ใหม่ ${newItemIds.length} · ตัดออก ${remItems.length}) · งานย่อยใหม่ ${nNewSub} · งานย่อยตัดออก ${remSubs.length}\n`
     +`• ตอนกดบันทึก ระบบดาวน์โหลดไฟล์สำรองโครงการ (ก่อนนำเข้า) ให้ 1 ไฟล์ แล้วปรับทุกแผน งวดงาน % ความก้าวหน้า และบันทึกรายวันตาม BOQ ใหม่\n\n`+buildBoqImportNote(S.cats);
   closeModal('modal-boq-match');_bm=null;
+  resetFormDiscountUI(0);
   toast('จับคู่แล้ว — ตรวจรายการ แล้วกด "บันทึก" เพื่อยืนยัน');
 }
 function downloadProjectBackup(p,tag){
@@ -6193,12 +6355,14 @@ function saveSubItemsModal(){
   if(!subItemsTargetRow)return;
   const rows=document.querySelectorAll('#subi-rows tr');
   const items=[];
+  const prevById={};try{JSON.parse(subItemsTargetRow.dataset.subItems||'[]').forEach(x=>{prevById[x.id]=x})}catch(e){}
   rows.forEach(tr=>{
     const name=tr.querySelector('[data-f=name]').value.trim();
     if(!name)return;
     let schedule;
     try{const s=JSON.parse(tr.dataset.schedule||'[]');schedule=s.length?s:undefined;}catch(e){schedule=undefined;}
     items.push({
+      ...(prevById[tr.dataset.id]||{}), // คงฟิลด์อื่นไว้ (ราคากลาง baseMat/baseLabor/baseAmount ฯลฯ)
       id:tr.dataset.id,
       name,
       group:tr.querySelector('[data-f=group]').value.trim()||null,
@@ -6258,6 +6422,7 @@ function handleBoqImport(e){
       note.style.display='block';
       note.style.whiteSpace='pre-line';
       note.textContent=buildBoqImportNote(categories);
+      resetFormDiscountUI(0);
       toast(`นำเข้า BOQ สำเร็จ: ${categories.length} หมวดงาน`);
     }catch(err){alert('ไม่สามารถอ่านไฟล์ Excel ได้: '+err.message)}
   };
@@ -6428,6 +6593,7 @@ function showNewProject(){
   document.getElementById('f-plan-not-submitted').checked=false;
   document.getElementById('item-rows').innerHTML='';
   addProjectItemRow('item-rows');addProjectItemRow('item-rows');addProjectItemRow('item-rows');
+  resetFormDiscountUI(0);
   document.getElementById('modal-project').classList.add('open');
 }
 function showEditProject(){
@@ -6449,6 +6615,7 @@ function showEditProject(){
   document.getElementById('f-plan-not-submitted').checked=!!p.planNotSubmitted;
   document.getElementById('item-rows').innerHTML='';
   p.items.forEach(item=>addProjectItemRow('item-rows',item));
+  resetFormDiscountUI(p.discountPct||0);
   document.getElementById('modal-project').classList.add('open');
 }
 function saveProject(){
@@ -6476,8 +6643,10 @@ function saveProject(){
       startPeriod:prev?prev.startPeriod:1,
       schedule:prev?prev.schedule:undefined,
       needsPlan:row.dataset.needsPlan==='1'?true:undefined,
+      baseValue:row.dataset.baseValue!=null&&row.dataset.baseValue!==''?Number(row.dataset.baseValue):undefined,
       subItems:subItems.length?subItems:undefined});
   });
+  items.forEach(it=>ensureItemBase(it,formDiscountPct));
   if(!items.length){alert('กรุณาเพิ่มรายการงานอย่างน้อย 1 รายการ');return}
   const proj={
     ...(old||{}), // เก็บฟิลด์เดิมทั้งหมดไว้ก่อน (reportSignoff, location, dailyReports, weekPhotos, completedDate, installments ฯลฯ) กันหายตอนแก้ไข
@@ -6490,6 +6659,7 @@ function saveProject(){
     fineRate:(v=>isNaN(v)?0.10:v)(parseFloat(document.getElementById('f-fine-rate').value)),
     contractVal:parseFloat(document.getElementById('f-contract-val').value)||0,
     planNotSubmitted:document.getElementById('f-plan-not-submitted').checked,
+    discountPct:formDiscountPct||0,
     startDate,endDate,unit:'week',items,
     history:old?old.history||[]:[],
     revisions:old?old.revisions||[]:[],
@@ -6500,7 +6670,7 @@ function saveProject(){
     downloadProjectBackup(old,'ก่อนนำเข้าBOQ');
     applyBoqRemap(proj,boqRemapPending);
     boqRemapPending=null;
-  }
+  }else if(old)propagatePricesToRevisions(proj,oldItemsById);
   if(editingId)projects=projects.map(p=>p.id===editingId?proj:p);
   else projects.push(proj);
   save(projects);
@@ -6523,6 +6693,7 @@ function addProjectItemRow(containerId,item=null){
   div.dataset.id=rowId;
   div.dataset.subItems=JSON.stringify(subItems);
   if(item&&item.needsPlan)div.dataset.needsPlan='1';
+  if(item&&item.baseValue!=null)div.dataset.baseValue=item.baseValue;
   div.innerHTML=`
     <input type="text" placeholder="ชื่อรายการงาน" value="${escH(item?item.name:'')}" data-field="name">
     <input type="number" placeholder="0.00" value="${item?Number(item.value||0).toFixed(2):''}" data-field="value" min="0" step="0.01" style="text-align:right">
