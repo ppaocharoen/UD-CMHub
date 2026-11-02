@@ -2,11 +2,16 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://www.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' data: blob: https://*.googleapis.com https://www.gstatic.com https://apis.google.com https://ud-cm-hub.firebaseapp.com; frame-src 'self' blob: https://ud-cm-hub.firebaseapp.com https://accounts.google.com https://apis.google.com; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UD-CM Hub | ระบบบริหารงานก่อสร้าง เทศบาลนครอุดรธานี</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0f766e">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='white'%3EUD%3C/text%3E%3C/svg%3E">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='white'%3EUD%3C/text%3E%3C/svg%3E">
@@ -298,6 +303,13 @@ tr:hover td{background:var(--gray-50)}
 .bk-menu button{display:block;width:100%;text-align:left;background:none;padding:8px 10px;border-radius:6px;font-size:13px;color:var(--gray-800)}
 .bk-menu button:hover{background:var(--gray-100)}
 .bk-note{font-size:11px;color:var(--gray-400);margin-left:4px}
+.cl-adm-row{display:grid;grid-template-columns:1.3fr 1.2fr 1.4fr 110px 190px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100);font-size:12.5px}
+.cl-adm-row .sub{font-size:11px;color:var(--gray-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cl-adm-row .acts{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.cl-adm-tabs{display:flex;gap:6px;margin:4px 0 8px;flex-wrap:wrap}
+.cl-st{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:10px;font-weight:600}
+.cl-st.pending{background:var(--amber-light);color:#7a5200}.cl-st.approved{background:#e3f3ea;color:#1d6b45}.cl-st.rejected,.cl-st.suspended{background:#fbe9e9;color:#a23b3b}
+@media(max-width:700px){.cl-adm-row{grid-template-columns:1fr 1fr}.cl-adm-row .acts{grid-column:1/-1;justify-content:flex-start}}
 .bk-hint{font-size:11px;color:var(--gray-400);padding:0 10px 6px}
 .bk-sep{font-size:10.5px;font-weight:600;color:var(--gray-400);padding:8px 10px 2px;border-top:1px solid var(--gray-100);margin-top:2px}
 /* ── คู่มือในระบบ ── */
@@ -1140,6 +1152,32 @@ tr:hover td{background:var(--gray-50)}
 </div>
 
 <!-- MODAL: Price Adjust -->
+<div class="modal-overlay" id="modal-cl-register">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title"><svg class=ic aria-hidden=true><use href=#i-cloud></use></svg> ลงทะเบียนใช้งานคลาวด์</div>
+    <div class="modal-sub" id="clr-sub">กรอกข้อมูลผู้ใช้งาน แล้วรอผู้ดูแลระบบอนุมัติ — ระหว่างรอ ใช้งานระบบในเครื่องนี้ได้ตามปกติ แต่ยังซิงก์ข้อมูลขึ้นคลาวด์ไม่ได้</div>
+    <div style="font-size:12px;color:var(--gray-500);margin-bottom:6px">บัญชี: <b id="clr-email"></b></div>
+    <label style="margin-top:0">ชื่อ - นามสกุล *</label><input id="clr-name" type="text" maxlength="100" autocomplete="name">
+    <label>ตำแหน่ง *</label><input id="clr-position" type="text" maxlength="100" placeholder="เช่น วิศวกรโยธาชำนาญการ">
+    <label>หน่วยงาน *</label><input id="clr-org" type="text" maxlength="150" placeholder="เช่น ส่วนควบคุมการก่อสร้าง สำนักช่าง เทศบาลนครอุดรธานี">
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-cl-register')">ภายหลัง</button>
+      <button class="btn-primary" id="clr-save" onclick="clSubmitProfile()">ส่งคำขอใช้งาน</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-cl-admin">
+  <div class="modal modal-lg">
+    <div class="modal-title"><svg class=ic aria-hidden=true><use href=#i-settings></use></svg> ผู้ดูแลระบบ: อนุมัติผู้ใช้งานคลาวด์</div>
+    <div class="modal-sub">ผู้ใช้ที่อนุมัติแล้วซิงก์ข้อมูลโครงการของตัวเองขึ้นคลาวด์ได้ (แต่ละคนเห็นเฉพาะข้อมูลของตัวเอง) · ระงับ = หยุดการซิงก์ทันที ข้อมูลบนคลาวด์ของผู้ใช้ยังอยู่</div>
+    <div class="cl-adm-tabs" id="cla-tabs"></div>
+    <div id="cla-list" style="max-height:60vh;overflow:auto"></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="clAdminLoad()"><svg class=ic aria-hidden=true><use href=#i-refresh></use></svg> โหลดใหม่</button>
+      <button class="btn-primary" onclick="closeModal('modal-cl-admin')">ปิด</button>
+    </div>
+  </div>
+</div>
 <div class="modal-overlay" id="modal-price-adjust">
   <div class="modal">
     <div class="modal-title"><svg class=ic aria-hidden=true><use href=#i-tag></use></svg> ปรับราคาตามส่วนลดผู้รับจ้าง</div>
@@ -1179,7 +1217,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.6';
+const APP_VERSION='11.7';
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
 const STORE_KEY='scurve_v4';
@@ -1539,7 +1577,38 @@ function docItemAlertInfo(p,T,d){
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function fmt(n,d=2){return(isNaN(n)||n===null||n===undefined)?'0.00':Number(n).toFixed(d)}
 function fmtMoney(n){return isNaN(Number(n))?'0.00':Number(n||0).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+// v11.7 สำหรับค่าที่อยู่ในสตริง JS ภายใน onclick="f('...')" — escH ไม่พอ (เบราว์เซอร์ถอด &#39; กลับเป็น ' ก่อนรัน JS)
+function escJ(s){return String(s??'').replace(/[\\'"<>&`\r\n\u2028\u2029]/g,c=>'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0'))}
+// v11.7 ตรวจข้อมูลโครงการจากไฟล์/โฟลเดอร์/คลาวด์ก่อนรับเข้า: รหัส (id) และคีย์ต้องไม่มีอักขระที่ใช้แทรกโค้ดได้
+const UNSAFE_ID_RE=/[<>"'`\\&\r\n\u2028\u2029]/;
+function projectUnsafeReason(p){
+  if(!p||typeof p!=='object')return 'ไม่ใช่ข้อมูลโครงการ';
+  let bad=null,n=0;
+  const walk=(o,k,depth)=>{
+    if(bad||depth>40)return;
+    if(++n>2000000){bad='ข้อมูลใหญ่ผิดปกติ';return}
+    if(typeof o==='string'){
+      if((/(^id$|Id$|^key$|^metaKey$)/.test(k)||k==='[photo]')&&UNSAFE_ID_RE.test(o))bad=`รหัส "${k}" มีอักขระไม่อนุญาต`;
+      return;
+    }
+    if(Array.isArray(o)){o.forEach(x=>walk(x,k==='weekPhotos'||k==='[photo]'?'[photo]':k,depth+1));return}
+    if(o&&typeof o==='object'){
+      for(const kk of Object.keys(o)){
+        if(kk==='__proto__'||kk==='constructor'||kk==='prototype'||UNSAFE_ID_RE.test(kk)){bad=`คีย์ข้อมูลไม่อนุญาต`;return}
+        walk(o[kk],k==='weekPhotos'?'[photo]':kk,depth+1);
+      }
+    }
+  };
+  walk(p,'',0);
+  return bad;
+}
+function filterSafeProjects(list,srcLabel){
+  const ok=[],rej=[];
+  (list||[]).forEach(p=>{const r=projectUnsafeReason(p);if(r)rej.push((p&&typeof p.name==='string'?p.name.slice(0,60):'(ไม่มีชื่อ)')+' — '+r);else ok.push(p)});
+  if(rej.length)alert(`ไม่รับข้อมูล ${rej.length} โครงการจาก${srcLabel||'ไฟล์'} เพราะรูปแบบข้อมูลผิดปกติ (อาจถูกแก้ไขมาเพื่อแทรกโค้ด):\n- `+rej.join('\n- ')+'\n\nถ้าไฟล์นี้ได้มาจากคนอื่น อย่าใช้ไฟล์นี้');
+  return ok;
+}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
 function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active')}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
@@ -1952,7 +2021,7 @@ function renderList(){
         <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
           ${revCount?`<span class="badge badge-rev">Rev.${revCount}</span>`:''}
           <span class="badge ${bc}">${bt}</span>
-          <button class="btn-icon" title="คัดลอกโครงการ" onclick="event.stopPropagation();duplicateProject('${p.id}')" style="padding:3px 5px;font-size:12px">⧉</button>
+          <button class="btn-icon" title="คัดลอกโครงการ" onclick="event.stopPropagation();duplicateProject('${escJ(p.id)}')" style="padding:3px 5px;font-size:12px">⧉</button>
         </div>
       </div>
       <div class="proj-card-sub">${escH(p.owner||'')} · ${fmtMoney(tv)} บาท</div>
@@ -2186,7 +2255,7 @@ const UDCM_FIREBASE_CONFIG={apiKey:"AIzaSyCqcTpqm8BlqkC_eIfTyTN9q3T2LhNl5B4",aut
 const FB_SDK_VER='10.14.1';
 const CL_META_KEY='udcm_cloud_meta',CL_ON_KEY='udcm_cloud_on',CL_DEV_KEY='udcm_device';
 const CL_PART=250000; // ตัวอักษรต่อส่วน (ไทย 3 ไบต์/ตัว → ไม่เกิน ~750KB < เพดาน 1MB ต่อเอกสาร)
-var _cl={ready:false,user:null,db:null,status:'off',msg:'',timer:null,running:false,again:false,lastAt:0,lastPull:0,remoteCount:0,queue:[]};
+var _cl={access:'',profile:null,isAdmin:false,lastAccessCheck:0,adminList:[],adminTab:'pending',ready:false,user:null,db:null,status:'off',msg:'',timer:null,running:false,again:false,lastAt:0,lastPull:0,remoteCount:0,queue:[]};
 function clConfigured(){return !!UDCM_FIREBASE_CONFIG}
 function clAvailable(){return clConfigured()&&/^https?:$/.test(location.protocol)}
 function clMeta(){try{const m=JSON.parse(localStorage.getItem(CL_META_KEY)||'{}');m.p=m.p||{};m.localOnly=m.localOnly||{};return m}catch(e){return{p:{},localOnly:{}}}}
@@ -2237,13 +2306,38 @@ async function clLogin(){
     alert('เข้าสู่ระบบไม่สำเร็จ: '+(e.message||e));
   }
 }
+// ── v11.7 สิทธิ์ใช้งานคลาวด์: ลงทะเบียน (ชื่อ/ตำแหน่ง/หน่วยงาน) → ผู้ดูแลอนุมัติ ──
+// profiles/{uid} = {name,position,org,email,status:'pending'|'approved'|'rejected'|'suspended',createdAt,updatedAt,decidedAt,decidedBy}
+// บังคับสิทธิ์จริงที่ Firestore Rules (ผู้ใช้ที่ยังไม่อนุมัติอ่าน/เขียน users/{uid} ไม่ได้) — ฝั่งแอปแค่แสดงสถานะ
+const CL_ADMINS=['patcharapol.pao@gmail.com'];
+const CL_STATUS_LBL={pending:'รออนุมัติ',approved:'อนุมัติแล้ว',rejected:'ไม่อนุมัติ',suspended:'ระงับการใช้งาน',none:'ยังไม่ลงทะเบียน'};
+function clIsAdminUser(u){return !!u&&CL_ADMINS.includes(String(u.email||'').toLowerCase())&&u.emailVerified!==false}
+function clProfRef(uid){return _cl.db.collection('profiles').doc(uid||_cl.user.uid)}
+async function clCheckAccess(){
+  const u=_cl.user;if(!u)return;
+  _cl.isAdmin=clIsAdminUser(u);_cl.lastAccessCheck=Date.now();
+  if(_cl.isAdmin){_cl.access='ok';return}
+  try{const d=await clProfRef(u.uid).get();_cl.profile=d.exists?d.data():null}
+  catch(e){_cl.access='error';_cl.msg='ตรวจสถานะการอนุมัติไม่ได้: '+(e.message||e);return}
+  const st=_cl.profile?(_cl.profile.status||'pending'):'none';
+  _cl.access=st==='approved'?'ok':st;
+}
 async function clOnAuth(u){
-  _cl.user=u;
+  _cl.user=u;_cl.access='';_cl.profile=null;_cl.isAdmin=false;
   if(!u){_cl.status='off';clRenderButton();return}
   try{localStorage.setItem(CL_ON_KEY,'1')}catch(e){}
   const m=clMeta();
   if(m.uid!==u.uid){clSaveMeta({uid:u.uid,p:{},localOnly:{},firstDone:false})} // บัญชีใหม่บนเครื่องนี้ → ยังไม่เคยซิงก์กับบัญชีนี้
+  _cl.status='connecting';clRenderButton();
+  await clCheckAccess();
+  if(_cl.access!=='ok'){
+    _cl.status='blocked';clRenderButton();
+    if(_cl.access==='none')clOpenRegister();
+    return;
+  }
+  _cl.status='ok';
   await clSyncNow();
+  if(_cl.isAdmin)clAdminCountPending();
 }
 function clRef(){return _cl.db.collection('users').doc(_cl.user.uid).collection('projects')}
 async function clReadJson(id,d){
@@ -2285,6 +2379,10 @@ function clOnDelete(p){
 // ซิงก์: ดึงรายการบนคลาวด์ → เทียบทีละโครงการ → ดึงลง / ส่งขึ้น / ถามเมื่อแก้ทั้งสองฝั่ง
 async function clSyncNow(){
   if(!_cl.user||!_cl.db)return;
+  if(_cl.access!=='ok'){ // ยังไม่อนุมัติ → ไม่ซิงก์ (ตรวจสถานะใหม่ได้ไม่เกินทุก 60 วินาที)
+    if(Date.now()-_cl.lastAccessCheck>60000){await clCheckAccess();if(_cl.access==='ok'){_cl.status='ok';toast('บัญชีได้รับอนุมัติแล้ว — เริ่มซิงก์ข้อมูล');return clSyncNow()}}
+    _cl.status='blocked';clRenderButton();return;
+  }
   if(_cl.running){_cl.again=true;return}
   _cl.running=true;_cl.status='syncing';clRenderButton();
   try{
@@ -2324,7 +2422,7 @@ async function clSyncNow(){
         }
         const j=await clReadJson(id,R); // โครงการใหม่จากเครื่องอื่น (หรือแก้หลังเราลบ → เก็บไว้ ไม่ทิ้งข้อมูล)
         if(!j)continue;
-        const p=JSON.parse(j);local.push(p);byId[id]=p;m.p[id]={rev:rRev,hash:clHash(JSON.stringify(p))};changedLocal=true;pulledNames.push(p.name);continue;
+        const p=JSON.parse(j);if(projectUnsafeReason(p))continue;local.push(p);byId[id]=p;m.p[id]={rev:rRev,hash:clHash(JSON.stringify(p))};changedLocal=true;pulledNames.push(p.name);continue;
       }
       if(!L)continue;
       if(R.deleted){
@@ -2340,7 +2438,7 @@ async function clSyncNow(){
       if(j===null)continue;
       if(!M&&j===lj){m.p[id]={rev:rRev,hash:lh};continue} // ข้อมูลเหมือนกันอยู่แล้ว
       if(M&&!dirty){ // เครื่องอื่นแก้ เครื่องนี้ไม่ได้แก้ → ดึงลง
-        const p=JSON.parse(j);local=local.map(x=>x.id===id?p:x);byId[id]=p;m.p[id]={rev:rRev,hash:clHash(JSON.stringify(p))};changedLocal=true;pulledNames.push(p.name);continue;
+        const p=JSON.parse(j);if(projectUnsafeReason(p))continue;local=local.map(x=>x.id===id?p:x);byId[id]=p;m.p[id]={rev:rRev,hash:clHash(JSON.stringify(p))};changedLocal=true;pulledNames.push(p.name);continue;
       }
       conflicts.push({id,L,R,j}); // แก้ทั้งสองฝั่ง
     }
@@ -2355,6 +2453,7 @@ async function clSyncNow(){
     _cl.status=e&&e.offline?'offline':'error';
     _cl.msg=e&&e.offline?'ออฟไลน์ — จะซิงก์เมื่อกลับมาออนไลน์':(e&&e.code==='permission-denied'?'ไม่มีสิทธิ์เขียนข้อมูล (ตรวจ Firestore Rules)':(e&&e.message)||String(e));
     console.warn('cloud sync',e);
+    if(e&&e.code==='permission-denied'&&!_cl.isAdmin){_cl.lastAccessCheck=0;clCheckAccess().then(()=>{if(_cl.access!=='ok'){_cl.status='blocked';clRenderButton()}})} // v11.7 ถูกระงับ/ยกเลิกอนุมัติ
   }finally{
     _cl.running=false;clRenderButton();
     if(_cl.again){_cl.again=false;setTimeout(clSyncNow,300)}
@@ -2421,13 +2520,16 @@ async function clLogout(){
   try{localStorage.removeItem(CL_ON_KEY)}catch(e){}
   if(clear){
     const m=clMeta();
-    const keep=load().filter(p=>!m.p[p.id]); // เก็บเฉพาะโครงการที่ไม่ได้ซิงก์ (กันข้อมูลหาย)
+    const all=load();
+    const keep=all.filter(p=>!m.p[p.id]); // เก็บเฉพาะโครงการที่ไม่ได้ซิงก์ (กันข้อมูลหาย)
+    const removedBlobIds=all.filter(p=>m.p[p.id]).flatMap(collectProjectBlobIds);
     localStorage.setItem(STORE_KEY,JSON.stringify(keep));
     clSaveMeta({p:{},localOnly:{}});
     projects=keep;goList();
+    deleteBlobsIfUnused(removedBlobIds); // v11.7 ลบรูป/ไฟล์แนบของโครงการที่ลบออกจากเครื่องด้วย
     toast(keep.length?`ออกจากระบบแล้ว · เหลือโครงการที่ไม่ได้ซิงก์ ${keep.length} โครงการในเครื่องนี้`:'ออกจากระบบและลบข้อมูลในเครื่องนี้แล้ว');
   }else toast('ออกจากระบบแล้ว');
-  _cl.user=null;_cl.status='off';clRenderButton();
+  _cl.user=null;_cl.status='off';_cl.access='';_cl.profile=null;_cl.isAdmin=false;clRenderButton();
 }
 function clRenderButton(){
   const b=document.getElementById('btn-cloud');if(!b)return;
@@ -2437,7 +2539,12 @@ function clRenderButton(){
   else if(_cl.status==='connecting'){txt='<svg class=ic aria-hidden=true><use href=#i-cloud></use></svg> กำลังเชื่อมต่อ…'}
   else if(_cl.user){
     const st=_cl.status;
-    if(st==='syncing')txt='<svg class=ic aria-hidden=true><use href=#i-cloud></use></svg> กำลังซิงก์…';
+    if(st==='blocked'){
+      const a=_cl.access;
+      txt='<svg class=ic aria-hidden=true><use href=#i-cloud></use></svg> '+(a==='none'?'ลงทะเบียนคลาวด์':a==='error'?'ตรวจสถานะไม่ได้':CL_STATUS_LBL[a]||'รออนุมัติ');
+      cls='btn-warning btn-sm';title=a==='pending'?'ส่งคำขอแล้ว รอผู้ดูแลระบบอนุมัติ — ระหว่างนี้ใช้งานในเครื่องได้ตามปกติ':(_cl.msg||'');
+    }
+    else if(st==='syncing')txt='<svg class=ic aria-hidden=true><use href=#i-cloud></use></svg> กำลังซิงก์…';
     else if(st==='pending')txt='<svg class=ic aria-hidden=true><use href=#i-cloud></use></svg> รอซิงก์…';
     else if(st==='offline'){txt='<svg class=ic aria-hidden=true><use href=#i-cloud></use></svg> ออฟไลน์';title=_cl.msg}
     else if(st==='error'){txt='<svg class=ic aria-hidden=true><use href=#i-alert></use></svg> ซิงก์ไม่ได้';cls='btn-warning btn-sm';title=_cl.msg}
@@ -2449,17 +2556,122 @@ function clButton(e){
   e.stopPropagation();
   if(!_cl.user){clLogin();return}
   const m=document.getElementById('cloud-menu');
+  if(_cl.access&&_cl.access!=='ok'){
+    const a=_cl.access,pf=_cl.profile;
+    m.innerHTML=`<div class="bk-hint" style="padding:6px 10px 4px">เข้าสู่ระบบด้วย<br><b style="color:var(--gray-800)">${escH(_cl.user.email||'')}</b></div>
+      <div class="bk-hint">สถานะ: <span class="cl-st ${escH(a)}">${escH(CL_STATUS_LBL[a]||a)}</span>${pf?`<br>${escH(pf.name)} · ${escH(pf.position)}<br>${escH(pf.org)}`:''}
+      <br>${a==='pending'?'รอผู้ดูแลระบบอนุมัติ ระหว่างนี้ใช้งานในเครื่องได้ตามปกติ แต่ยังซิงก์ขึ้นคลาวด์ไม่ได้':a==='rejected'?'คำขอไม่ได้รับอนุมัติ แก้ไขข้อมูลแล้วส่งใหม่ได้':a==='suspended'?'บัญชีถูกระงับการซิงก์ ติดต่อผู้ดูแลระบบ':a==='none'?'ลงทะเบียนเพื่อขอใช้งานคลาวด์':escH(_cl.msg||'')}</div>
+      <div class="bk-sep"></div>
+      ${a==='none'||a==='rejected'||a==='pending'?`<button onclick="closeCloudMenu();clOpenRegister()"><svg class=ic aria-hidden=true><use href=#i-edit></use></svg> ${a==='none'?'ลงทะเบียน':a==='rejected'?'แก้ไขข้อมูลและส่งคำขอใหม่':'แก้ไขข้อมูลที่ส่ง'}</button>`:''}
+      <button onclick="closeCloudMenu();clRecheck()"><svg class=ic aria-hidden=true><use href=#i-refresh></use></svg> ตรวจสถานะอีกครั้ง</button>
+      <button onclick="clLogout()"><svg class=ic aria-hidden=true><use href=#i-logout></use></svg> ออกจากระบบ</button>`;
+    m.classList.toggle('open');return;
+  }
   const meta=clMeta(),localOnly=load().filter(p=>meta.localOnly[p.id]).length;
   m.innerHTML=`<div class="bk-hint" style="padding:6px 10px 4px">เข้าสู่ระบบด้วย<br><b style="color:var(--gray-800)">${escH(_cl.user.email||_cl.user.displayName||'')}</b></div>
     <div class="bk-hint">โครงการบนคลาวด์ ${_cl.remoteCount} โครงการ${localOnly?` · เก็บในเครื่องนี้อย่างเดียว ${localOnly}`:''}${_cl.msg?`<br><span style="color:var(--amber)">${escH(_cl.msg)}</span>`:''}</div>
     <div class="bk-sep"></div>
     <button onclick="closeCloudMenu();clSyncNow()"><svg class=ic aria-hidden=true><use href=#i-refresh></use></svg> ซิงก์ตอนนี้</button>
     ${localOnly?`<button onclick="closeCloudMenu();clUploadLocalOnly()"><svg class=ic aria-hidden=true><use href=#i-upload></use></svg> อัปโหลดโครงการที่เก็บในเครื่องอย่างเดียว (${localOnly})</button>`:''}
+    ${_cl.isAdmin?`<button onclick="closeCloudMenu();clOpenAdmin()"><svg class=ic aria-hidden=true><use href=#i-settings></use></svg> อนุมัติผู้ใช้งาน${_cl.pendingCount?` <span class="cl-st pending">${_cl.pendingCount} รอ</span>`:''}</button>`:''}
     <button onclick="clLogout()"><svg class=ic aria-hidden=true><use href=#i-logout></use></svg> ออกจากระบบ</button>
     <div class="bk-hint" style="padding-top:6px">ซิงก์เฉพาะข้อมูลข้อความ — รูปและไฟล์แนบยังเก็บในเครื่อง ใช้ <svg class=ic aria-hidden=true><use href=#i-save></use></svg> สำรอง/กู้คืน ตามเดิม</div>`;
   m.classList.toggle('open');
 }
 function closeCloudMenu(){const m=document.getElementById('cloud-menu');if(m)m.classList.remove('open')}
+async function clRecheck(){
+  if(!_cl.user)return;
+  _cl.status='connecting';clRenderButton();
+  await clCheckAccess();
+  if(_cl.access==='ok'){_cl.status='ok';toast('บัญชีได้รับอนุมัติแล้ว — เริ่มซิงก์ข้อมูล');clSyncNow();return}
+  _cl.status='blocked';clRenderButton();
+  toast('สถานะ: '+(CL_STATUS_LBL[_cl.access]||_cl.msg||_cl.access));
+}
+function clOpenRegister(){
+  if(!_cl.user)return;
+  const pf=_cl.profile||{};
+  document.getElementById('clr-email').textContent=_cl.user.email||'';
+  document.getElementById('clr-name').value=pf.name||_cl.user.displayName||'';
+  document.getElementById('clr-position').value=pf.position||'';
+  document.getElementById('clr-org').value=pf.org||'';
+  const st=_cl.profile?_cl.profile.status:'none';
+  document.getElementById('clr-save').textContent=st==='pending'?'บันทึกการแก้ไข':st==='rejected'?'ส่งคำขอใหม่':'ส่งคำขอใช้งาน';
+  document.getElementById('modal-cl-register').classList.add('open');
+}
+async function clSubmitProfile(){
+  const v=id=>document.getElementById(id).value.trim();
+  const name=v('clr-name'),position=v('clr-position'),org=v('clr-org');
+  if(!name||!position||!org){toast('กรุณากรอกชื่อ ตำแหน่ง และหน่วยงานให้ครบ');return}
+  const now=Date.now(),btn=document.getElementById('clr-save');btn.disabled=true;
+  try{
+    if(!_cl.profile)await clProfRef().set({name,position,org,email:_cl.user.email||'',status:'pending',createdAt:now,updatedAt:now});
+    else{
+      const upd={name,position,org,updatedAt:now};
+      if(_cl.profile.status==='rejected')upd.status='pending';
+      await clProfRef().update(upd);
+    }
+    closeModal('modal-cl-register');
+    await clCheckAccess();_cl.status=_cl.access==='ok'?'ok':'blocked';clRenderButton();
+    toast(_cl.access==='pending'?'ส่งคำขอแล้ว — รอผู้ดูแลระบบอนุมัติ':'บันทึกแล้ว');
+  }catch(e){alert('ส่งข้อมูลไม่สำเร็จ: '+(e.message||e))}
+  finally{btn.disabled=false}
+}
+// ── หน้าผู้ดูแลระบบ ──
+async function clAdminCountPending(){
+  if(!_cl.isAdmin)return;
+  try{const snap=await _cl.db.collection('profiles').where('status','==','pending').get();let n=0;snap.forEach(()=>n++);_cl.pendingCount=n;
+    if(n)toast(`มีผู้ขอใช้งานคลาวด์รออนุมัติ ${n} คน (เมนูคลาวด์ → อนุมัติผู้ใช้งาน)`);}catch(e){}
+}
+function clOpenAdmin(){
+  if(!_cl.isAdmin)return;
+  document.getElementById('modal-cl-admin').classList.add('open');
+  clAdminLoad();
+}
+async function clAdminLoad(){
+  const list=document.getElementById('cla-list');
+  list.innerHTML='<div style="padding:16px;color:var(--gray-400);font-size:12.5px">กำลังโหลด…</div>';
+  try{
+    const snap=await _cl.db.collection('profiles').get();
+    const arr=[];snap.forEach(d=>arr.push({uid:d.id,...d.data()}));
+    arr.sort((a,b)=>(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0));
+    _cl.adminList=arr;_cl.pendingCount=arr.filter(x=>x.status==='pending').length;
+    clAdminRender();
+  }catch(e){list.innerHTML=`<div style="padding:16px;color:var(--red,#a23b3b);font-size:12.5px">โหลดรายชื่อไม่ได้: ${escH(e.message||e)}<br>ตรวจว่าได้วาง Firestore Rules รุ่นใหม่แล้ว</div>`}
+}
+function clAdminRender(){
+  const arr=_cl.adminList||[],tab=_cl.adminTab;
+  const groups={pending:x=>x.status==='pending',approved:x=>x.status==='approved',other:x=>x.status==='rejected'||x.status==='suspended'};
+  const lbl={pending:'รออนุมัติ',approved:'อนุมัติแล้ว',other:'ไม่อนุมัติ / ระงับ'};
+  document.getElementById('cla-tabs').innerHTML=Object.keys(groups).map(k=>`<button type="button" class="${k===tab?'btn-primary':'btn-secondary'} btn-sm" onclick="_cl.adminTab='${k}';clAdminRender()">${lbl[k]} (${arr.filter(groups[k]).length})</button>`).join('');
+  const rows=arr.filter(groups[tab]);
+  const dt=t=>t?thD(new Date(t)):'-';
+  const btn=(uid,st,cls,txt)=>`<button type="button" class="${cls} btn-sm" onclick="clAdminSet('${escJ(uid)}','${st}')">${txt}</button>`;
+  document.getElementById('cla-list').innerHTML=rows.length?rows.map(x=>`<div class="cl-adm-row">
+      <div><b>${escH(x.name)}</b><div class="sub" title="${escH(x.email)}">${escH(x.email)}</div></div>
+      <div>${escH(x.position)}</div>
+      <div>${escH(x.org)}</div>
+      <div><span class="cl-st ${escH(x.status)}">${escH(CL_STATUS_LBL[x.status]||x.status)}</span><div class="sub">${x.status==='pending'?'ขอเมื่อ '+dt(x.updatedAt||x.createdAt):'เมื่อ '+dt(x.decidedAt)}</div></div>
+      <div class="acts">${x.status==='pending'?btn(x.uid,'approved','btn-primary','อนุมัติ')+btn(x.uid,'rejected','btn-secondary','ไม่อนุมัติ')
+        :x.status==='approved'?btn(x.uid,'suspended','btn-secondary','ระงับ')
+        :btn(x.uid,'approved','btn-primary','อนุมัติ')+`<button type="button" class="btn-secondary btn-sm" onclick="clAdminDelete('${escJ(x.uid)}')">ลบคำขอ</button>`}</div>
+    </div>`).join(''):`<div style="padding:16px;color:var(--gray-400);font-size:12.5px">ไม่มีรายการ</div>`;
+}
+async function clAdminSet(uid,status){
+  const x=(_cl.adminList||[]).find(y=>y.uid===uid);if(!x)return;
+  const verb={approved:'อนุมัติ',rejected:'ไม่อนุมัติ',suspended:'ระงับการใช้งานของ'}[status];
+  if(!confirm(`${verb} ${x.name} (${x.email}) ?`))return;
+  try{
+    await clProfRef(uid).update({status,decidedAt:Date.now(),decidedBy:_cl.user.email||''});
+    x.status=status;x.decidedAt=Date.now();_cl.pendingCount=(_cl.adminList||[]).filter(y=>y.status==='pending').length;
+    clAdminRender();toast(`${verb} ${x.name} แล้ว`);
+  }catch(e){alert('บันทึกไม่สำเร็จ: '+(e.message||e))}
+}
+async function clAdminDelete(uid){
+  const x=(_cl.adminList||[]).find(y=>y.uid===uid);if(!x)return;
+  if(!confirm(`ลบคำขอของ ${x.name} (${x.email}) ?\n(ผู้ใช้ลงทะเบียนใหม่ได้ ข้อมูลโครงการบนคลาวด์ของผู้ใช้ไม่ถูกลบ)`))return;
+  try{await clProfRef(uid).delete();_cl.adminList=_cl.adminList.filter(y=>y.uid!==uid);clAdminRender();toast('ลบคำขอแล้ว')}
+  catch(e){alert('ลบไม่สำเร็จ: '+(e.message||e))}
+}
 function clUploadLocalOnly(){const m=clMeta();m.localOnly={};clSaveMeta(m);clSyncNow()}
 document.addEventListener('click',e=>{if(!e.target.closest('#cloud-wrap'))closeCloudMenu()});
 
@@ -2602,7 +2814,7 @@ async function fbRestore(){
   async function scan(dir){
     const data=await fbReadJson(dir,'data.json');
     if(Array.isArray(data)){
-      const valid=data.filter(x=>x&&x.name&&x.items);
+      const valid=filterSafeProjects(data.filter(x=>x&&x.name&&x.items),'โฟลเดอร์สำรอง');
       if(valid.length)found.push({dir,projects:valid,man:await fbReadJson(dir,'manifest.json')});
       return true;
     }
@@ -2638,10 +2850,11 @@ async function fbRestore(){
       if(n%5===1)toast(`กำลังกู้คืนไฟล์ ${n}/${keys.length}...`);
       const meta=files[key];
       try{
+        if(UNSAFE_ID_RE.test(key))continue;
         const cur=await idbGetFile(key);
         if(cur&&meta.size&&cur.size===meta.size)continue;
         const file=await fbGetFileAtPath(f.dir,meta.path);
-        await idbPutFile(key,new Blob([file],{type:meta.type||file.type||''}));
+        await idbPutFile(key,new Blob([file],{type:safeFileType(meta.type||file.type)}));
         restoredFiles++;
       }catch(e){failedFiles++}
     }
@@ -2880,6 +3093,9 @@ const MANUAL_SECTIONS=[
 <li>ใช้ได้เฉพาะเมื่อเปิดผ่านเว็บไซต์ <b>https://ppaocharoen.github.io/UD-CMHub/</b> (เปิดจากไฟล์ในเครื่องเข้าสู่ระบบไม่ได้)</li>
 <li>กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-cloud></use></svg> เข้าสู่ระบบ</span> ที่แถบด้านบน → เลือกบัญชี Google — ครั้งแรกระบบถามว่าจะอัปโหลดโครงการในเครื่องนี้ขึ้นบัญชีหรือไม่</li>
 <li>หลังจากนั้น <b>ซิงก์อัตโนมัติ</b> ทุกครั้งที่บันทึก (หน่วงไม่กี่วินาที) ปุ่มด้านบนแสดง "<svg class=ic aria-hidden=true><use href=#i-cloud></use></svg> ซิงก์แล้ว 14:52" · ถ้าออฟไลน์ ระบบยังใช้งานได้ตามปกติ และส่งขึ้นเมื่อกลับมาออนไลน์</li>
+<li><b>ครั้งแรกต้องลงทะเบียน:</b> หลังเลือกบัญชี Google ระบบเปิดหน้าลงทะเบียน กรอก <b>ชื่อ - นามสกุล ตำแหน่ง และหน่วยงาน</b> แล้วกด "ส่งคำขอใช้งาน" ปุ่มด้านบนจะเป็น <b>รออนุมัติ</b> — ระหว่างรอใช้งานระบบในเครื่องได้ตามปกติทุกอย่าง แต่ยังซิงก์ขึ้นคลาวด์ไม่ได้</li>
+<li>เมื่อผู้ดูแลระบบอนุมัติแล้ว ระบบตรวจสถานะให้เองเป็นระยะ หรือกดปุ่มคลาวด์ → <b>ตรวจสถานะอีกครั้ง</b> แล้วจะเริ่มซิงก์ทันที · ถ้าไม่ได้รับอนุมัติ แก้ข้อมูลแล้วส่งคำขอใหม่ได้จากเมนูเดียวกัน</li>
+<li><b>ผู้ดูแลระบบ:</b> ปุ่มคลาวด์ → <b>อนุมัติผู้ใช้งาน</b> (มีตัวเลขบอกจำนวนที่รอ) เห็นรายชื่อพร้อมตำแหน่ง/หน่วยงาน/อีเมล กด <b>อนุมัติ</b> / <b>ไม่อนุมัติ</b> หรือ <b>ระงับ</b> ผู้ที่อนุมัติไปแล้ว (หยุดการซิงก์ทันที ข้อมูลเดิมบนคลาวด์ของผู้ใช้ยังอยู่) · สิทธิ์นี้บังคับที่เซิร์ฟเวอร์ ผู้ใช้อนุมัติตัวเองไม่ได้</li>
 <li>แต่ละบัญชีเห็นได้เฉพาะข้อมูลของตัวเอง (คนอื่นที่เปิดเว็บเดียวกันไม่เห็น)</li>
 <li><b>รูปภาพและไฟล์แนบไม่ขึ้นคลาวด์</b> — ยังเก็บในเครื่อง ใช้ <svg class=ic aria-hidden=true><use href=#i-save></use></svg> สำรอง/กู้คืน (โฟลเดอร์สำรอง หรือ ZIP) ย้ายไปเครื่องใหม่ตามเดิม ในเครื่องใหม่ไฟล์แนบจะขึ้นป้าย <svg class=ic aria-hidden=true><use href=#i-alert></use></svg> ไม่พบตัวไฟล์ จนกว่าจะกู้คืน</li>
 <li>ถ้าโครงการถูกแก้ <b>ทั้งในเครื่องนี้และในเครื่องอื่น</b> ก่อนซิงก์ ระบบจะถามให้เลือก: ใช้ของเครื่องนี้ / ใช้ของคลาวด์ (ดาวน์โหลดไฟล์สำรองของเครื่องนี้ให้ก่อน) / เก็บทั้งสองชุด — ไม่ทับกันเงียบ ๆ</li>
@@ -2984,6 +3200,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.7</b> — <b>ความปลอดภัย:</b> ตรวจข้อมูลก่อนนำเข้า (ไฟล์สำรอง .json / กู้จากโฟลเดอร์ / ZIP / ดึงจากคลาวด์) ไม่รับไฟล์ที่ถูกแก้ให้แทรกโค้ด · แก้จุดแสดงข้อความที่ไม่ได้แปลงอักขระพิเศษ (สรุปงวดงาน จำนวนเครื่องจักร งานอื่นในรายงานประจำสัปดาห์ และค่าในปุ่ม) · ดูตัวอย่างไฟล์แนบเปิดได้เฉพาะรูปและ PDF จริง · ออกจากระบบแบบลบข้อมูล ลบรูป/ไฟล์แนบของโครงการนั้นด้วย · เพิ่มนโยบายความปลอดภัยของหน้าเว็บ (CSP) · <b>คลาวด์:</b> ผู้ใช้ใหม่ลงทะเบียน (ชื่อ ตำแหน่ง หน่วยงาน) และรอผู้ดูแลระบบอนุมัติก่อนซิงก์ · หน้าอนุมัติ/ไม่อนุมัติ/ระงับผู้ใช้สำหรับผู้ดูแลระบบ</li>
 <li><b>v11.6</b> — กราฟ S-Curve: ชี้ที่กราฟแล้วแสดงช่วงวันที่ของสัปดาห์นั้น (เช่น W3 · 19–25 ต.ค. 2569) · เพิ่มแถบเดือนใต้แกน X</li>
 <li><b>v11.5</b> — หน้าแผนงาน แท็บ "กำหนดเอง": หมวดงานที่มีงานย่อยกรอกที่หมวดหลักบรรทัดเดียวได้ (ค่าเริ่มต้น) งานย่อยแสดงสีจาง "ตามหมวดหลัก" · ปุ่ม "แยกงานย่อย" สำหรับกรอกทีละงานย่อย · "เลือกทั้งหมด" ไม่ติ๊กงานย่อยที่ตามหมวดหลัก · งานย่อยที่ไม่ได้กรอกใช้ %/W ของหมวดหลักด้วย (เดิมใช้แค่ระยะเวลา/เริ่ม W)</li>
 <li><b>v11.4</b> — หน้าโครงการใหม่ / แก้ไขโครงการ: เพิ่มแถบ "ปรับลดราคาทุกรายการจากราคากลาง (%)" ใต้ปุ่มนำเข้า Excel · กรอกวงเงินค่าจ้างแล้วระบบคำนวณ % ที่ต่ำกว่าราคากลาง (รวม Factor F / VAT) และเสนอให้ปรับทั้งหมดในคลิกเดียว · เก็บราคากลางไว้อ้างอิง ส่วนลดคิดจากราคากลางเสมอ (ไม่ลดทบ) · ถามก่อนปรับทับรายการที่แก้ราคาเอง · แก้ปุ่ม "ปรับราคาตามส่วนลดผู้รับจ้าง" ให้เทียบวงเงินกับมูลค่ารวม Factor F / VAT (เดิมเทียบกับต้นทุนก่อนคูณ) และปรับแผนแก้ไขที่ราคาตรงกันตามไปด้วย · แก้บรรทัดพื้นที่จัดเก็บในหน้าโครงการทั้งหมดที่แสดงโค้ดไอคอนแทนสัญลักษณ์</li>
@@ -3049,8 +3266,8 @@ function mnRender(scrollTo){
   const list=MANUAL_SECTIONS.filter(sec=>!q||mnPlain(sec.title+' '+sec.html).includes(q));
   const toc=document.getElementById('mn-toc'),box=document.getElementById('mn-content');
   if(!list.length){toc.innerHTML='';box.innerHTML='<div class="mn-empty">ไม่พบหัวข้อที่ตรงกับ "'+escH(q)+'" — ลองคำอื่น เช่น สำรอง, BOQ, PDF, แผนงาน, ไฟล์แนบ</div>';return}
-  toc.innerHTML=list.map((sec,i)=>`<a data-id="${sec.id}" class="${q?'hit':''}" onclick="mnGo('${sec.id}')">${i+1}. ${escH(sec.title)}</a>`).join('');
-  box.innerHTML=list.map((sec,i)=>`<div class="mn-sec" id="mn-sec-${sec.id}"><h3>${i+1}. ${escH(sec.title)}</h3>${sec.html}</div>`).join('');
+  toc.innerHTML=list.map((sec,i)=>`<a data-id="${escH(sec.id)}" class="${q?'hit':''}" onclick="mnGo('${escJ(sec.id)}')">${i+1}. ${escH(sec.title)}</a>`).join('');
+  box.innerHTML=list.map((sec,i)=>`<div class="mn-sec" id="mn-sec-${escH(sec.id)}"><h3>${i+1}. ${escH(sec.title)}</h3>${sec.html}</div>`).join('');
   if(q){ // เน้นคำที่ค้นหา
     const walker=document.createTreeWalker(box,NodeFilter.SHOW_TEXT);const nodes=[];
     while(walker.nextNode())nodes.push(walker.currentNode);
@@ -3460,7 +3677,7 @@ function renderPlanToggles(p){
     tog.className='plan-toggle'+(on?' active':'');
     tog.style.color=on?plan.color:'var(--gray-400)';
     const ds=plan.dash&&plan.dash.length?'border-top:2px dashed '+plan.color:'border-top:2px solid '+plan.color;
-    tog.innerHTML=`<input type="checkbox" ${on?'checked':''} onchange="togglePlan('${plan.id}',this)">
+    tog.innerHTML=`<input type="checkbox" ${on?'checked':''} onchange="togglePlan('${escJ(plan.id)}',this)">
       <span style="color:inherit;font-weight:500">${escH(plan.label)}</span>
       <span style="display:inline-block;width:18px;height:0;${ds};vertical-align:middle;margin-left:4px"></span>`;
     wrap.appendChild(tog);
@@ -3891,7 +4108,7 @@ function renderItemsTab(p){
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td style="color:var(--gray-400);font-size:11px">${idx+1}</td>
-      <td>${item.subItems&&item.subItems.length?`<span class="item-name-click" onclick="showSubBreakdownModal('${item.id}',null)" title="ดูรายละเอียดงานย่อย">${escH(item.name)} <span class="badge badge-rev" style="font-size:9px">${item.subItems.length} งานย่อย <svg class=ic aria-hidden=true><use href=#i-search></use></svg></span></span>`:escH(item.name)}${tags}</td>
+      <td>${item.subItems&&item.subItems.length?`<span class="item-name-click" onclick="showSubBreakdownModal('${escJ(item.id)}',null)" title="ดูรายละเอียดงานย่อย">${escH(item.name)} <span class="badge badge-rev" style="font-size:9px">${item.subItems.length} งานย่อย <svg class=ic aria-hidden=true><use href=#i-search></use></svg></span></span>`:escH(item.name)}${tags}</td>
       <td style="text-align:right">${fmtMoney(item.value)}</td>
       <td><span class="badge badge-done" style="font-size:10px">${typeLabel}</span></td>
       <td style="text-align:right">${inLatest?fmtMoney(cv):'-'}</td>
@@ -3972,7 +4189,7 @@ function renderHistoryTab(p){
         <div style="font-size:10px;color:var(--gray-400)">${range}</div>
         <div style="font-size:10px;color:var(--gray-600)">บันทึก: ${entry.date||''}</div>
       </td>
-      ${allPlanItems(p).map(i=>`<td style="text-align:right">${i.subItems&&i.subItems.length?`<span class="item-name-click" onclick="showSubBreakdownModal('${i.id}',${entry.period})" title="ดูรายละเอียดงานย่อย">${fmt(entry.actuals[i.id]||0)}% <svg class=ic aria-hidden=true><use href=#i-search></use></svg></span>`:fmt(entry.actuals[i.id]||0)+'%'}</td>`).join('')}
+      ${allPlanItems(p).map(i=>`<td style="text-align:right">${i.subItems&&i.subItems.length?`<span class="item-name-click" onclick="showSubBreakdownModal('${escJ(i.id)}',${entry.period})" title="ดูรายละเอียดงานย่อย">${fmt(entry.actuals[i.id]||0)}% <svg class=ic aria-hidden=true><use href=#i-search></use></svg></span>`:fmt(entry.actuals[i.id]||0)+'%'}</td>`).join('')}
       <td style="text-align:right">${planMissing?'<span style="color:var(--gray-400);font-size:11px">ยังไม่ส่งแผน</span>':fmt(pp)+'%'}</td>
       ${lr?`<td style="text-align:right;color:var(--purple)">${planMissing?'-':(rp!==null?fmt(rp)+'%':'-')}</td>`:''}
       <td style="text-align:right"><strong>${fmt(ap)}%</strong></td>
@@ -4066,21 +4283,21 @@ function renderDocsTab(p){
     const phaseTag=showPhaseTag?`<div class="doc-note" style="color:var(--gray-600);font-style:normal">${escH(d.phase)}${d.group?' · '+escH(d.group):''}</div>`:'';
     const attCt=(d.attachments||[]).length;
     const attTag=attCt?`<span class="badge badge-done" data-att-ids="${(d.attachments||[]).map(a=>a.id).join(',')}" style="font-size:9px;margin-left:4px" title="มีไฟล์แนบ ${attCt} ไฟล์"><svg class=ic aria-hidden=true><use href=#i-clip></use></svg> ${attCt}</span>`:'';
-    const reorderBtns=allowReorder?`<button class="btn-icon" onclick="moveDocItem('${d.id}','up')" title="เลื่อนขึ้น" style="padding:2px 5px;font-size:10px">▲</button><button class="btn-icon" onclick="moveDocItem('${d.id}','down')" title="เลื่อนลง" style="padding:2px 5px;font-size:10px">▼</button>`:'';
-    return `<tr data-id="${d.id}" style="border-left:3px solid ${isOwner?'var(--blue)':'var(--purple)'};background:${rowBg}">
+    const reorderBtns=allowReorder?`<button class="btn-icon" onclick="moveDocItem('${escJ(d.id)}','up')" title="เลื่อนขึ้น" style="padding:2px 5px;font-size:10px">▲</button><button class="btn-icon" onclick="moveDocItem('${escJ(d.id)}','down')" title="เลื่อนลง" style="padding:2px 5px;font-size:10px">▼</button>`:'';
+    return `<tr data-id="${escH(d.id)}" style="border-left:3px solid ${isOwner?'var(--blue)':'var(--purple)'};background:${rowBg}">
         <td style="text-align:center;color:var(--gray-400);font-size:11px">${rowNum}${reorderBtns?`<div style="margin-top:2px">${reorderBtns}</div>`:''}</td>
-        <td>${phaseTag}<input value="${escH(d.name)}" onchange="updateDocField('${d.id}','name',this.value)" style="font-weight:500">${attTag}${d.note?`<div class="doc-note">${escH(d.note)}</div>`:''}</td>
-        <td><select onchange="updateDocField('${d.id}','responsible',this.value)" style="color:${isOwner?'var(--blue)':'var(--purple)'};font-weight:600">
+        <td>${phaseTag}<input value="${escH(d.name)}" onchange="updateDocField('${escJ(d.id)}','name',this.value)" style="font-weight:500">${attTag}${d.note?`<div class="doc-note">${escH(d.note)}</div>`:''}</td>
+        <td><select onchange="updateDocField('${escJ(d.id)}','responsible',this.value)" style="color:${isOwner?'var(--blue)':'var(--purple)'};font-weight:600">
           <option value="owner" ${isOwner?'selected':''}>ผู้ว่าจ้าง</option>
           <option value="contractor" ${!isOwner?'selected':''}>ผู้รับจ้าง</option>
         </select></td>
-        <td><input type="date" value="${d.sentDate||''}" onchange="updateDocField('${d.id}','sentDate',this.value)"></td>
-        <td><input type="date" value="${d.receivedDate||''}" onchange="updateDocField('${d.id}','receivedDate',this.value)"></td>
-        <td><select onchange="updateDocField('${d.id}','status',this.value)" class="badge ${stObj.cls}" style="border:none">${DOC_STATUS.map(s=>`<option value="${s.v}" ${s.v===(d.status||'pending')?'selected':''}>${s.label}</option>`).join('')}</select>${alertBadge}</td>
-        <td><input value="${escH(d.meetingRef||'')}" placeholder="เช่น ครั้งที่ 3/2568" onchange="updateDocField('${d.id}','meetingRef',this.value)"></td>
-        <td><input type="date" value="${d.approvalDate||''}" onchange="updateDocField('${d.id}','approvalDate',this.value)"></td>
-        <td><input value="${escH(d.remark||'')}" onchange="updateDocField('${d.id}','remark',this.value)"></td>
-        <td style="text-align:center;white-space:nowrap"><button class="btn-icon" onclick="showEditDocModal('${d.id}')" title="แก้ไขรายละเอียด/แนบไฟล์"><svg class=ic aria-hidden=true><use href=#i-edit></use></svg></button><button class="btn-icon" onclick="deleteDocItem('${d.id}')" title="ลบรายการ">✕</button></td>
+        <td><input type="date" value="${d.sentDate||''}" onchange="updateDocField('${escJ(d.id)}','sentDate',this.value)"></td>
+        <td><input type="date" value="${d.receivedDate||''}" onchange="updateDocField('${escJ(d.id)}','receivedDate',this.value)"></td>
+        <td><select onchange="updateDocField('${escJ(d.id)}','status',this.value)" class="badge ${stObj.cls}" style="border:none">${DOC_STATUS.map(s=>`<option value="${s.v}" ${s.v===(d.status||'pending')?'selected':''}>${s.label}</option>`).join('')}</select>${alertBadge}</td>
+        <td><input value="${escH(d.meetingRef||'')}" placeholder="เช่น ครั้งที่ 3/2568" onchange="updateDocField('${escJ(d.id)}','meetingRef',this.value)"></td>
+        <td><input type="date" value="${d.approvalDate||''}" onchange="updateDocField('${escJ(d.id)}','approvalDate',this.value)"></td>
+        <td><input value="${escH(d.remark||'')}" onchange="updateDocField('${escJ(d.id)}','remark',this.value)"></td>
+        <td style="text-align:center;white-space:nowrap"><button class="btn-icon" onclick="showEditDocModal('${escJ(d.id)}')" title="แก้ไขรายละเอียด/แนบไฟล์"><svg class=ic aria-hidden=true><use href=#i-edit></use></svg></button><button class="btn-icon" onclick="deleteDocItem('${escJ(d.id)}')" title="ลบรายการ">✕</button></td>
       </tr>`;
   };
 
@@ -4315,6 +4532,9 @@ function idbOpen(){
   });
   return _idbPromise;
 }
+// v11.7 ชนิดไฟล์ที่อนุญาตให้แสดงในหน้าเว็บ — อย่างอื่นบังคับเป็นไฟล์ดาวน์โหลด (กันไฟล์ HTML ปลอมชนิดมารันในระบบ)
+const SAFE_VIEW_TYPES=['image/jpeg','image/png','image/gif','image/webp','image/bmp','application/pdf'];
+function safeFileType(t){t=String(t||'').toLowerCase().split(';')[0].trim();return SAFE_VIEW_TYPES.includes(t)?t:'application/octet-stream'}
 function idbPutFile(id,blob){
   return idbOpen().then(db=>new Promise((resolve,reject)=>{
     const tx=db.transaction('attachments','readwrite');
@@ -4504,7 +4724,8 @@ async function handleZipImport(e){
         if(!zf){failed++;continue}
         try{
           const raw=await zf.async('blob');
-          await idbPutFile(it.key,new Blob([raw],{type:it.type||raw.type||''}));
+          if(typeof it.key!=='string'||!it.key||UNSAFE_ID_RE.test(it.key)){failed++;continue}
+          await idbPutFile(it.key,new Blob([raw],{type:safeFileType(it.type||raw.type)}));
           restored++;
         }catch(err){failed++}
       }
@@ -4531,8 +4752,8 @@ function showExportZipModal(){
     const fc=countProjectFiles(p);const attCt=fc.att+fc.photos;
     const div=document.createElement('div');
     div.style.cssText='display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)';
-    div.innerHTML=`<input type="checkbox" id="expzip-${p.id}" ${attCt?'checked':''} ${attCt?'':'disabled'} style="width:16px;height:16px;flex-shrink:0">
-      <label for="expzip-${p.id}" style="margin:0;font-size:13px;cursor:${attCt?'pointer':'default'};font-weight:normal;color:${attCt?'var(--gray-800)':'var(--gray-400)'};flex:1">${escH(p.name)}</label>
+    div.innerHTML=`<input type="checkbox" id="expzip-${escH(p.id)}" ${attCt?'checked':''} ${attCt?'':'disabled'} style="width:16px;height:16px;flex-shrink:0">
+      <label for="expzip-${escH(p.id)}" style="margin:0;font-size:13px;cursor:${attCt?'pointer':'default'};font-weight:normal;color:${attCt?'var(--gray-800)':'var(--gray-400)'};flex:1">${escH(p.name)}</label>
       <span style="font-size:11px;color:var(--gray-400)">${fc.att} ไฟล์แนบ · ${fc.photos} รูป</span>`;
     list.appendChild(div);
   });
@@ -4580,8 +4801,8 @@ function renderDocAttachList(d){
   if(!atts.length){wrap.innerHTML='<div style="font-size:11.5px;color:var(--gray-400)">ยังไม่มีไฟล์แนบ</div>';return}
   wrap.innerHTML=atts.map(a=>`
     <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border:1px solid var(--gray-100);border-radius:6px;margin-bottom:6px;gap:8px">
-      <span data-att-ids="${a.id}" data-att-inline="1" onclick="viewDocAttachment('${a.id}','${escH(a.name).replace(/'/g,"&#39;")}','${a.type||''}')" style="font-size:12px;color:var(--blue);cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1" title="ดูตัวอย่าง ${escH(a.name)}"><svg class=ic aria-hidden=true><use href=#i-clip></use></svg> ${escH(a.name)} <span style="color:var(--gray-400)">(${fmtFileSize(a.size)})</span></span>
-      <button class="btn-icon" onclick="removeDocAttachment('${a.id}')" title="ลบไฟล์แนบ">✕</button>
+      <span data-att-ids="${escH(a.id)}" data-att-inline="1" onclick="viewDocAttachment('${escJ(a.id)}','${escJ(a.name)}','${escJ(a.type||'')}')" style="font-size:12px;color:var(--blue);cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1" title="ดูตัวอย่าง ${escH(a.name)}"><svg class=ic aria-hidden=true><use href=#i-clip></use></svg> ${escH(a.name)} <span style="color:var(--gray-400)">(${fmtFileSize(a.size)})</span></span>
+      <button class="btn-icon" onclick="removeDocAttachment('${escJ(a.id)}')" title="ลบไฟล์แนบ">✕</button>
     </div>`).join('');
   markMissingAttachments(wrap);
 }
@@ -4639,11 +4860,13 @@ function finalizeDocAttachment(name,blob,type){
 }
 let currentAttachPreviewUrl=null;
 function viewDocAttachment(attId,name,type){
-  idbGetFile(attId).then(blob=>{
-    if(!blob){toast('ไม่พบไฟล์นี้ในเบราว์เซอร์เครื่องนี้ (ไฟล์แนบไม่รวมอยู่ในไฟล์สำรองข้อมูล)');return}
+  idbGetFile(attId).then(blob0=>{
+    if(!blob0){toast('ไม่พบไฟล์นี้ในเบราว์เซอร์เครื่องนี้ (ไฟล์แนบไม่รวมอยู่ในไฟล์สำรองข้อมูล)');return}
+    // บังคับชนิดไฟล์จากรายการที่อนุญาตเท่านั้น (ไม่เชื่อชนิดที่เก็บมากับไฟล์/ZIP)
+    const t=safeFileType(blob0.type&&blob0.type!=='application/octet-stream'?blob0.type:type);
+    const blob=new Blob([blob0],{type:t});
     const url=URL.createObjectURL(blob);
     currentAttachPreviewUrl=url;
-    const t=type||blob.type||'';
     document.getElementById('attach-preview-title').textContent=name;
     const body=document.getElementById('attach-preview-body');
     if(t.startsWith('image/')){
@@ -4709,7 +4932,7 @@ function renderWeekPlanPick(p){
   if(plans.length<2){el.innerHTML='';return}
   el.innerHTML=`<div style="font-size:11.5px;color:var(--gray-600);margin-bottom:4px">แสดงรายการงานของแผน <span style="color:var(--gray-400)">(เลือกได้หลายแผน · รายการที่ซ่อนไว้ยังคงค่าเดิม)</span></div>
     <div class="plan-toggles" style="margin-bottom:10px">${plans.map(pl=>{const on=weekPlanSel.has(pl.id);
-      return `<label class="plan-toggle${on?' active':''}" style="color:${on?pl.color:'var(--gray-400)'}"><input type="checkbox" ${on?'checked':''} onchange="toggleWeekPlan('${pl.id}',this.checked)"><span style="color:inherit;font-weight:500">${escH(pl.label)}</span></label>`}).join('')}</div>`;
+      return `<label class="plan-toggle${on?' active':''}" style="color:${on?pl.color:'var(--gray-400)'}"><input type="checkbox" ${on?'checked':''} onchange="toggleWeekPlan('${escJ(pl.id)}',this.checked)"><span style="color:inherit;font-weight:500">${escH(pl.label)}</span></label>`}).join('')}</div>`;
 }
 function weekShownItems(p){
   const ids=new Set();
@@ -4767,7 +4990,7 @@ function buildWeekItemRows(p, w, editPeriod){
     if(dpSum){
       const dpText=dpSum.hasSub?'มีบันทึกรายวันในสัปดาห์นี้':`บันทึกรายวันรวม ${fmt(dpSum.pct)}%`;
       dpHint=`<div style="font-size:10.5px;color:var(--purple);margin-top:2px"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> ${dpText}
-        <button type="button" class="btn-icon" style="font-size:10px;padding:0 4px;color:var(--purple)" onclick="applyDailyProgressToItem('${item.id}',${w})">ใช้ค่านี้</button></div>`;
+        <button type="button" class="btn-icon" style="font-size:10px;padding:0 4px;color:var(--purple)" onclick="applyDailyProgressToItem('${escJ(item.id)}',${w})">ใช้ค่านี้</button></div>`;
     }
     const row=document.createElement('div');
     row.className='wk-row';
@@ -4777,10 +5000,10 @@ function buildWeekItemRows(p, w, editPeriod){
         ${planBadge}
         <div style="font-size:11px;color:var(--gray-400)">ก่อนหน้า ${fmt(prev)}%</div>
         <div style="display:flex;gap:5px;align-items:center;justify-content:flex-end">
-          <input type="number" id="wa-${item.id}" min="0" max="100" step="0.01" value="${fmt(cur)}" readonly
+          <input type="number" id="wa-${escH(item.id)}" min="0" max="100" step="0.01" value="${fmt(cur)}" readonly
             title="คำนวณจากงานย่อยอัตโนมัติ — กดปุ่มงานย่อยเพื่อกรอก"
             style="text-align:right;width:74px;background:var(--gray-50);color:var(--gray-600)">
-          <button class="btn-icon" type="button" title="กรอกงานย่อย" onclick="openSubWeekModal('${item.id}')"
+          <button class="btn-icon" type="button" title="กรอกงานย่อย" onclick="openSubWeekModal('${escJ(item.id)}')"
             style="color:var(--purple);padding:4px 6px"><svg class=ic aria-hidden=true><use href=#i-plan></use></svg></button>
         </div>`;
     } else {
@@ -4788,8 +5011,8 @@ function buildWeekItemRows(p, w, editPeriod){
         <div><div style="font-size:13px;font-weight:500">${escH(item.name)}${planTag}</div>${dpHint}</div>
         ${planBadge}
         <div style="font-size:11px;color:var(--gray-400)">ก่อนหน้า ${fmt(prev)}%</div>
-        <input type="number" id="wa-${item.id}" min="0" max="100" step="0.01" value="${fmt(cur)}"
-          oninput="validateActualInput(this,'${item.id}')"
+        <input type="number" id="wa-${escH(item.id)}" min="0" max="100" step="0.01" value="${fmt(cur)}"
+          oninput="validateActualInput(this,'${escJ(item.id)}')"
           style="text-align:right;width:110px">`;
     }
     form.appendChild(row);
@@ -5264,8 +5487,8 @@ function renderDpElemSum(p,dateStr){
     <div style="font-size:11px;font-weight:600;color:var(--purple);margin-bottom:2px"><svg class=ic aria-hidden=true><use href=#i-element></use></svg> ชิ้นส่วนที่ลงวันนี้ — ปริมาณแยกตามชิ้นส่วน <span style="font-weight:400;color:var(--gray-600)">(รายการวัสดุด้านล่างเป็นยอดรวมของวัน)</span></div>
     ${list.map(o=>`<div style="display:flex;gap:6px;align-items:center;padding:4px 0;border-top:1px dashed #cdbff0;flex-wrap:wrap">
       <div style="flex:1 1 260px;font-size:12px;min-width:0"><b>${escH(o.el?elemLabel(o.el):'(ชิ้นส่วนถูกลบแล้ว)')} × ${fmt(o.n,0)} ${escH((o.el&&o.el.unit)||'ชิ้น')}</b> — ${o.mats.map(m=>`${escH(m.name)} ${fmt(m.qty,2)} ${escH(m.unit)}`).join(', ')}</div>
-      <input type="text" value="${escH(o.sta)}" placeholder="STA./GL." title="STA./GL. ของชิ้นส่วนนี้ — ดึงไปใช้ในรายงานประจำวัน (ช่อง STA.) และรายงานประจำสัปดาห์ (ช่องหมายเหตุ)" onchange="setDpElemSta('${dateStr}','${o.elId}',this.value)" style="width:160px;flex:none;font-size:11.5px;padding:3px 6px">
-      <button class="btn-icon" type="button" title="เอาชิ้นส่วนนี้ออกจากวันนี้ (หักปริมาณออกจากรายการวัสดุด้านล่าง)" onclick="removeDpElemFromDay('${dateStr}','${o.elId}')">✕</button>
+      <input type="text" value="${escH(o.sta)}" placeholder="STA./GL." title="STA./GL. ของชิ้นส่วนนี้ — ดึงไปใช้ในรายงานประจำวัน (ช่อง STA.) และรายงานประจำสัปดาห์ (ช่องหมายเหตุ)" onchange="setDpElemSta('${dateStr}','${escJ(o.elId)}',this.value)" style="width:160px;flex:none;font-size:11.5px;padding:3px 6px">
+      <button class="btn-icon" type="button" title="เอาชิ้นส่วนนี้ออกจากวันนี้ (หักปริมาณออกจากรายการวัสดุด้านล่าง)" onclick="removeDpElemFromDay('${dateStr}','${escJ(o.elId)}')">✕</button>
     </div>`).join('')}</div>`;
 }
 function setDpElemSta(date,elId,val){
@@ -5338,7 +5561,7 @@ function dpGroupMatsHtml(l,handler,key){
     <details style="margin-top:2px"><summary style="cursor:pointer;color:var(--purple)">ปรับรายตัว (${(l.mats||[]).length} วัสดุ)</summary>
     ${(l.mats||[]).map(m=>`<div style="display:flex;gap:6px;align-items:center;margin-top:2px">
       <span style="flex:1;min-width:0;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${escH(m.name)}">– ${escH(m.name)}</span>
-      <select onchange="${handler}('${key}','mode:${m.id}',this.value)" style="width:132px;flex:none;font-size:11px;padding:1px 4px">${opt('name','ชื่ออย่างเดียว',m.mode)}${opt('qty','ปริมาณ ('+escH(m.unit||'หน่วย')+')',m.mode)}${opt('pct','%',m.mode)}${opt('hide','ไม่แสดง',m.mode)}</select></div>`).join('')}
+      <select onchange="${handler}('${key}','mode:${escH(m.id)}',this.value)" style="width:132px;flex:none;font-size:11px;padding:1px 4px">${opt('name','ชื่ออย่างเดียว',m.mode)}${opt('qty','ปริมาณ ('+escH(m.unit||'หน่วย')+')',m.mode)}${opt('pct','%',m.mode)}${opt('hide','ไม่แสดง',m.mode)}</select></div>`).join('')}
     </details>
   </div>`;
 }
@@ -5464,7 +5687,7 @@ function buildDpEntityOptionsHtml(p,selected){
   allPlanItems(p).forEach(item=>{
     const mainRemain=getDpRemainInfo(p,item.id,null);
     const mainSuffix=mainRemain?` (คงเหลือ ${fmt(mainRemain.remain,1)}%)`:'';
-    html+=`<option value="${item.id}" ${selected===item.id?'selected':''}>${escH(item.name)}${mainSuffix}</option>`;
+    html+=`<option value="${escH(item.id)}" ${selected===item.id?'selected':''}>${escH(item.name)}${mainSuffix}</option>`;
     (item.subItems||[]).forEach(s=>{
       const val=item.id+'::'+s.id;
       const subRemain=getDpRemainInfo(p,val,null);
@@ -5711,7 +5934,7 @@ function renderBoqMatch(){
     const o=S.old.find(x=>x.id===S.catMap[i]);
     const subs=c.subItems||[];
     const usedSubs=new Set((S.subMap[i]||[]).map(m=>m.oldId).filter(Boolean));
-    const catOpts='<option value="">— หมวดใหม่ (ไม่มีในของเดิม) —</option>'+S.old.filter(x=>!usedCats.has(x.id)||x.id===S.catMap[i]).map(x=>`<option value="${x.id}" ${x.id===S.catMap[i]?'selected':''}>${escH(x.name)}${x.revOnly?' (จากแผนรีไวส์)':''}</option>`).join('');
+    const catOpts='<option value="">— หมวดใหม่ (ไม่มีในของเดิม) —</option>'+S.old.filter(x=>!usedCats.has(x.id)||x.id===S.catMap[i]).map(x=>`<option value="${escH(x.id)}" ${x.id===S.catMap[i]?'selected':''}>${escH(x.name)}${x.revOnly?' (จากแผนรีไวส์)':''}</option>`).join('');
     let rows='';
     if(!subs.length){
       const st=!o?'new':(Math.abs((o.value||0)-(c.value||0))<0.005?'same':'changed');cnt[st]++;
@@ -5722,7 +5945,7 @@ function renderBoqMatch(){
       const os=o&&m.oldId?(o.subItems||[]).find(x=>x.id===m.oldId):null;
       const st=bmStatus(n,os,m.flag);cnt[st]++;
       if(S.hideSame&&st==='same')return;
-      const opts=o?'<option value="">— รายการใหม่ —</option>'+(o.subItems||[]).filter(x=>!usedSubs.has(x.id)||x.id===m.oldId).map(x=>`<option value="${x.id}" ${x.id===m.oldId?'selected':''}>${escH(x.name)}${x.group?' · '+escH(x.group):''}</option>`).join(''):'<option>— รายการใหม่ —</option>';
+      const opts=o?'<option value="">— รายการใหม่ —</option>'+(o.subItems||[]).filter(x=>!usedSubs.has(x.id)||x.id===m.oldId).map(x=>`<option value="${escH(x.id)}" ${x.id===m.oldId?'selected':''}>${escH(x.name)}${x.group?' · '+escH(x.group):''}</option>`).join(''):'<option>— รายการใหม่ —</option>';
       const hint=m.flag==='similar'?`<div class="bm-grp">ชื่อคล้ายกัน ${Math.round((m.score||0)*100)}%</div>`:m.flag==='group'?'<div class="bm-grp">ชื่อตรงกัน แต่อยู่คนละหัวข้อ</div>':'';
       const prog=os&&bmProgress(S.p,o.id+'::'+os.id)?'<div class="bm-grp" style="color:var(--purple)">มีความก้าวหน้าแล้ว</div>':'';
       rows+=`<tr class="bm-${st}"><td><span class="badge ${BM_LBL[st][1]}">${BM_LBL[st][0]}</span></td>
@@ -5943,7 +6166,7 @@ function renderElemsTab(p){
     html+=`<div class="el-row">
       <div><div style="font-weight:600;font-size:13.5px">${escH(el.name)}</div><div style="font-size:11.5px;color:var(--gray-600)">${cnt?fmt(cnt,0)+' '+escH(el.unit||'ชิ้น'):'ไม่ระบุจำนวน'}</div></div>
       <div>${chips}${el.note?`<div style="font-size:11.5px;color:var(--gray-600);margin-top:2px;white-space:pre-wrap"><svg class=ic aria-hidden=true><use href=#i-note></use></svg> ${escH(el.note)}</div>`:''}</div>
-      <div style="white-space:nowrap"><button class="btn-icon" title="แก้ไข" onclick="openElemModal('${el.id}')"><svg class=ic aria-hidden=true><use href=#i-edit></use></svg></button><button class="btn-icon" title="คัดลอกเป็นชิ้นส่วนใหม่ (เช่น F1 → F2)" onclick="duplicateElem('${el.id}')">⧉</button><button class="btn-icon" title="ลบ" style="color:var(--red)" onclick="deleteElem('${el.id}')"><svg class=ic aria-hidden=true><use href=#i-trash></use></svg></button></div>
+      <div style="white-space:nowrap"><button class="btn-icon" title="แก้ไข" onclick="openElemModal('${escJ(el.id)}')"><svg class=ic aria-hidden=true><use href=#i-edit></use></svg></button><button class="btn-icon" title="คัดลอกเป็นชิ้นส่วนใหม่ (เช่น F1 → F2)" onclick="duplicateElem('${escJ(el.id)}')">⧉</button><button class="btn-icon" title="ลบ" style="color:var(--red)" onclick="deleteElem('${escJ(el.id)}')"><svg class=ic aria-hidden=true><use href=#i-trash></use></svg></button></div>
     </div>`;
   });
   wrap.innerHTML=html+`<div style="font-size:11px;color:var(--gray-400);margin-top:8px">ตัวเลข x/y = ลงบันทึกรายวันผ่านปุ่ม <svg class=ic aria-hidden=true><use href=#i-element></use></svg> แล้ว x ชิ้น จากทั้งหมด y ชิ้น (นับแยกตามวัสดุ)</div>`;
@@ -6045,7 +6268,7 @@ function openElemPick(dateStr){
   elemPickDate=dateStr;
   document.getElementById('ep-sub').textContent='วันที่ '+thDate(dateStr);
   let h='',lastG=null;
-  els.forEach(e=>{const g=e.group||'';if(g!==lastG){if(lastG!==null)h+='</optgroup>';h+=`<optgroup label="${escH(g||'(ไม่มีกลุ่ม)')}">`;lastG=g}h+=`<option value="${e.id}">${escH(e.name)}${e.count?` (${fmt(e.count,0)} ${escH(e.unit||'ชิ้น')})`:''}</option>`});
+  els.forEach(e=>{const g=e.group||'';if(g!==lastG){if(lastG!==null)h+='</optgroup>';h+=`<optgroup label="${escH(g||'(ไม่มีกลุ่ม)')}">`;lastG=g}h+=`<option value="${escH(e.id)}">${escH(e.name)}${e.count?` (${fmt(e.count,0)} ${escH(e.unit||'ชิ้น')})`:''}</option>`});
   document.getElementById('ep-elem').innerHTML=h+'</optgroup>';
   document.getElementById('ep-n').value=1;
   document.getElementById('ep-sta').value='';
@@ -6067,7 +6290,7 @@ function renderElemPickMats(){
     if(!info)return `<div class="ep-mat off"><span></span><span><svg class=ic aria-hidden=true><use href=#i-alert></use></svg> งานย่อยนี้ไม่อยู่ใน BOQ แล้ว (ข้าม)</span><span></span><span></span></div>`;
     const d=done[m.entityId]||0,on=prevChecked[m.entityId]!==undefined?prevChecked[m.entityId]:true,over=cnt&&d+n>cnt;
     return `<label class="ep-mat${on?'':' off'}" style="margin:0;font-weight:normal;cursor:pointer">
-      <input type="checkbox" data-el="${el.id}" value="${m.entityId}" ${on?'checked':''} onchange="this.parentNode.classList.toggle('off',!this.checked)" style="width:16px;height:16px">
+      <input type="checkbox" data-el="${escH(el.id)}" value="${escH(m.entityId)}" ${on?'checked':''} onchange="this.parentNode.classList.toggle('off',!this.checked)" style="width:16px;height:16px">
       <span>${escH(info.name)}</span>
       <span style="text-align:right"><b>${fmt((Number(m.qtyPer)||0)*n,2)}</b> ${escH(info.unit)}</span>
       <span style="text-align:right;font-size:11px" class="${over?'over':''}">ลงแล้ว ${fmt(d,0)}/${cnt||'-'}${over?' <svg class=ic aria-hidden=true><use href=#i-alert></use></svg> เกิน':''}</span></label>`;
@@ -6978,7 +7201,7 @@ function renderPlanInstSummary(card){
     let sched=[];try{sched=JSON.parse(row.dataset.sched||'[]')}catch(e){}
     const wTag=sched.length?' <span style="color:var(--blue);font-size:10.5px">(แตก %W เอง)</span>':'';
     return `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--gray-100);font-size:12.5px">
-      <span>${name}</span><span>${fmt(Number(pct)||0)}%${wTag}</span>
+      <span>${escH(name)}</span><span>${fmt(Number(pct)||0)}%${wTag}</span>
     </div>`;
   }).join('');
 }
@@ -7162,7 +7385,7 @@ function markPlanSchedRowTouched(inp){
 function togglePlanSubMode(btn){
   const row=btn.closest('.plan-sched-row');
   row.dataset.subMode=row.dataset.subMode==='1'?'0':'1';
-  if(row.dataset.subMode==='0')document.querySelectorAll(`#plan-sched-rows .plan-sched-row[data-parent="${row.dataset.id}"] .plan-sched-check`).forEach(c=>c.checked=false);
+  if(row.dataset.subMode==='0')document.querySelectorAll(`#plan-sched-rows .plan-sched-row[data-parent="${escH(row.dataset.id)}"] .plan-sched-check`).forEach(c=>c.checked=false);
   refreshPlanBadges();
 }
 
@@ -7463,8 +7686,8 @@ function showExportModal(){
     const tv=totalConVal(p.items,p);
     const div=document.createElement('div');
     div.style.cssText='display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)';
-    div.innerHTML=`<input type="checkbox" id="exp-${p.id}" checked style="width:16px;height:16px;flex-shrink:0">
-      <label for="exp-${p.id}" style="margin:0;font-size:13px;cursor:pointer;font-weight:normal;color:var(--gray-800);flex:1">${escH(p.name)}</label>
+    div.innerHTML=`<input type="checkbox" id="exp-${escH(p.id)}" checked style="width:16px;height:16px;flex-shrink:0">
+      <label for="exp-${escH(p.id)}" style="margin:0;font-size:13px;cursor:pointer;font-weight:normal;color:var(--gray-800);flex:1">${escH(p.name)}</label>
       <span style="font-size:11px;color:var(--gray-400)">${fmtMoney(tv)} บาท</span>`;
     list.appendChild(div);
   });
@@ -7493,8 +7716,8 @@ function handleImport(e){
     try{
       let data=JSON.parse(ev.target.result);
       if(!Array.isArray(data))data=[data];
-      const valid=data.filter(x=>x&&x.name&&x.items);
-      if(!valid.length){alert('ไม่พบข้อมูลโครงการในไฟล์');return}
+      const valid=filterSafeProjects(data.filter(x=>x&&x.name&&x.items),'ไฟล์');
+      if(!valid.length){if(!data.some(x=>x&&x.name&&x.items))alert('ไม่พบข้อมูลโครงการในไฟล์');return}
       for(const imp of valid){ // ไฟล์สำรองรุ่นเก่าฝังรูป base64 ไว้ → ย้ายลง IndexedDB ก่อนบันทึก
         const conv=await convertProjectPhotos(imp);
         if(conv.length)applyPhotoConversions(imp,conv);
@@ -8144,10 +8367,10 @@ function refreshWrAutoItemsPreview(){
   const groupHtml=lines.filter(l=>l.kind==='group').map(l=>`<div style="padding:6px 8px;margin:4px 0;background:var(--purple-light);border-radius:6px">
       <div style="font-size:12px;font-weight:600;${l.hidden?'color:var(--gray-400);text-decoration:line-through':''}" title="${escH(l.text)}"><svg class=ic aria-hidden=true><use href=#i-element></use></svg> ${escH(l.text)}</div>
       <div style="display:flex;gap:6px;margin-top:3px">
-        <select onchange="onWrGroupMetaChange('${escH(l.key)}','hide',this.value)" style="flex:1;font-size:11px;padding:2px 4px;min-width:0"><option value="show" ${l.hidden?'':'selected'}>แสดงหัวข้อนี้ในรายงาน</option><option value="hide" ${l.hidden?'selected':''}>ไม่แสดงในรายงาน</option></select>
-        <input type="text" onchange="onWrGroupMetaChange('${escH(l.key)}','note',this.value)" value="${escH(l.noteTyped)}" placeholder="${escH(l.staAuto?l.staAuto+' (จากชิ้นส่วน)':'หมายเหตุ')}" title="ว่างไว้ = ใช้ STA./GL. ที่ใส่ไว้ตอนบันทึกชิ้นส่วน" style="flex:1;font-size:11px;padding:2px 4px;min-width:0">
+        <select onchange="onWrGroupMetaChange('${escJ(l.key)}','hide',this.value)" style="flex:1;font-size:11px;padding:2px 4px;min-width:0"><option value="show" ${l.hidden?'':'selected'}>แสดงหัวข้อนี้ในรายงาน</option><option value="hide" ${l.hidden?'selected':''}>ไม่แสดงในรายงาน</option></select>
+        <input type="text" onchange="onWrGroupMetaChange('${escJ(l.key)}','note',this.value)" value="${escH(l.noteTyped)}" placeholder="${escH(l.staAuto?l.staAuto+' (จากชิ้นส่วน)':'หมายเหตุ')}" title="ว่างไว้ = ใช้ STA./GL. ที่ใส่ไว้ตอนบันทึกชิ้นส่วน" style="flex:1;font-size:11px;padding:2px 4px;min-width:0">
       </div>
-      ${dpGroupMatsHtml(l,'onWrGroupMetaChange',escH(l.key))}
+      ${dpGroupMatsHtml(l,'onWrGroupMetaChange',escJ(l.key))}
       <div style="font-size:10.5px;color:var(--gray-400);margin-top:2px">ยอดรวมทั้งสัปดาห์</div>
     </div>`).join('');
   wrap.innerHTML=(groupHtml?dpGroupDefaultBar(p,'wr')+groupHtml:'')+lines.filter(l=>l.kind==='entity'&&l.covered!=='full').map(l=>{
@@ -8163,10 +8386,10 @@ function refreshWrAutoItemsPreview(){
     return `<div style="padding:5px 0;border-bottom:1px dashed var(--gray-100)">
       <div style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${hidden?'color:var(--gray-400);text-decoration:line-through':''}" title="${escH(lineText)}">${escH(lineText)}</div>
       <div style="display:flex;gap:6px;margin-top:3px">
-        <select data-entity-id="${l.entityId}" onchange="onWrAutoModeChange(this)" style="flex:1;font-size:11px;padding:2px 4px;min-width:0">
+        <select data-entity-id="${escH(l.entityId)}" onchange="onWrAutoModeChange(this)" style="flex:1;font-size:11px;padding:2px 4px;min-width:0">
           ${opts}
         </select>
-        <input type="text" data-entity-id="${l.entityId}" onchange="onWrNoteChange(this)" value="${escH(l.note||'')}" placeholder="หมายเหตุ" style="flex:1;font-size:11px;padding:2px 4px;min-width:0" ${l.covered==='full'?'disabled title="รายการนี้อยู่ในหัวข้อชิ้นส่วนทั้งหมด — ใส่หมายเหตุที่หัวข้อ "':''}>
+        <input type="text" data-entity-id="${escH(l.entityId)}" onchange="onWrNoteChange(this)" value="${escH(l.note||'')}" placeholder="หมายเหตุ" style="flex:1;font-size:11px;padding:2px 4px;min-width:0" ${l.covered==='full'?'disabled title="รายการนี้อยู่ในหัวข้อชิ้นส่วนทั้งหมด — ใส่หมายเหตุที่หัวข้อ "':''}>
       </div>
     </div>`;
   }).join('');
@@ -8491,8 +8714,8 @@ function renderDailyReportList(){
     <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid var(--gray-100);border-radius:6px;margin-bottom:6px">
       <div style="font-size:12.5px"><strong>${thDate(d.date)}${d.dateTo?' – '+thDate(d.dateTo):''}</strong> <span style="color:var(--gray-400)">· ${(d.items||[]).length} รายการงาน · แรงงาน ${sumLabor(d.labor)} คน</span>${dpCount?` <span style="color:var(--purple)">· <svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> ${dpCount} รายการก้าวหน้ารายวัน</span>`:''}</div>
       <div style="display:flex;gap:6px">
-        <button class="btn-secondary btn-sm" onclick="showDailyReportModal('${d.id}')">แก้ไข</button>
-        <button class="btn-purple btn-sm" onclick="printDailyReportSingle('${d.id}')"><svg class=ic aria-hidden=true><use href=#i-printer></use></svg></button>
+        <button class="btn-secondary btn-sm" onclick="showDailyReportModal('${escJ(d.id)}')">แก้ไข</button>
+        <button class="btn-purple btn-sm" onclick="printDailyReportSingle('${escJ(d.id)}')"><svg class=ic aria-hidden=true><use href=#i-printer></use></svg></button>
       </div>
     </div>`;
   }).join('');
@@ -8558,10 +8781,10 @@ function refreshDrAutoItemsPreview(){
   const groupHtml=lines.filter(l=>l.kind==='group').map(l=>`<div style="padding:6px 8px;margin:4px 0;background:var(--purple-light);border-radius:6px">
       <div style="font-size:12px;font-weight:600;${l.hidden?'color:var(--gray-400);text-decoration:line-through':''}" title="${escH(l.text)}"><svg class=ic aria-hidden=true><use href=#i-element></use></svg> ${escH(l.text)}</div>
       <div style="display:flex;gap:6px;margin-top:3px">
-        <select onchange="onDrGroupMetaChange('${escH(l.metaKey)}','hide',this.value)" style="flex:1;font-size:11px;padding:2px 4px;min-width:0"><option value="show" ${l.hidden?'':'selected'}>แสดงหัวข้อนี้ในรายงาน</option><option value="hide" ${l.hidden?'selected':''}>ไม่แสดงในรายงาน</option></select>
-        <input type="text" onchange="onDrGroupMetaChange('${escH(l.metaKey)}','sta',this.value)" value="${escH(l.staTyped)}" placeholder="${escH(l.staAuto?l.staAuto+' (จากชิ้นส่วน)':'STA.')}" title="ว่างไว้ = ใช้ STA./GL. ที่ใส่ไว้ตอนบันทึกชิ้นส่วน" style="flex:1;font-size:11px;padding:2px 4px;min-width:0">
+        <select onchange="onDrGroupMetaChange('${escJ(l.metaKey)}','hide',this.value)" style="flex:1;font-size:11px;padding:2px 4px;min-width:0"><option value="show" ${l.hidden?'':'selected'}>แสดงหัวข้อนี้ในรายงาน</option><option value="hide" ${l.hidden?'selected':''}>ไม่แสดงในรายงาน</option></select>
+        <input type="text" onchange="onDrGroupMetaChange('${escJ(l.metaKey)}','sta',this.value)" value="${escH(l.staTyped)}" placeholder="${escH(l.staAuto?l.staAuto+' (จากชิ้นส่วน)':'STA.')}" title="ว่างไว้ = ใช้ STA./GL. ที่ใส่ไว้ตอนบันทึกชิ้นส่วน" style="flex:1;font-size:11px;padding:2px 4px;min-width:0">
       </div>
-      ${dpGroupMatsHtml(l,'onDrGroupMetaChange',escH(l.metaKey))}
+      ${dpGroupMatsHtml(l,'onDrGroupMetaChange',escJ(l.metaKey))}
     </div>`).join('');
   wrap.innerHTML=(groupHtml?dpGroupDefaultBar(p,'dr')+groupHtml:'')+entries.map(e=>{
     const disp=formatDpDisplayText(p,e);
@@ -8588,10 +8811,10 @@ function refreshDrAutoItemsPreview(){
     return `<div style="padding:5px 0;border-bottom:1px dashed var(--gray-100)">
       <div style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${hidden?'color:var(--gray-400);text-decoration:line-through':''}" title="${escH(fullLine)}">${escH(fullLine)}</div>
       <div style="display:flex;gap:6px;margin-top:3px">
-        <select data-entry-id="${e.id}" onchange="onDrAutoModeChange(this)" style="flex:1;font-size:11px;padding:2px 4px;min-width:0">
+        <select data-entry-id="${escH(e.id)}" onchange="onDrAutoModeChange(this)" style="flex:1;font-size:11px;padding:2px 4px;min-width:0">
           ${opts}
         </select>
-        <input type="text" data-entry-id="${e.id}" onchange="onDrStaChange(this)" value="${escH(e.sta||'')}" placeholder="STA." style="flex:1;font-size:11px;padding:2px 4px;min-width:0">
+        <input type="text" data-entry-id="${escH(e.id)}" onchange="onDrStaChange(this)" value="${escH(e.sta||'')}" placeholder="STA." style="flex:1;font-size:11px;padding:2px 4px;min-width:0">
       </div>
     </div>`;
   }).join('');
@@ -8629,7 +8852,7 @@ function addDrEquipRow(it){
   div.className='dr-equip-row';
   div.style.cssText='display:flex;gap:8px;margin-bottom:6px;align-items:center';
   div.innerHTML=`<input type="text" placeholder="รายการเครื่องมือ/เครื่องจักร" value="${escH(it?it.name:'')}" data-field="name" style="flex:2">
-    <input type="number" min="0" step="1" placeholder="จำนวน" value="${it?it.qty:''}" data-field="qty" style="flex:1">
+    <input type="number" min="0" step="1" placeholder="จำนวน" value="${escH(it?it.qty:'')}" data-field="qty" style="flex:1">
     <button class="btn-icon" type="button" onclick="this.closest('.dr-equip-row').remove()" title="ลบ">✕</button>`;
   container.appendChild(div);
 }

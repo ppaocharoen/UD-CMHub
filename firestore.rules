@@ -1,0 +1,48 @@
+rules_version = '2';
+// UD-CM Hub v11.7 — ผู้ใช้ต้องลงทะเบียนและได้รับอนุมัติจากผู้ดูแลระบบก่อนซิงก์ข้อมูลขึ้นคลาวด์
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+
+    // ผู้ดูแลระบบ (ต้องตรงกับ CL_ADMINS ในแอป)
+    function isAdmin() {
+      return signedIn()
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in ['patcharapol.pao@gmail.com'];
+    }
+
+    function isApproved(uid) {
+      let p = /databases/$(database)/documents/profiles/$(uid);
+      return exists(p) && get(p).data.status == 'approved';
+    }
+
+    function validInfo(d) {
+      return d.name is string && d.name.size() > 0 && d.name.size() <= 100
+        && d.position is string && d.position.size() > 0 && d.position.size() <= 100
+        && d.org is string && d.org.size() > 0 && d.org.size() <= 150;
+    }
+
+    // คำขอใช้งาน: เจ้าของอ่าน/สร้าง/แก้ข้อมูลตัวเองได้ แต่เปลี่ยนสถานะเองไม่ได้ (ยกเว้นส่งใหม่หลังไม่อนุมัติ)
+    match /profiles/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name','position','org','email','status','createdAt','updatedAt'])
+        && request.resource.data.status == 'pending'
+        && request.resource.data.email == request.auth.token.email
+        && validInfo(request.resource.data);
+      allow update: if isAdmin()
+        || (signedIn() && request.auth.uid == uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name','position','org','updatedAt','status'])
+            && (request.resource.data.status == resource.data.status
+                || (resource.data.status == 'rejected' && request.resource.data.status == 'pending'))
+            && validInfo(request.resource.data));
+      allow delete: if isAdmin();
+    }
+
+    // ข้อมูลโครงการ: เฉพาะเจ้าของบัญชีที่ได้รับอนุมัติแล้ว (หรือผู้ดูแลระบบสำหรับข้อมูลของตัวเอง)
+    match /users/{uid}/{document=**} {
+      allow read, write: if signedIn() && request.auth.uid == uid && (isApproved(uid) || isAdmin());
+    }
+  }
+}
