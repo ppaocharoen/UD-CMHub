@@ -39,6 +39,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='white'%3EUD%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='white'%3EUD%3C/text%3E%3C/svg%3E">
 <script data-lib="Chart.js 4.4.1">/* Chart.js 4.4.1 — ฝังในไฟล์เพื่อใช้งานออฟไลน์ (ลิขสิทธิ์ตามสัญญาอนุญาตของไลบรารี) */
 /*!
  * Chart.js v4.4.1
@@ -179,9 +183,9 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(15,1
 .pg-kv{display:grid;grid-template-columns:1fr auto;gap:5px 10px;font-size:12.5px}.pg-kv .k{color:var(--gray-500)}.pg-kv .v{text-align:right;font-weight:700;white-space:nowrap}
 .pg-sep{border-top:1px dashed var(--gray-200);margin:10px 0}
 .pg-sm{font-size:11px;color:var(--gray-400);font-weight:500}
-.pg-row{display:grid;grid-template-columns:78px 1fr 168px;gap:10px;align-items:center;margin-bottom:9px}
+.pg-row{display:grid;grid-template-columns:var(--pg-lw,78px) 1fr 168px;gap:10px;align-items:center;margin-bottom:9px}
 .pg-row .pv{font-size:12px;color:var(--gray-500);white-space:nowrap}.pg-row .pv b{font-size:17px;margin-right:6px}
-.pg-ticks{display:grid;grid-template-columns:78px 1fr 168px;gap:10px;margin-top:-3px}.pg-ticks>div{display:flex;justify-content:space-between;font-size:9.5px;color:var(--gray-400)}
+.pg-ticks{display:grid;grid-template-columns:var(--pg-lw,78px) 1fr 168px;gap:10px;margin-top:-3px}.pg-ticks>div{display:flex;justify-content:space-between;font-size:9.5px;color:var(--gray-400)}
 @media(max-width:600px){.pg-row,.pg-ticks{grid-template-columns:62px 1fr 92px;gap:6px}.pg-row .pv{white-space:normal;font-size:10.5px;line-height:1.25}.pg-row .pv b{display:block;font-size:15px}.pg-ticks span.t2{display:none}}
 @media(max-width:900px){.pg-panel{grid-template-columns:1fr}.pg-panel>div+div{border-left:none;border-top:1px solid var(--gray-100)}}
 .metric-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
@@ -914,7 +918,7 @@ tr:hover td{background:var(--gray-50)}
     </div>
     <div id="plan-rev-meta-form" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--gray-100)">
       <div class="form-row">
-        <div><label style="margin-top:0">ชื่อแผนแก้ไข</label><input id="plan-rev-name" type="text" placeholder="Rev.1"></div>
+        <div><label style="margin-top:0">ชื่อแผน (ตั้งให้อัตโนมัติตามลำดับ)</label><input id="plan-rev-name" type="text" readonly style="background:var(--gray-50);color:var(--gray-600)"></div>
         <div><label style="margin-top:0">เหตุผลที่รีไวส์</label><input id="plan-rev-reason" type="text" placeholder="มีคำสั่งขยายเวลา..."></div>
       </div>
       <div class="form-row">
@@ -1205,7 +1209,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="modal-overlay" id="modal-price-adjust">
   <div class="modal">
     <div class="modal-title"><svg class=ic aria-hidden=true><use href=#i-tag></use></svg> ปรับราคาตามส่วนลดผู้รับจ้าง</div>
-    <div class="modal-sub">ใช้เมื่อราคาที่นำเข้าจาก BOQ เป็นราคากลาง แต่ผู้รับจ้างเสนอราคาต่ำกว่า ระบบคิดส่วนลดจาก <b>ราคากลาง</b> เสมอ (ปรับซ้ำได้ ไม่ลดทบ) แล้วใช้ราคาหลังลดเป็นมูลค่าจริงทุกส่วน ทั้งแผนเดิมและแผนแก้ไขที่ราคายังตรงกัน แก้ราคาแต่ละรายการเองภายหลังได้อิสระ</div>
+    <div class="modal-sub">ใช้เมื่อราคาที่นำเข้าจาก BOQ เป็นราคากลาง แต่ผู้รับจ้างเสนอราคาต่ำกว่า ระบบคิดส่วนลดจาก <b>ราคากลาง</b> เสมอ (ปรับซ้ำได้ ไม่ลดทบ) แล้วใช้ราคาหลังลดเป็นมูลค่าจริงทุกส่วน ทั้งแผนงานและแผนงาน Rev.ที่ราคายังตรงกัน แก้ราคาแต่ละรายการเองภายหลังได้อิสระ</div>
     <div style="background:var(--gray-50);border-radius:8px;padding:10px 14px;margin-bottom:10px">
       <div style="font-size:12px;color:var(--gray-400)">ราคากลางรวม (คูณ Factor F / VAT แล้ว) เทียบกับวงเงินค่าจ้าง</div>
       <div style="font-size:18px;font-weight:700" id="pa-current-total">0.00 บาท</div>
@@ -1241,7 +1245,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.10';
+const APP_VERSION='11.11';
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
 const STORE_KEY='scurve_v4';
@@ -1933,12 +1937,15 @@ function computeScheduleFromInstallments(entityId,installments,projStart,T){
   });
   return{duration,startPeriod:minStart,schedule:weeklyPct.map(pct=>({pct}))};
 }
+// v11.11 ชื่อแผนแบบเดียวทั้งระบบ: แผนแรก = "แผนงาน" · แผนปรับปรุงลำดับที่ n = "แผนงาน Rev.n" (ตามลำดับ ไม่ใช้ชื่อที่พิมพ์เอง)
+function planName(i){return (i===null||i===undefined||i<0)?'แผนงาน':'แผนงาน Rev.'+(i+1)}
+function revTitle(p,r){return planName((p&&p.revisions||[]).indexOf(r))}
 function getAllPlans(p){
   const plans=[];
-  plans.push({id:'original',label:'แผนเดิม',items:p.items,endDate:p.endDate,color:'#85b7eb',dash:[]});
+  plans.push({id:'original',label:'แผนงาน',items:p.items,endDate:p.endDate,color:'#85b7eb',dash:[]});
   (p.revisions||[]).forEach((rev,idx)=>{
     const colors=['#b07ee8','#e8a23a','#e86060','#3ab5e8','#3ae8a2'];
-    plans.push({id:'rev_'+idx,label:rev.name||('Rev.'+(idx+1)),items:rev.items,endDate:rev.endDate,color:colors[idx%colors.length],dash:[6,3],rev,idx});
+    plans.push({id:'rev_'+idx,label:planName(idx),items:rev.items,endDate:rev.endDate,color:colors[idx%colors.length],dash:[6,3],rev,idx});
   });
   return plans;
 }
@@ -2028,7 +2035,7 @@ function renderList(){
       const revT=periodsFromDates(p.startDate,lr.endDate)||T;
       const revPlan=buildPlanCurve(lr.items,revT,p);
       comparePlanNow=revPlan[Math.max(0,Math.min(cp,revT)-1)]||0;
-      planLabel=lr.name;
+      planLabel=planName(revs.length-1);
     }
     const diff=actualNow-comparePlanNow;
     const revCount=revs.length;
@@ -2947,7 +2954,7 @@ const MANUAL_SECTIONS=[
 <li><b>วิธีที่ง่ายที่สุด:</b> กรอก <b>วงเงินค่าจ้าง</b> ในหน้าโครงการใหม่ / แก้ไขโครงการ ระบบเทียบกับราคากลางรวม (คูณ Factor F / VAT แล้ว) และบอกว่าต่ำกว่ากี่ % พร้อมปุ่ม <b>ปรับราคาทุกรายการลง X%</b> หรือกด <b>ไม่ใช้</b></li>
 <li>หรือพิมพ์ % เองในแถบ <span class="k"><svg class=ic aria-hidden=true><use href=#i-tag></use></svg> ปรับลดราคาทุกรายการจากราคากลาง</span> ใต้ปุ่มนำเข้า แล้วกด <b>ปรับราคา</b> (ใส่ 0 = คืนเป็นราคากลาง) — ราคาในรายการและราคาต่อหน่วยของงานย่อยเปลี่ยนทันที กด "บันทึก" เพื่อยืนยัน</li>
 <li>ยังแก้ราคาแต่ละรายการเองได้เหมือนเดิม ถ้าปรับ % ใหม่ภายหลัง ระบบจะถามก่อนว่าจะปรับทับรายการที่แก้เองหรือคงไว้</li>
-<li>ราคาหลังลดคือมูลค่าจริงที่ใช้ทุกส่วน (S-Curve ร้อยละ งวดงาน รายงาน) รวมถึงแผนแก้ไขที่ราคารายการยังเท่าแผนเดิม</li>
+<li>ราคาหลังลดคือมูลค่าจริงที่ใช้ทุกส่วน (S-Curve ร้อยละ งวดงาน รายงาน) รวมถึงแผนงาน Rev. ที่ราคารายการยังเท่าแผนงาน</li>
 <li>โครงการที่บันทึกแล้วใช้ปุ่ม <span class="k"><svg class=ic aria-hidden=true><use href=#i-tag></use></svg> ปรับราคาตามส่วนลดผู้รับจ้าง</span> ในแท็บ "รายการงาน" ได้ด้วย (กรอกวงเงินรวม Factor F / VAT หรือ %)</li>
 <li>นำเข้า BOQ ใหม่ (รวม BOQ ฉบับแก้ไขสัญญา) ระบบถือราคาในไฟล์เป็นราคาที่ใช้ และตั้งส่วนลดกลับเป็น 0</li>
 </ul>
@@ -2957,7 +2964,7 @@ const MANUAL_SECTIONS=[
 <li>ระบบจับคู่หมวดงานและงานย่อยจากชื่อให้อัตโนมัติ: <b>= เหมือนเดิม</b> · <b>~ เปลี่ยน</b> (ปริมาณ/ราคา) · <b><svg class=ic aria-hidden=true><use href=#i-alert></use></svg> ควรตรวจ</b> (ชื่อคล้ายกัน หรือชื่อตรงแต่คนละหัวข้อ) · <b>+ ใหม่</b> · <b>− ตัดออก</b> — แก้คู่ได้ทุกแถว</li>
 <li>รายการที่จับคู่ได้ ใช้ความก้าวหน้า แผน งวดงาน และชิ้นส่วนโครงสร้างเดิมต่อ (ชื่อ ปริมาณ ราคา ตามไฟล์ใหม่)</li>
 <li>กด <span class="k">ใช้การจับคู่นี้</span> แล้วกด <span class="k">บันทึก</span> ของหน้าแก้ไขโครงการ — ระบบดาวน์โหลดไฟล์สำรองโครงการ (ก่อนนำเข้า) ให้ก่อน</li>
-<li>หลังบันทึก: ปรับทุกแผน (แผนเดิมและรีไวส์) · รายการที่ตัดออกถูกตัดออกจากแผนและงวดงาน · รายการใหม่เพิ่มเข้าแผนล่าสุดแบบ <b>ยังไม่มีแผน</b> (ไม่นับในเส้นแผน) และมีแถบเตือนสีส้มที่หน้าโครงการจนกว่าจะใส่แผนที่ <svg class=ic aria-hidden=true><use href=#i-plan></use></svg> แผนงาน</li>
+<li>หลังบันทึก: ปรับทุกแผน (แผนงานและแผนงาน Rev.) · รายการที่ตัดออกถูกตัดออกจากแผนและงวดงาน · รายการใหม่เพิ่มเข้าแผนล่าสุดแบบ <b>ยังไม่มีแผน</b> (ไม่นับในเส้นแผน) และมีแถบเตือนสีส้มที่หน้าโครงการจนกว่าจะใส่แผนที่ <svg class=ic aria-hidden=true><use href=#i-plan></use></svg> แผนงาน</li>
 <li>% ความก้าวหน้า <b>คิดใหม่ตาม BOQ ใหม่ทั้งหมด</b> รวมสัปดาห์ที่ผ่านมา (อาจไม่ตรงกับรายงานที่ส่งไปแล้ว): ปริมาณที่ทำได้คงเดิม ร้อยละคิดเทียบปริมาณใหม่ · น้ำหนักแต่ละรายการตามมูลค่าใหม่</li>
 <li>ความก้าวหน้าของรายการที่ตัดออกไม่ถูกลบ แต่ไม่นับแล้ว · ชิ้นส่วนโครงสร้างที่ใช้วัสดุที่ถูกตัดออกจะขึ้น <svg class=ic aria-hidden=true><use href=#i-alert></use></svg> ไม่พบ</li>
 </ul>
@@ -2980,8 +2987,8 @@ const MANUAL_SECTIONS=[
 <li>หลายรายการพร้อมกัน: ติ๊กรายการ (หรือ "เลือกทั้งหมด") แล้วใช้ <span class="k">✓ ใช้ระยะ/เริ่มW กับรายการที่เลือก</span> หรือ <span class="k">%/W ให้รายการที่เลือก</span></li>
 </ul>
 <p>สุดท้ายกด <span class="k"><svg class=ic aria-hidden=true><use href=#i-save></use></svg> บันทึกแผนงาน</span> (ถ้าปิดหน้าโดยไม่บันทึก การแก้ไขในหน้านี้จะไม่ถูกเก็บ)</p>
-<h4>แก้ไขแผน (รีไวส์)</h4>
-<p>เมื่อมีการปรับแผนระหว่างสัญญา เลือก <span class="k">+ สร้างแผนแก้ไขใหม่ (รีไวส์)</span> ที่ช่อง "แผนที่กำลังแก้ไข" ระบบเก็บแผนเดิมไว้เทียบกับแผนแก้ไข (แสดงเป็น "แผน REV" ใน S-Curve) ดูรายการแผนทั้งหมดที่แท็บ <b>รีไวส์ทั้งหมด</b> · <span class="k"><svg class=ic aria-hidden=true><use href=#i-trash></use></svg> ล้างแผนทั้งหมด</span> ล้างแผนที่กำลังแก้ไขอยู่</p>
+<h4>ปรับแผน (แผนงาน Rev.1, Rev.2 …)</h4>
+<p>เมื่อมีการปรับแผนระหว่างสัญญา เลือก <span class="k">+ สร้างแผนใหม่ (แผนงาน Rev.…)</span> ที่ช่อง "แผนที่กำลังแก้ไข" ระบบเก็บแผนงานเดิมไว้เทียบกับแผนงาน Rev. (แสดงเป็น "แผน REV" ใน S-Curve) ดูรายการแผนทั้งหมดที่แท็บ <b>รีไวส์ทั้งหมด</b> · <span class="k"><svg class=ic aria-hidden=true><use href=#i-trash></use></svg> ล้างแผนทั้งหมด</span> ล้างแผนที่กำลังแก้ไขอยู่ · ระบบตั้งชื่อแผนให้อัตโนมัติตามลำดับ: แผนแรกชื่อ <b>แผนงาน</b> แผนที่ปรับครั้งแรกชื่อ <b>แผนงาน Rev.1</b> ครั้งถัดไป <b>แผนงาน Rev.2</b> (ถ้าลบแผน Rev. ใด แผนถัดไปจะเลื่อนเลขขึ้นมา)</p>
 <div class="tip">เพิ่ม/ลบ/เปลี่ยนมูลค่ารายการงาน ทำที่ปุ่ม <b>แก้ไข</b> ของโครงการ ไม่ใช่ที่หน้าแผนงาน</div>`},
 
 {id:'weekly',title:'บันทึกความก้าวหน้ารายสัปดาห์ และอ่านหน้า S-Curve',html:`
@@ -2992,7 +2999,7 @@ const MANUAL_SECTIONS=[
 <li>กรอก <b>% จริงสะสม (0–100)</b> ของแต่ละรายการงาน — เป็นค่าสะสมตั้งแต่เริ่มโครงการ ไม่ใช่เฉพาะสัปดาห์นี้ ข้างช่องกรอกจะเห็น "แผน" และ "ก่อนหน้า" ให้เทียบ</li>
 <li>แก้ไขสัปดาห์ที่บันทึกแล้ว กด <svg class=ic aria-hidden=true><use href=#i-edit></use></svg> ในแท็บประวัติ · <b>ลบ</b> กด <svg class=ic aria-hidden=true><use href=#i-trash></use></svg> (หรือปุ่ม "<svg class=ic aria-hidden=true><use href=#i-trash></use></svg> ลบสัปดาห์นี้" ในหน้าต่างแก้ไข) — ลบเฉพาะ % ความก้าวหน้าและรายละเอียดรายงานประจำสัปดาห์ของสัปดาห์นั้น รายงานประจำวัน ภาพถ่าย และบันทึกรายวันยังอยู่</li>
 <li>ติ๊ก <b>การก่อสร้างแล้วเสร็จ</b> และระบุวันที่ → ระบบหยุดนับระยะเวลา และบันทึกได้ถึงสัปดาห์ที่แล้วเสร็จเท่านั้น (ถ้ามีบันทึกหลังวันนั้นอยู่ ต้องลบก่อน) ยกเลิกติ๊กถ้าต้องการบันทึกต่อ</li>
-<li>ถ้าโครงการมีแผนรีไวส์ จะมีแถบ <b>แสดงรายการงานของแผน</b> ติ๊กเลือกได้หลายแผน (แผนเดิม / Rev.1 / Rev.2 …) — ค่าเริ่มต้นคือแผนล่าสุด ใช้บันทึก % จริงของรายการที่เพิ่มในแผนรีไวส์ รายการที่ซ่อนไว้ยังคงค่าเดิม</li>
+<li>ถ้าโครงการมีแผนรีไวส์ จะมีแถบ <b>แสดงรายการงานของแผน</b> ติ๊กเลือกได้หลายแผน (แผนงาน / แผนงาน Rev.1 / แผนงาน Rev.2 …) — ค่าเริ่มต้นคือแผนล่าสุด ใช้บันทึก % จริงของรายการที่เพิ่มในแผนรีไวส์ รายการที่ซ่อนไว้ยังคงค่าเดิม</li>
 <li>ถ้าบันทึกความก้าวหน้ารายวันไว้ กด <span class="k">⤵ ดึงค่าจากบันทึกรายวันทั้งหมด</span> เพื่อเติม % ของทุกรายการที่แสดงในครั้งเดียว (หรือกด "ใช้ค่านี้" ทีละรายการ) แล้วตรวจก่อนบันทึก</li>
 <li>ถ้ารายการมีงานย่อย กดปุ่ม <span class="k"><svg class=ic aria-hidden=true><use href=#i-plan></use></svg></span> กรอกเป็น "จำนวนที่ทำแล้ว" หรือ % ของงานย่อยแต่ละตัว ระบบคำนวณอีกช่องให้ตรงกันและรวมเป็น % ของรายการ</li>
 <li>กด <span class="k">บันทึก</span></li>
@@ -3001,8 +3008,8 @@ const MANUAL_SECTIONS=[
 <p>เมื่อก่อสร้างเสร็จจริง ติ๊ก <b>การก่อสร้างแล้วเสร็จ</b> ในหน้าต่างบันทึกและเลือกวันที่แล้วเสร็จ (ใช้คำนวณค่าปรับ/การนับวัน)</p>
 <h4>อ่านแท็บ S-Curve</h4>
 <ul>
-<li><b>แถบความก้าวหน้า</b> (แบบเดียวกับรายงานประจำสัปดาห์) — แผนเดิม / แผน REV (ถ้ามี) / ผลงานจริง / เวลาสัญญา บนสเกล 0–100% เดียวกัน ส่วนสีเหลือง = ที่เพิ่มขึ้นในสัปดาห์นั้น ผลงานจริงสีเขียว = ตามแผน สีแดง = ช้ากว่าแผน · เทียบแถบผลงานกับแถบเวลาจะเห็นทันทีว่างานตามทันเวลาหรือไม่</li>
-<li>ป้ายมุมขวาบนบอกสถานะและผลต่างเทียบแผนที่แสดงอยู่ (แผนเดิม หรือแผน REV ถ้าเปิดเส้น REV ไว้)</li>
+<li><b>แถบความก้าวหน้า</b> (แบบเดียวกับรายงานประจำสัปดาห์) — แผนงาน / แผนงาน Rev. ล่าสุด (ถ้ามี) / ผลงานจริง / เวลาสัญญา บนสเกล 0–100% เดียวกัน ส่วนสีเหลือง = ที่เพิ่มขึ้นในสัปดาห์นั้น ผลงานจริงสีเขียว = ตามแผน สีแดง = ช้ากว่าแผน · เทียบแถบผลงานกับแถบเวลาจะเห็นทันทีว่างานตามทันเวลาหรือไม่</li>
+<li>ป้ายมุมขวาบนบอกสถานะและผลต่างเทียบแผนที่แสดงอยู่ (แผนงาน หรือแผนงาน Rev. ล่าสุดถ้าเปิดเส้นนั้นไว้)</li>
 <li><b>มูลค่างาน</b> — ใช้ <b>วงเงินค่าจ้าง</b> ที่กรอกในหน้าโครงการเป็นวงเงินตามสัญญา (ถ้าไม่ได้กรอก ใช้ผลรวมรายการงาน) แสดงมูลค่าแล้วเสร็จ (% จริง × วงเงิน) มูลค่าที่ทำได้ในสัปดาห์นั้น และคงเหลือ — ตรงกับวงเงินในรายงานประจำสัปดาห์</li>
 <li><b>กราฟ</b> — ชี้ที่จุดใดก็ได้ จะแสดงสัปดาห์และช่วงวันที่ของสัปดาห์นั้น (เช่น W3 · 19–25 ต.ค. 2569) พร้อม % ของแต่ละเส้นที่มีข้อมูล ใต้แกน X มีแถบบอกเดือน (สัปดาห์ที่คร่อมสองเดือนนับเข้าเดือนที่มีวันมากกว่า)</li>
 <li><b>แสดงข้อมูล ณ :</b> เลือกสัปดาห์ที่ต้องการดู · ปุ่ม <span class="k">ล่าสุด</span> = สัปดาห์ล่าสุดที่มีการบันทึก · <span class="k">ปัจจุบัน</span> = สัปดาห์ตามปฏิทินวันนี้</li>
@@ -3218,13 +3225,14 @@ const MANUAL_SECTIONS=[
 <tr><td>W (สัปดาห์ที่)</td><td>W1 = สัปดาห์แรกนับจากวันเริ่มสัญญา</td></tr>
 <tr><td>% จริงสะสม</td><td>ความก้าวหน้าตั้งแต่เริ่มโครงการถึงสัปดาห์นั้น (0–100) ของแต่ละรายการ</td></tr>
 <tr><td>% ความก้าวหน้ารวม</td><td>ผลรวมของ (น้ำหนัก% × % จริงสะสมของรายการ) ถ่วงน้ำหนักด้วยมูลค่าของ <b>แผนล่าสุด</b> (รีไวส์ล่าสุด ถ้ามี) — รายการที่เพิ่มในรีไวส์จึงถูกนับด้วย</td></tr>
-<tr><td>แผนเดิม / แผน REV</td><td>แผนตอนเริ่มโครงการ / แผนที่แก้ไขภายหลัง (รีไวส์)</td></tr>
+<tr><td>แผนงาน / แผนงาน Rev.1, Rev.2 …</td><td>แผนตอนเริ่มโครงการ / แผนที่ปรับปรุงภายหลังตามลำดับ (ระบบตั้งชื่อให้อัตโนมัติ)</td></tr>
 <tr><td>ผลต่าง</td><td>% จริง − % แผน (ติดลบ = ล่าช้ากว่าแผน)</td></tr>
 <tr><td>เกินกำหนดเฟส</td><td>เอกสารที่ยังไม่เสร็จ ทั้งที่เลยกำหนดของเฟสนั้นแล้ว</td></tr>
 </table>`},
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.11</b> — เปลี่ยนชื่อแผนทั้งระบบ: แผนแรกเรียก "แผนงาน" (เดิม "แผนเดิม") แผนที่ปรับเรียก "แผนงาน Rev.1", "แผนงาน Rev.2" ตามลำดับโดยอัตโนมัติ — ทั้งหน้าจอ กราฟ ตาราง และรายงาน</li>
 <li><b>v11.10</b> — รายงานสรุป: พิมพ์สีแถบความก้าวหน้าและหัวตารางออกเสมอ (ไม่ต้องเปิด "กราฟิกพื้นหลัง" เอง) · จัดเนื้อหาให้เต็มความกว้าง A4 ไม่เหลือขอบซ้ายขวามาก · หน้าพิมพ์อื่นพิมพ์สีพื้นหลังออกเสมอเช่นกัน</li>
 <li><b>v11.9</b> — หน้า S-Curve: สรุปความก้าวหน้าใหม่เป็นแผงเดียว — แถบสะสมแบบรายงานประจำสัปดาห์ (แผนเดิม / แผน REV / ผลงานจริง / เวลาสัญญา) + มูลค่างาน + ระยะเวลา ใช้พื้นที่น้อยลง · ช่องเลือกสัปดาห์แสดงช่วงวันที่ · มูลค่างานใช้วงเงินค่าจ้างตามสัญญา (ตรงกับรายงานประจำสัปดาห์) · รายงานสรุป: จัดหน้าใหม่ กราฟ S-Curve ใหญ่ขึ้นและคมชัด มีกรอบรายละเอียดสัปดาห์ที่ออกรายงาน แถวรวมในตารางรายการงาน และหมายเหตุส่วนต่างจากการปัดเศษ · กรอบรายละเอียดบนกราฟไม่ทับป้าย W ที่เลือก</li>
 <li><b>v11.8</b> — อัปเกรดไลบรารีอ่าน/เขียน Excel (SheetJS) จาก 0.18.5 เป็น 0.20.3 ปิดช่องโหว่ที่ไฟล์ Excel ที่ถูกแต่งมาใช้แทรกค่าเข้าระบบหรือทำให้หน้าเว็บค้างได้</li>
@@ -3415,7 +3423,7 @@ function openDashboard(id){
   if(revs.length){
     strip.innerHTML=`<div class="rev-strip">
       <span style="color:var(--purple);font-weight:600">&#8635; แผนแก้ไข</span>
-      <span style="color:var(--gray-600)">${revs.length} ครั้ง · ล่าสุด: <strong>${escH(revs[revs.length-1].name)}</strong> (ณ W${revs[revs.length-1].atPeriod||'?'})</span>
+      <span style="color:var(--gray-600)">${revs.length} ครั้ง · ล่าสุด: <strong>${escH(planName(revs.length-1))}</strong> (ณ W${revs[revs.length-1].atPeriod||'?'})</span>
     </div>`;
   } else strip.innerHTML='';
 
@@ -3482,11 +3490,11 @@ function computeProgressSummary(p,dw){
     const lr=revs[revs.length-1];
     const revT=periodsFromDates(p.startDate,lr.endDate)||(()=>{let mx=0;(lr.items||[]).forEach(i=>{const e=Number(i.startPeriod||1)+Number(i.duration||1)-1;if(e>mx)mx=e});return mx||T})();
     const rc=buildPlanCurve(lr.items,revT,p);
-    rev={name:lr.name,now:at(rc,dw,revT),prev:at(rc,dw-1,revT),T:revT};
+    rev={name:planName(revs.length-1),now:at(rc,dw,revT),prev:at(rc,dw-1,revT),T:revT};
   }
   const lastRevVisible=!!(rev&&visiblePlans.has('rev_'+(revs.length-1)));
   const cmpNow=lastRevVisible?rev.now:planNow,cmpPrev=lastRevVisible?rev.prev:planPrev;
-  const cmpLabel=lastRevVisible?rev.name:'แผนเดิม';
+  const cmpLabel=lastRevVisible?rev.name:'แผนงาน';
   const entry=entryAtOrBefore(p,dw);
   const actualNow=getActualWeighted(p,entry);
   const entryPrev=dw>1?entryAtOrBefore(p,dw-1):null;
@@ -3508,7 +3516,7 @@ function progressBarsHtml(S,pr){
   const C={plan:'#1a6fc4',rev:'#6d4fc2',week:'#FFC000',time:'#8a94a3',good:'#1D9E75',bad:'#C00000',na:'#1a6fc4'};
   const actCol=S.planMissing?C.na:(S.actualNow>=S.cmpNow?C.good:C.bad);
   const clamp=v=>Math.max(0,Math.min(100,Number(v)||0));
-  const lw=pr?92:78,vw=pr?200:168,bh=pr?15:14;
+  const lw=pr?(S.rev?128:92):(S.rev?108:78),vw=pr?200:168,bh=pr?15:14;
   const bar=(prev,now,col,empty)=>{
     if(empty)return `<div style="height:${bh}px;background:${pr?'#f2f2f2':'#eef1f5'};border:1px solid ${pr?'#999':'#d9dee6'};border-radius:${pr?0:3}px"></div>`;
     const a=clamp(Math.min(prev,now)),b=clamp(now);
@@ -3523,15 +3531,15 @@ function progressBarsHtml(S,pr){
   const big=(v,col)=>pr?`<b style="font-size:19px;color:${col};margin-right:6px">${v}</b>`:`<b style="color:${col}">${v}</b>`;
   const miss=`<span style="color:#999">ยังไม่ส่งแผน</span>`;
   let h='';
-  h+=row('แผนเดิม',bar(S.planPrev,S.planNow,C.plan,S.planMissing),S.planMissing?miss:big(fmt(S.planNow)+'%','#1a6fc4')+'สัปดาห์นี้ '+sgn(S.planNow-S.planPrev));
-  if(S.rev)h+=row(`<span title="${escH(S.rev.name)}">แผน REV</span>`,bar(S.rev.prev,S.rev.now,C.rev,S.planMissing),S.planMissing?miss:big(fmt(S.rev.now)+'%','#6d4fc2')+'สัปดาห์นี้ '+sgn(S.rev.now-S.rev.prev));
+  h+=row('แผนงาน',bar(S.planPrev,S.planNow,C.plan,S.planMissing),S.planMissing?miss:big(fmt(S.planNow)+'%','#1a6fc4')+'สัปดาห์นี้ '+sgn(S.planNow-S.planPrev));
+  if(S.rev)h+=row(`<span>${escH(S.rev.name)}</span>`,bar(S.rev.prev,S.rev.now,C.rev,S.planMissing),S.planMissing?miss:big(fmt(S.rev.now)+'%','#6d4fc2')+'สัปดาห์นี้ '+sgn(S.rev.now-S.rev.prev));
   h+=row('ผลงานจริง',bar(S.actualPrev,S.actualNow,actCol),big(fmt(S.actualNow)+'%',actCol)+'สัปดาห์นี้ '+sgn(S.actualNow-S.actualPrev));
   h+=row('เวลาสัญญา',bar(S.timePrev,S.timeNow,C.time),big(fmt(S.timeNow)+'%',pr?'#444':'var(--gray-800)')+`${S.elapsed} / ${S.T} สัปดาห์`);
   const ticks=[];for(let t=0;t<=100;t+=10)ticks.push(`<span${t%50?' class="t2"':''}>${t}${t===0||t===100?'%':''}</span>`);
   h+=pr?`<div style="display:grid;grid-template-columns:${lw}px 1fr ${vw}px;gap:10px;margin-top:-3px"><span></span><div style="display:flex;justify-content:space-between;font-size:11px;color:#666">${ticks.join('')}</div><span></span></div>`
     :`<div class="pg-ticks"><span></span><div>${ticks.join('')}</div><span></span></div>`;
   const sw=(c,t)=>`<span style="white-space:nowrap;margin-right:${pr?14:16}px"><span style="display:inline-block;width:${pr?12:10}px;height:${pr?12:10}px;border-radius:2px;background:${c};vertical-align:-1px;margin-right:4px"></span>${t}</span>`;
-  h+=`<div style="font-size:${pr?12.5:11}px;color:${pr?'#666':'var(--gray-500)'};margin-top:${pr?4:8}px;line-height:1.7">${S.planMissing?'':sw(C.plan,'แผนสะสมถึงสัปดาห์ก่อน')}${S.rev&&!S.planMissing?sw(C.rev,'แผน REV สะสมถึงสัปดาห์ก่อน'):''}${sw(actCol,'ผลงานสะสมถึงสัปดาห์ก่อน'+(S.planMissing?'':' (เขียว = ตามแผน / แดง = ช้ากว่าแผน)'))}${sw(C.time,'เวลาที่ใช้ไป')}${sw(C.week,'สัปดาห์นี้')}</div>`;
+  h+=`<div style="font-size:${pr?12.5:11}px;color:${pr?'#666':'var(--gray-500)'};margin-top:${pr?4:8}px;line-height:1.7">${S.planMissing?'':sw(C.plan,'แผนงานสะสมถึงสัปดาห์ก่อน')}${S.rev&&!S.planMissing?sw(C.rev,escH(S.rev.name)+' สะสมถึงสัปดาห์ก่อน'):''}${sw(actCol,'ผลงานสะสมถึงสัปดาห์ก่อน'+(S.planMissing?'':' (เขียว = ตามแผน / แดง = ช้ากว่าแผน)'))}${sw(C.time,'เวลาที่ใช้ไป')}${sw(C.week,'สัปดาห์นี้')}</div>`;
   return h;
 }
 function progressPillHtml(S,pr){
@@ -3559,7 +3567,7 @@ function renderInfoRowOld(p){
   if(revs.length){
     const lr=revs[revs.length-1];
     const revT=periodsFromDates(p.startDate,lr.endDate);
-    if(revT>T) revWarnHtml=`<div style="font-size:10px;color:var(--red);margin-top:2px"><svg class=ic aria-hidden=true><use href=#i-alert></use></svg> แผน Rev เกินสัญญา ${revT-T} สัปดาห์</div>`;
+    if(revT>T) revWarnHtml=`<div style="font-size:10px;color:var(--red);margin-top:2px"><svg class=ic aria-hidden=true><use href=#i-alert></use></svg> ${escH(planName(revs.length-1))} เกินสัญญา ${revT-T} สัปดาห์</div>`;
   }
   document.getElementById('dash-info').innerHTML=`
     <div class="info-box">
@@ -3586,7 +3594,7 @@ function renderMetrics(p){
   const cp=currentPeriod(p);
   const wLbl=dashWeek?`สัปดาห์ที่ ${dw}`:(S.entry?`สัปดาห์ที่ ${S.entry.period} (ล่าสุด)`:'ยังไม่มีข้อมูล');
   const el=document.getElementById('dash-metrics');
-  el.className='pg-panel';
+  el.className='pg-panel';el.style.setProperty('--pg-lw',S.rev?'108px':'78px');
   const actCol=S.planMissing?'var(--blue)':(S.actualNow>=S.cmpNow?'var(--green)':'var(--red)');
   el.innerHTML=`<div>
       <div class="pg-h"><span>ความก้าวหน้า ณ ${wLbl}${S.range?' · '+S.range:''}${S.planMissing?'':' · เทียบ'+escH(S.cmpLabel)}</span>${progressPillHtml(S,false)}</div>
@@ -3607,7 +3615,7 @@ function renderMetrics(p){
         <span class="k">คงเหลือ</span><span class="v" style="color:${S.remain<=0?'var(--red)':'var(--green)'}">${S.remain} สัปดาห์ <span class="pg-sm">(${S.remainDays} วัน)</span></span>
         <span class="k">สัปดาห์ปัจจุบัน (วันนี้)</span><span class="v" style="font-weight:500">W${cp}</span>
       </div>
-      ${S.revOver?`<div style="font-size:10.5px;color:var(--red);margin-top:6px"><svg class=ic aria-hidden=true><use href=#i-alert></use></svg> แผน REV เกินสัญญา ${S.revOver} สัปดาห์</div>`:''}
+      ${S.revOver?`<div style="font-size:10.5px;color:var(--red);margin-top:6px"><svg class=ic aria-hidden=true><use href=#i-alert></use></svg> ${escH(S.rev?S.rev.name:'แผน Rev')} เกินสัญญา ${S.revOver} สัปดาห์</div>`:''}
     </div>`;
   const plan=buildPlanCurve(p.items,S.T,p);
   checkTerminationAlert(p,dw,S.actualNow,S.T,plan);
@@ -4186,7 +4194,7 @@ function renderItemsTab(p){
     const d=comparePlan===null?null:ap-comparePlan;
     const typeLabel=item.valueType==='vat'?`×VAT(${p.vatRate||7}%)`:item.valueType==='none'?'ไม่คูณ':'×Factor F';
     let planDisplay=ip!==null?`${fmt(ip)}%`:'<span style="color:var(--gray-400)">-</span>';
-    if(rp!==null) planDisplay+=` <span style="color:var(--purple);font-size:10px">(${escH(lr.name)}: ${fmt(rp)}%)</span>`;
+    if(rp!==null) planDisplay+=` <span style="color:var(--purple);font-size:10px">(${escH(revTitle(p,lr))}: ${fmt(rp)}%)</span>`;
     if(planMissing)planDisplay='<span style="color:var(--gray-400);font-size:11px">ยังไม่ส่งแผน</span>';
     const tags=(!oi&&revs.length?' <span class="badge badge-rev" style="font-size:9px">เพิ่มในรีไวส์</span>':'')
       +(inLatest?'':' <span class="badge badge-done" style="font-size:9px" title="รายการนี้ไม่อยู่ในแผนล่าสุด จึงไม่นับใน % รวม">ไม่อยู่ในแผนล่าสุด</span>')
@@ -4203,7 +4211,7 @@ function renderItemsTab(p){
       <td style="text-align:right">${planDisplay}</td>
       <td style="text-align:right"><span class="stat-val ${planMissing||d===null?'':(d>=0?'ok':'behind')}">${fmt(ap)}%</span></td>
       <td>${planMissing||d===null?'<span class="badge badge-done">-</span>':`<span class="badge ${d>=0?'badge-ok':d>-10?'badge-warn':'badge-behind'}">${d>=0?'+':''}${fmt(d)}%</span>
-        ${lastRevVisible&&rp!==null?`<div style="font-size:9px;color:var(--purple)">เทียบ ${escH(lr.name)}</div>`:''}`}
+        ${lastRevVisible&&rp!==null?`<div style="font-size:9px;color:var(--purple)">เทียบ ${escH(revTitle(p,lr))}</div>`:''}`}
       </td>`;
     tbody.appendChild(tr);
   });
@@ -4245,11 +4253,11 @@ function renderHistoryTab(p){
   const revPlan=lr?buildPlanCurve(lr.items,revT,p):[];
   // ข้อ 2: ตรวจ visiblePlans
   const lastRevVisible=revs.length&&visiblePlans.has('rev_'+(revs.length-1));
-  const compareLabel=lastRevVisible&&lr?lr.name:'แผนเดิม';
+  const compareLabel=lastRevVisible&&lr?revTitle(p,lr):'แผนงาน';
   thead.innerHTML=`<tr>
     <th>สัปดาห์</th>
     ${allPlanItems(p).map(i=>`<th title="${escH(i.name)}">${escH(i.name.slice(0,8))}</th>`).join('')}
-    <th>% แผนเดิม</th>${lr?`<th style="color:var(--purple)">% ${escH(lr.name)}</th>`:''}
+    <th>% แผนงาน</th>${lr?`<th style="color:var(--purple)">% ${escH(revTitle(p,lr))}</th>`:''}
     <th>% จริงรวม</th>
     <th>ผลต่าง<br><span style="font-size:9px;font-weight:400">(เทียบ ${escH(compareLabel)})</span></th>
     <th></th>
@@ -4296,7 +4304,7 @@ function renderRevisionsList(p){
   }
   wrap.innerHTML='<div style="font-weight:600;font-size:13px;margin-bottom:14px">ประวัติการรีไวส์แผน</div>';
   wrap.innerHTML+=`<div class="rev-item" style="border-left:3px solid #85b7eb">
-    <div><div class="rev-item-label">แผนเดิม (Original)</div>
+    <div><div class="rev-item-label">แผนงาน</div>
     <div class="rev-item-sub">วันสิ้นสุด: ${thDate(p.endDate)} · ${T} สัปดาห์ · ${p.items.length} รายการ</div></div>
     <span class="badge badge-done">ต้นฉบับ</span>
   </div>`;
@@ -4307,7 +4315,7 @@ function renderRevisionsList(p){
     const over=revT>T?` <span style="color:var(--red);font-size:10px"><svg class=ic aria-hidden=true><use href=#i-alert></use></svg> เกินสัญญา ${revT-T} W</span>`:'';
     wrap.innerHTML+=`<div class="rev-item" style="border-left:3px solid ${c}">
       <div style="flex:1">
-        <div class="rev-item-label" style="color:${c}">${escH(rev.name)}</div>
+        <div class="rev-item-label" style="color:${c}">${escH(revTitle(p,rev))}</div>
         <div class="rev-item-sub">รีไวส์ ณ W${rev.atPeriod||'?'} · วันสิ้นสุด: ${thDate(rev.endDate)} · ${revT||'?'} สัปดาห์${over}</div>
         ${rev.reason?`<div class="rev-item-sub">เหตุผล: ${escH(rev.reason)}</div>`:''}
       </div>
@@ -5068,7 +5076,7 @@ function buildWeekItemRows(p, w, editPeriod){
     }
     const oi=(p.items||[]).find(x=>x.id===item.id);
     const ri=lr?(lr.items||[]).find(x=>x.id===item.id||x.name===item.name):null;
-    const planBadge=`<span style="font-size:10px;color:var(--gray-600)">แผน: <b style="color:#1a3a6b">${oi?fmt(getItemPlanAt(oi,w))+'%':'-'}</b>${lr?`<span style="color:var(--purple)"> / ${escH(lr.name)}: ${ri?fmt(getItemPlanAt(ri,w))+'%':'-'}</span>`:''}</span>`;
+    const planBadge=`<span style="font-size:10px;color:var(--gray-600)">แผน: <b style="color:#1a3a6b">${oi?fmt(getItemPlanAt(oi,w))+'%':'-'}</b>${lr?`<span style="color:var(--purple)"> / ${escH(revTitle(p,lr))}: ${ri?fmt(getItemPlanAt(ri,w))+'%':'-'}</span>`:''}</span>`;
     const inPlans=plans.filter(pl=>(pl.items||[]).some(x=>x.id===item.id));
     const planTag=plans.length>1&&inPlans.length<plans.length?` <span style="font-size:10px;color:var(--purple)">[${inPlans.map(pl=>escH(pl.label)).join(', ')}]</span>`:'';
     const dpSum=sumDailyProgressForWeek(p,item.id,w);
@@ -6196,9 +6204,9 @@ function renderBoqPlanNote(p){
   const revs=p.revisions||[],items=latestPlanItems(p),list=boqPendingPlan(p,items);
   if(!list.length||p.planNotSubmitted){el.style.display='none';el.innerHTML='';return}
   const tv=totalConVal(items,p)||1,v=list.reduce((a,x)=>a+x.val,0);
-  const planName=revs.length?revs[revs.length-1].name:'แผนเดิม';
+  const planNm=planName(revs.length-1);
   el.style.display='';
-  el.innerHTML=`<svg class=ic aria-hidden=true><use href=#i-alert></use></svg> <b>มี ${list.length} รายการที่ยังไม่มีแผน</b> ใน ${escH(planName)} (มูลค่า ${fmtMoney(v)} บาท ≈ ${fmt(v/tv*100)}% ของโครงการ) — เส้นแผนจะไปไม่ถึง 100% จนกว่าจะใส่แผน: ${list.slice(0,6).map(x=>escH(x.name)).join(', ')}${list.length>6?' …':''}
+  el.innerHTML=`<svg class=ic aria-hidden=true><use href=#i-alert></use></svg> <b>มี ${list.length} รายการที่ยังไม่มีแผน</b> ใน ${escH(planNm)} (มูลค่า ${fmtMoney(v)} บาท ≈ ${fmt(v/tv*100)}% ของโครงการ) — เส้นแผนจะไปไม่ถึง 100% จนกว่าจะใส่แผน: ${list.slice(0,6).map(x=>escH(x.name)).join(', ')}${list.length>6?' …':''}
     <button class="btn-warning btn-sm" style="margin-left:6px" onclick="openPlanPage(${revs.length?revs.length-1:"'original'"})"><svg class=ic aria-hidden=true><use href=#i-plan></use></svg> ไปใส่แผน</button>`;
 }
 
@@ -7088,9 +7096,9 @@ function openPlanPage(target){
   document.getElementById('plan-page-projname').textContent=p.name;
   const revs=p.revisions||[];
   const sel=document.getElementById('plan-select');
-  let opts='<option value="original">แผนเดิม (Original)</option>';
-  revs.forEach((r,i)=>{opts+=`<option value="${i}">${escH(r.name)}</option>`});
-  opts+='<option value="new">+ สร้างแผนแก้ไขใหม่ (รีไวส์)</option>';
+  let opts='<option value="original">แผนงาน</option>';
+  revs.forEach((r,i)=>{opts+=`<option value="${i}">${escH(planName(i))}</option>`});
+  opts+='<option value="new">+ สร้างแผนใหม่ ('+planName((p.revisions||[]).length)+')</option>';
   sel.innerHTML=opts;
   sel.value=target==='original'?'original':(target==='new'?'new':String(target));
   planEditingTarget=target;
@@ -7126,19 +7134,19 @@ function loadPlanForTarget(p,target){
   }
   let sourceItems,sourceInstallments;
   if(target==='original'){
-    document.getElementById('plan-page-sub').textContent='กำลังแก้ไขแผนเดิม (Original) — เพิ่ม/ลบ/แก้ไขรายการงานได้ที่ปุ่ม "แก้ไข" บนหน้าโครงการ';
+    document.getElementById('plan-page-sub').textContent='กำลังแก้ไขแผนงาน — เพิ่ม/ลบ/แก้ไขรายการงานได้ที่ปุ่ม "แก้ไข" บนหน้าโครงการ';
     metaForm.style.display='none';
     compWrap.style.display='none';
     delBtn.style.display='none';
     sourceItems=p.items;
     sourceInstallments=p.installments||[];
   } else if(target==='new'){
-    document.getElementById('plan-page-sub').textContent='สร้างแผนแก้ไขใหม่ (รีไวส์)';
+    document.getElementById('plan-page-sub').textContent='สร้างแผนปรับปรุงใหม่: '+planName(revs.length);
     metaForm.style.display='';
     compWrap.style.display='';
     delBtn.style.display='none';
     copySrcRow.style.display='';
-    document.getElementById('plan-rev-name').value=`Rev.${revs.length+1}`;
+    document.getElementById('plan-rev-name').value=planName(revs.length);
     document.getElementById('plan-rev-end').value=(revs.length?revs[revs.length-1].endDate:p.endDate)||'';
     document.getElementById('plan-rev-reason').value='';
     const l=latestEntry(p);
@@ -7151,12 +7159,12 @@ function loadPlanForTarget(p,target){
   } else {
     const rev=revs[target];
     if(!rev){toast('ไม่พบแผนแก้ไขนี้');return}
-    document.getElementById('plan-page-sub').textContent='กำลังแก้ไขแผนแก้ไข: '+rev.name;
+    document.getElementById('plan-page-sub').textContent='กำลังแก้ไข '+planName(target);
     metaForm.style.display='';
     compWrap.style.display='';
     delBtn.style.display='';
     copySrcRow.style.display='none';
-    document.getElementById('plan-rev-name').value=rev.name;
+    document.getElementById('plan-rev-name').value=planName(target);
     document.getElementById('plan-rev-end').value=rev.endDate||'';
     document.getElementById('plan-rev-reason').value=rev.reason||'';
     atSel.value=rev.atPeriod||1;
@@ -7180,8 +7188,8 @@ function loadPlanComposition(items){
 function populatePlanCopySourceOptions(p){
   const sel=document.getElementById('plan-copy-source');
   const revs=p.revisions||[];
-  let opts='<option value="original">แผนเดิม (Original)</option>';
-  revs.forEach((r,i)=>{opts+=`<option value="rev_${i}">${escH(r.name)}</option>`});
+  let opts='<option value="original">แผนงาน</option>';
+  revs.forEach((r,i)=>{opts+=`<option value="rev_${i}">${escH(planName(i))}</option>`});
   sel.innerHTML=opts;
   sel.value=revs.length?('rev_'+(revs.length-1)):'original';
 }
@@ -7606,7 +7614,7 @@ function deletePlanRev(){
   if(typeof planEditingTarget!=='number')return;
   const p=projects.find(x=>x.id===currentId);
   if(!p||!p.revisions||!p.revisions[planEditingTarget])return;
-  if(!confirm(`ลบแผนแก้ไข "${p.revisions[planEditingTarget].name}" ใช่หรือไม่?`))return;
+  if(!confirm(`ลบ "${planName(planEditingTarget)}" ใช่หรือไม่?\n(แผนลำดับถัดไปจะเลื่อนเลข Rev. ขึ้นมาแทน)`))return;
   p.revisions.splice(planEditingTarget,1);
   projects=projects.map(x=>x.id===currentId?p:x);
   save(projects);
@@ -7676,13 +7684,12 @@ function savePlanPage(){
     p.installments=installments;
     projects=projects.map(x=>x.id===currentId?p:x);
     save(projects);
-    toast('✓ บันทึกแผนงาน (แผนเดิม) แล้ว');
+    toast('✓ บันทึกแผนงานแล้ว');
     closePlanPage();
     return;
   }
 
-  const name=document.getElementById('plan-rev-name').value.trim();
-  if(!name){alert('กรุณากรอกชื่อแผนแก้ไข');return}
+  const name=planName(typeof planEditingTarget==='number'?planEditingTarget:(p.revisions||[]).length);
   const endDate=document.getElementById('plan-rev-end').value;
   const reason=document.getElementById('plan-rev-reason').value.trim();
   const atPeriod=Number(document.getElementById('plan-rev-at-period').value)||currentPeriod(p);
@@ -7726,7 +7733,7 @@ function savePlanPage(){
 function deleteRevision(idx){
   const p=projects.find(x=>x.id===currentId);
   if(!p||!p.revisions)return;
-  if(!confirm(`ลบแผนแก้ไข "${p.revisions[idx].name}" ใช่หรือไม่?`))return;
+  if(!confirm(`ลบ "${planName(idx)}" ใช่หรือไม่?\n(แผนลำดับถัดไปจะเลื่อนเลข Rev. ขึ้นมาแทน)`))return;
   p.revisions.splice(idx,1);
   projects=projects.map(x=>x.id===currentId?p:x);
   save(projects);
@@ -7898,11 +7905,11 @@ function printSummary(p,pdfW){
     const revT=periodsFromDates(p.startDate,lr.endDate)||T;
     const rp=buildPlanCurve(lr.items,revT,p);
     revPlanNow=rp[Math.max(0,Math.min(dw,revT)-1)]||0;
-    revLabel=lr.name;
+    revLabel=revTitle(p,lr);
   }
   const lastRevVisible=revs.length&&visiblePlans.has('rev_'+(revs.length-1));
   const comparePlanNow=lastRevVisible&&revPlanNow!==null?revPlanNow:planNow;
-  const compareLabel=lastRevVisible&&revPlanNow!==null?revLabel:'แผนเดิม';
+  const compareLabel=lastRevVisible&&revPlanNow!==null?revLabel:'แผนงาน';
   const diff=actualNow-comparePlanNow;
   const showBothPlans=revPlanNow!==null&&!lastRevVisible;
   const metricCols=showBothPlans?4:3;
@@ -8022,8 +8029,8 @@ function printSummary(p,pdfW){
     <th style="text-align:center;width:30px">#</th><th>รายการงาน</th>
     <th style="text-align:right">มูลค่าก่อสร้าง (บาท)</th><th style="text-align:right">น้ำหนัก%</th>
     <th style="text-align:center">ระยะเวลา (W)</th>
-    <th style="text-align:right">% แผนเดิม</th>
-    ${revs.length?`<th style="text-align:right;background:#4a3080">% ${escH(revs[revs.length-1].name)}</th>`:''}
+    <th style="text-align:right">% แผนงาน</th>
+    ${revs.length?`<th style="text-align:right;background:#4a3080">% ${escH(planName(revs.length-1))}</th>`:''}
     <th style="text-align:right">% จริง</th><th style="text-align:right">ผลต่าง${planMissing?'':'<br><span style="font-weight:400;font-size:9px">(เทียบ '+escH(compareLabel)+')</span>'}</th>
   </tr></thead><tbody>${itemRows}<tr class="tot"><td></td><td>รวม</td><td style="text-align:right">${fmtMoney(S.itemsTotal)}</td><td style="text-align:right">100.00%</td><td colspan="${revs.length?5:4}"></td></tr></tbody></table>
   ${Number(p.contractVal)>0&&Math.abs(S.itemsTotal-S.cv)>=0.005?`<div class="tot-note">ผลรวมรายการ ${fmtMoney(S.itemsTotal)} บาท · วงเงินตามสัญญา ${fmtMoney(S.cv)} บาท (ต่าง ${fmtMoney(Math.abs(S.itemsTotal-S.cv))} บาท จากการปัดเศษรายการ)</div>`:''}
@@ -8073,7 +8080,7 @@ function printHistory(p){
   const revPlan=lr?buildPlanCurve(lr.items,revT,p):[];
   // ติดตาม visiblePlans เหมือน renderHistoryTab
   const lastRevVisible=revs.length&&visiblePlans.has('rev_'+(revs.length-1));
-  const compareLabel=lastRevVisible&&lr?lr.name:'แผนเดิม';
+  const compareLabel=lastRevVisible&&lr?revTitle(p,lr):'แผนงาน';
   const sorted=[...p.history].sort((a,b)=>a.period-b.period);
   const rows=sorted.map(entry=>{
     const t=Number(entry.period)-1;
@@ -8135,8 +8142,8 @@ function printHistory(p){
       <th class="left" style="width:62px">สัปดาห์</th>
       <th style="width:70px">วันที่บันทึก</th>
       ${allPlanItems(p).map(i=>`<th>${escH(i.name.length>10?i.name.slice(0,9)+'…':i.name)}</th>`).join('')}
-      <th>% แผนเดิม</th>
-      ${lr?`<th>% ${escH(lr.name)}</th>`:''}
+      <th>% แผนงาน</th>
+      ${lr?`<th>% ${escH(revTitle(p,lr))}</th>`:''}
       <th>% จริงรวม</th>
       <th>ผลต่าง${planMissing?'':'<br><span style="font-weight:400;font-size:8.5px">(เทียบ '+escH(compareLabel)+')</span>'}</th>
     </tr></thead>
