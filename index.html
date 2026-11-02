@@ -43,6 +43,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='white'%3EUD%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='white'%3EUD%3C/text%3E%3C/svg%3E">
 <script data-lib="Chart.js 4.4.1">/* Chart.js 4.4.1 — ฝังในไฟล์เพื่อใช้งานออฟไลน์ (ลิขสิทธิ์ตามสัญญาอนุญาตของไลบรารี) */
 /*!
  * Chart.js v4.4.1
@@ -493,7 +497,7 @@ tr:hover td{background:var(--gray-50)}
       <table><thead><tr>
         <th>#</th><th>รายการงาน</th><th style="text-align:right">มูลค่าต้นทุน</th>
         <th>ประเภท</th><th style="text-align:right">มูลค่าก่อสร้าง</th>
-        <th style="text-align:right">น้ำหนัก%</th><th>ระยะเวลา</th>
+        <th style="text-align:right">น้ำหนัก%</th><th style="text-align:center" title="ช่วงสัปดาห์ที่หมวดนี้ทำงานตามแผน (สัปดาห์เริ่ม–สัปดาห์เสร็จ) และจำนวนสัปดาห์ในวงเล็บ">ช่วงตามแผน</th>
         <th style="text-align:right">% แผน</th><th style="text-align:right">% จริง</th><th>ผลต่าง</th>
       </tr></thead><tbody id="items-tbody"></tbody><tfoot id="items-tfoot"></tfoot></table>
     </div>
@@ -1245,7 +1249,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.11';
+const APP_VERSION='11.12';
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
 const STORE_KEY='scurve_v4';
@@ -1938,6 +1942,26 @@ function computeScheduleFromInstallments(entityId,installments,projStart,T){
   return{duration,startPeriod:minStart,schedule:weeklyPct.map(pct=>({pct}))};
 }
 // v11.11 ชื่อแผนแบบเดียวทั้งระบบ: แผนแรก = "แผนงาน" · แผนปรับปรุงลำดับที่ n = "แผนงาน Rev.n" (ตามลำดับ ไม่ใช้ชื่อที่พิมพ์เอง)
+// v11.12 ช่วงสัปดาห์ตามแผนจริงของหมวด (คิดจากเส้นแผน — รองรับแผนที่ตั้งที่หมวดหลัก งานย่อย หรืองวดงาน)
+function itemPlanSpan(p,itemId){
+  if(!p||p.planNotSubmitted)return null;
+  const revs=p.revisions||[];
+  let it=null,T=totalPeriods(p);
+  if(revs.length&&visiblePlans.has('rev_'+(revs.length-1))){
+    const lr=revs[revs.length-1];
+    it=(lr.items||[]).find(x=>x.id===itemId)||null;
+    if(it)T=Math.max(T,periodsFromDates(p.startDate,lr.endDate)||0);
+  }
+  if(!it)it=(p.items||[]).find(x=>x.id===itemId)||null;
+  if(!it)return null;
+  const c=buildItemPlanCurve(it,Math.max(1,T));
+  let s=-1,e=-1;
+  for(let i=0;i<c.length;i++){if(s<0&&c[i]>0.0001)s=i;if(c[i]>=99.999){e=i;break}}
+  if(s<0)return null;
+  if(e<0){for(let i=c.length-1;i>0;i--){if(c[i]-c[i-1]>0.0001){e=i;break}}if(e<0)e=s}
+  return {s:s+1,e:e+1,n:e-s+1};
+}
+function itemSpanTxt(sp){return sp?(sp.s===sp.e?`W${sp.s} (1)`:`W${sp.s}–W${sp.e} (${sp.n})`):'-'}
 function planName(i){return (i===null||i===undefined||i<0)?'แผนงาน':'แผนงาน Rev.'+(i+1)}
 function revTitle(p,r){return planName((p&&p.revisions||[]).indexOf(r))}
 function getAllPlans(p){
@@ -3014,7 +3038,7 @@ const MANUAL_SECTIONS=[
 <li><b>กราฟ</b> — ชี้ที่จุดใดก็ได้ จะแสดงสัปดาห์และช่วงวันที่ของสัปดาห์นั้น (เช่น W3 · 19–25 ต.ค. 2569) พร้อม % ของแต่ละเส้นที่มีข้อมูล ใต้แกน X มีแถบบอกเดือน (สัปดาห์ที่คร่อมสองเดือนนับเข้าเดือนที่มีวันมากกว่า)</li>
 <li><b>แสดงข้อมูล ณ :</b> เลือกสัปดาห์ที่ต้องการดู · ปุ่ม <span class="k">ล่าสุด</span> = สัปดาห์ล่าสุดที่มีการบันทึก · <span class="k">ปัจจุบัน</span> = สัปดาห์ตามปฏิทินวันนี้</li>
 <li><b>เฝ้าระวังเร่งรัดงาน</b> — วันที่ถึง 1/4, 1/2 และ 3/4 ของสัญญา</li>
-<li>แท็บ <b>รายการงาน</b> ดูมูลค่า น้ำหนัก% ระยะเวลา และ % แผน/จริงรายหมวด</li>
+<li>แท็บ <b>รายการงาน</b> ดูมูลค่า น้ำหนัก% <b>ช่วงตามแผน</b> และ % แผน/จริงรายหมวด — ช่วงตามแผนคำนวณจากเส้นแผนจริงของหมวด เช่น "W3–W12 (10)" = เริ่มสัปดาห์ที่ 3 เสร็จสัปดาห์ที่ 12 รวม 10 สัปดาห์ (ใช้ได้ทั้งแผนที่ตั้งที่หมวดหลัก งานย่อย หรืองวดงาน)</li>
 </ul>`},
 
 {id:'daily-progress',title:'บันทึกความก้าวหน้ารายวัน',html:`
@@ -3232,6 +3256,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.12</b> — คอลัมน์ "ระยะเวลา" ในแท็บรายการงานและรายงานสรุปเปลี่ยนเป็น "ช่วงตามแผน" คำนวณจากแผนจริงของหมวด เช่น W3–W12 (10) — เดิมแสดง 1 เมื่อแผนตั้งไว้ที่งานย่อยหรืองวดงาน</li>
 <li><b>v11.11</b> — เปลี่ยนชื่อแผนทั้งระบบ: แผนแรกเรียก "แผนงาน" (เดิม "แผนเดิม") แผนที่ปรับเรียก "แผนงาน Rev.1", "แผนงาน Rev.2" ตามลำดับโดยอัตโนมัติ — ทั้งหน้าจอ กราฟ ตาราง และรายงาน</li>
 <li><b>v11.10</b> — รายงานสรุป: พิมพ์สีแถบความก้าวหน้าและหัวตารางออกเสมอ (ไม่ต้องเปิด "กราฟิกพื้นหลัง" เอง) · จัดเนื้อหาให้เต็มความกว้าง A4 ไม่เหลือขอบซ้ายขวามาก · หน้าพิมพ์อื่นพิมพ์สีพื้นหลังออกเสมอเช่นกัน</li>
 <li><b>v11.9</b> — หน้า S-Curve: สรุปความก้าวหน้าใหม่เป็นแผงเดียว — แถบสะสมแบบรายงานประจำสัปดาห์ (แผนเดิม / แผน REV / ผลงานจริง / เวลาสัญญา) + มูลค่างาน + ระยะเวลา ใช้พื้นที่น้อยลง · ช่องเลือกสัปดาห์แสดงช่วงวันที่ · มูลค่างานใช้วงเงินค่าจ้างตามสัญญา (ตรงกับรายงานประจำสัปดาห์) · รายงานสรุป: จัดหน้าใหม่ กราฟ S-Curve ใหญ่ขึ้นและคมชัด มีกรอบรายละเอียดสัปดาห์ที่ออกรายงาน แถวรวมในตารางรายการงาน และหมายเหตุส่วนต่างจากการปัดเศษ · กรอบรายละเอียดบนกราฟไม่ทับป้าย W ที่เลือก</li>
@@ -4207,7 +4232,7 @@ function renderItemsTab(p){
       <td><span class="badge badge-done" style="font-size:10px">${typeLabel}</span></td>
       <td style="text-align:right">${inLatest?fmtMoney(cv):'-'}</td>
       <td style="text-align:right">${fmt(w)}%</td>
-      <td style="text-align:center">${item.duration||'-'}</td>
+      <td style="text-align:center;white-space:nowrap">${itemSpanTxt(itemPlanSpan(p,item.id))}</td>
       <td style="text-align:right">${planDisplay}</td>
       <td style="text-align:right"><span class="stat-val ${planMissing||d===null?'':(d>=0?'ok':'behind')}">${fmt(ap)}%</span></td>
       <td>${planMissing||d===null?'<span class="badge badge-done">-</span>':`<span class="badge ${d>=0?'badge-ok':d>-10?'badge-warn':'badge-behind'}">${d>=0?'+':''}${fmt(d)}%</span>
@@ -7956,7 +7981,7 @@ function printSummary(p,pdfW){
     return `<tr><td style="text-align:center">${idx+1}</td><td>${escH(item.name)}${inL?'':' <span style="font-size:10px;color:#888">(ไม่อยู่ในแผนล่าสุด)</span>'}</td>
       <td style="text-align:right">${inL?fmtMoney(cv):'-'}</td>
       <td style="text-align:right">${fmt(w)}%</td>
-      <td style="text-align:center">${item.duration||'-'}</td>
+      <td style="text-align:center">${itemSpanTxt(itemPlanSpan(p,item.id))}</td>
       ${planCell}
       ${revCell}
       <td style="text-align:right">${fmt(ap)}%</td>
@@ -8028,7 +8053,7 @@ function printSummary(p,pdfW){
   <table><thead><tr>
     <th style="text-align:center;width:30px">#</th><th>รายการงาน</th>
     <th style="text-align:right">มูลค่าก่อสร้าง (บาท)</th><th style="text-align:right">น้ำหนัก%</th>
-    <th style="text-align:center">ระยะเวลา (W)</th>
+    <th style="text-align:center">ช่วงตามแผน<br><span style="font-weight:400;font-size:11px">(สัปดาห์)</span></th>
     <th style="text-align:right">% แผนงาน</th>
     ${revs.length?`<th style="text-align:right;background:#4a3080">% ${escH(planName(revs.length-1))}</th>`:''}
     <th style="text-align:right">% จริง</th><th style="text-align:right">ผลต่าง${planMissing?'':'<br><span style="font-weight:400;font-size:9px">(เทียบ '+escH(compareLabel)+')</span>'}</th>
