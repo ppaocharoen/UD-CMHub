@@ -1156,7 +1156,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.2';
+const APP_VERSION='11.3';
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
 const STORE_KEY='scurve_v4';
 function load(){try{return JSON.parse(localStorage.getItem(STORE_KEY)||'[]')}catch(e){return[]}}
@@ -2739,6 +2739,7 @@ const MANUAL_SECTIONS=[
 <li>กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> บันทึกงานวันนี้</span> ที่หน้าโครงการ (เปิดวันนี้ให้ทันที) หรือในหน้าต่างบันทึกสัปดาห์ กดปุ่ม <span class="k"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> บันทึกความก้าวหน้ารายวัน (สัปดาห์นี้)</span></li>
 <li>ในวันที่ต้องการ กด <span class="k">+ เพิ่มรายการ</span> เลือกรายการงาน/งานย่อย ใส่ปริมาณ (สำหรับงานย่อยที่มีหน่วย) หรือ % (สำหรับรายการหลัก) ข้างช่องกรอกแสดง "คงเหลือ" ให้ดู</li>
 <li>กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-save></use></svg> บันทึกวันนี้</span> ของวันนั้น</li>
+<li>งานที่ไม่อยู่ในรายการ BOQ (เช่น ปรับพื้นที่หน้างาน ขนย้ายวัสดุ) เลือก <b>งานอื่นนอกรายการ (พิมพ์รายละเอียดเอง)</b> แล้วพิมพ์รายละเอียด ใส่ปริมาณและหน่วยได้ (ไม่บังคับ) — แสดงในรายงานประจำวันและประจำสัปดาห์ แต่ <b>ไม่นับใน % ความก้าวหน้า</b> (เพราะไม่อยู่ในสัญญา)</li>
 </ol>
 <p>งานย่อยที่มีปริมาณ <b>กรอกช่องปริมาณหรือช่อง % ก็ได้</b> ระบบคำนวณอีกช่องให้ (ปริมาณ = % × ปริมาณทั้งหมดใน BOQ) · "คงเหลือ" ของรายการหลักคิดรวมจากงานย่อยด้วย (ถ่วงตามมูลค่างานย่อย)</p>
 <p>ถ้าตั้งค่า <b>ชิ้นส่วนโครงสร้าง</b> ไว้ กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-element></use></svg> + จากชิ้นส่วน</span> เพื่อใส่ปริมาณวัสดุของชิ้นส่วนทั้งชุด (ดูหัวข้อถัดไป)</p>
@@ -2944,6 +2945,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.3</b> — บันทึกความก้าวหน้ารายวัน: เพิ่มตัวเลือก "งานอื่นนอกรายการ (พิมพ์รายละเอียดเอง)" ใส่ปริมาณ/หน่วยได้ แสดงในรายงานประจำวันและประจำสัปดาห์ (ไม่นับ % ความก้าวหน้า)</li>
 <li><b>v11.2</b> — เลิกใช้อีโมจิทั้งระบบ เปลี่ยนเป็นชุดไอคอนเส้นที่ออกแบบเฉพาะ (แบบเดียวกับ UD-Cost Hub) ในปุ่ม หัวข้อ ป้ายสถานะ คู่มือ และหน้าพิมพ์ · ข้อความแจ้งเตือน/ยืนยันใช้ตัวอักษรล้วน</li>
 <li><b>v11.1</b> — <svg class=ic aria-hidden=true><use href=#i-cloud></use></svg> เข้าสู่ระบบด้วยบัญชี Google และซิงก์ข้อมูลข้อความของโครงการขึ้นคลาวด์อัตโนมัติ (เปิดเครื่องอื่นเห็นโครงการเดิม · แต่ละบัญชีเห็นเฉพาะของตัวเอง · ถามเมื่อแก้ทั้งสองเครื่อง · ออกจากระบบแล้วล้างข้อมูลในเครื่องได้) · รูป/ไฟล์แนบยังเก็บในเครื่องตามเดิม</li>
 <li><b>v11.0</b> — เปลี่ยนชื่อเป็น <b>UD-CM Hub</b> (ระบบในเครือ UD ร่วมกับ UD-Cost Hub) · โลโก้ UD สีเขียวหัวเป็ด · ธีมและพื้นหลังตราเทศบาลแบบเดียวกับ UD-Cost Hub · ใช้ฟอนต์ Sarabun ทั้งหน้าจอ · เปิดใช้งานผ่านเว็บไซต์ได้ (ข้อมูลยังเก็บในเครื่อง) · รายงานราชการที่พิมพ์ออกไม่เปลี่ยนรูปแบบ</li>
@@ -4920,6 +4922,7 @@ function buildDailyProgressSummaryRows(p,ws,we,modes,notes,gmeta){
   return buildDpWeekLines(p,ws,we,modes,notes,gmeta).filter(l=>!l.hidden&&l.text).map(l=>({desc:l.text,note:l.note||''}));
 }
 const DP_NONE_VALUE='__NONE__';
+const DP_OTHER_VALUE='__OTHER__'; // v11.3: งานอื่นนอกรายการ BOQ (พิมพ์เอง) — แสดงในรายงาน แต่ไม่นับ % ความก้าวหน้า
 // ── ยอดสะสม "ทำไปแล้ว" ต่อรายการ จากบันทึกความก้าวหน้ารายวัน ──────────
 // project.dpDone = { [entityId]: จำนวนสะสม }  main item เก็บเป็น % (0-100), งานย่อยเก็บเป็นปริมาณ (0-qtyTotal)
 // เก็บแยกต่างหาก ไม่คำนวณย้อนจาก dailyProgress[] ทุกครั้ง (อัปเดตแบบ delta ที่ saveDpDay) — recomputeDpDone ใช้ซ่อมข้อมูลเท่านั้น
@@ -5147,7 +5150,7 @@ function buildDpReportLines(p,dFrom,dTo){
       return{kind:'group',key:g.key,metaKey:dFrom+'|'+g.key,text:dpGroupText(g,els,gMode),sta:m.sta||staAuto,staTyped:m.sta||'',staAuto,hidden:!!m.hide,mats:dpGroupMatList(g,gMode)};
     }
     const e=l.e;
-    if(e.entityId!==DP_NONE_VALUE&&!l.info)return null;
+    if(e.entityId!==DP_NONE_VALUE&&e.entityId!==DP_OTHER_VALUE&&!l.info)return null;
     const hidden=(e.displayMode||'pct')==='hide';
     if(l.covered>0){
       const rem=(Number(e.qty)||0)-l.covered;
@@ -5174,6 +5177,13 @@ function buildDpWeekLines(p,ws,we,modes,notes,gmeta){
   const sums={},order=[];
   raw.forEach(l=>{
     if(l.kind==='group'){order.push({kind:'group',key:l.key});return}
+    if(l.e.entityId===DP_OTHER_VALUE){
+      const t=(l.e.text||'').trim();if(!t)return;
+      const oid=DP_OTHER_VALUE+':'+t+'|'+(l.e.unit||'');
+      if(!sums[oid]){sums[oid]={info:{name:t,unit:l.e.unit||'',isSub:false,qtyTotal:0},other:true,pct:0,qty:0,covered:0};order.push({kind:'entity',id:oid})}
+      sums[oid].qty+=Number(l.e.qty)||0;
+      return;
+    }
     if(!l.info)return;
     const id=l.e.entityId;
     if(!sums[id]){sums[id]={info:l.info,pct:0,qty:0,covered:0};order.push({kind:'entity',id})}
@@ -5189,6 +5199,10 @@ function buildDpWeekLines(p,ws,we,modes,notes,gmeta){
       return{kind:'group',key:g.key,text:dpGroupText(g,els,gMode),note:m.note||staAuto,noteTyped:m.note||'',staAuto,hidden:!!m.hide,mats:dpGroupMatList(g,gMode)};
     }
     const sm=sums[o.id],info=sm.info,mode=modeOf(o.id);
+    if(sm.other){
+      const qt=mode!=='name'&&sm.qty>0?fmt(sm.qty,2)+(info.unit?' '+info.unit:''):'';
+      return{kind:'entity',entityId:o.id,isSub:false,isOther:true,name:info.name,text:info.name+(qt?' ('+qt+')':''),covered:null,note:notes[o.id]||'',hidden:mode==='hide'};
+    }
     const hidden=mode==='hide';
     let qty=sm.qty,pct=sm.pct,covered=null;
     if(sm.covered>0){
@@ -5214,6 +5228,10 @@ function onDrGroupMetaChange(key,field,val){
 }
 function formatDpDisplayText(p,e){
   if(e.entityId===DP_NONE_VALUE)return{name:'ไม่มีการดำเนินงาน',qtyText:'',isSub:false};
+  if(e.entityId===DP_OTHER_VALUE){
+    const q=(e.displayMode||'pct')!=='name'&&Number(e.qty)>0?fmt(e.qty,2)+(e.unit?' '+e.unit:''):'';
+    return{name:e.text||'งานอื่น',qtyText:q,isSub:false,isOther:true};
+  }
   const info=resolveDpEntityInfo(p,e.entityId);
   if(!info)return null;
   const mode=e.displayMode||'pct';
@@ -5230,6 +5248,7 @@ function formatDpDisplayText(p,e){
 function buildDpEntityOptionsHtml(p,selected){
   let html='<option value="">— เลือกรายการ —</option>';
   html+=`<option value="${DP_NONE_VALUE}" ${selected===DP_NONE_VALUE?'selected':''}>ไม่มีการดำเนินงาน (วันหยุด/ไม่ได้ปฏิบัติงาน)</option>`;
+  html+=`<option value="${DP_OTHER_VALUE}" ${selected===DP_OTHER_VALUE?'selected':''}>งานอื่นนอกรายการ (พิมพ์รายละเอียดเอง)</option>`;
   allPlanItems(p).forEach(item=>{
     const mainRemain=getDpRemainInfo(p,item.id,null);
     const mainSuffix=mainRemain?` (คงเหลือ ${fmt(mainRemain.remain,1)}%)`:'';
@@ -5325,8 +5344,10 @@ function addDpEntryRow(dateStr,existing){
   const isSub=!!(existing&&existing.entityId&&existing.entityId.indexOf('::')>=0);
   row.innerHTML=`
     <select class="dp-entity-select" style="flex:2;min-width:180px" onchange="onDpEntitySelectChange(this)">${selHtml}</select>
+    <input type="text" class="dp-other-text" placeholder="รายละเอียดงาน เช่น ปรับพื้นที่หน้างาน, ขนย้ายวัสดุ" maxlength="200" style="flex:3;min-width:200px;display:none" value="${escH(existing&&existing.text||'')}">
     <input type="number" class="dp-qty" placeholder="ปริมาณที่ทำวันนี้" min="0" step="0.01" style="width:120px;display:${isSub?'inline-block':'none'}" value="${existing&&existing.qty?existing.qty:''}" oninput="onDpQtyInput(this)">
     <span class="dp-unit" style="font-size:11px;color:var(--gray-400);min-width:26px"></span>
+    <input type="text" class="dp-other-unit" placeholder="หน่วย" maxlength="20" style="width:70px;display:none" value="${escH(existing&&existing.unit||'')}">
     <input type="number" class="dp-pct" placeholder="% ที่ทำวันนี้" min="0" max="100" step="0.01" style="width:90px" value="${existing&&existing.pct?fmt(existing.pct,2):''}" oninput="onDpPctInput(this)">
     <span class="dp-remain-hint" style="font-size:10.5px;color:var(--purple);min-width:0"></span>
     <button class="btn-icon" type="button" onclick="this.closest('.dp-row').remove()" title="ลบ">✕</button>`;
@@ -5339,10 +5360,19 @@ function onDpEntitySelectChange(sel){
   const val=opt?opt.value:'';
   const isSub=!!(val&&val.indexOf('::')>=0);
   const isNone=val===DP_NONE_VALUE;
+  const isOther=val===DP_OTHER_VALUE;
   const qtyInp=row.querySelector('.dp-qty');
   const unitSpan=row.querySelector('.dp-unit');
   const pctInp=row.querySelector('.dp-pct');
-  if(isNone){
+  const oText=row.querySelector('.dp-other-text'),oUnit=row.querySelector('.dp-other-unit');
+  if(oText){oText.style.display=isOther?'':'none';oUnit.style.display=isOther?'':'none'}
+  if(isOther){
+    qtyInp.style.display='inline-block';
+    qtyInp.placeholder='ปริมาณ (ถ้ามี)';
+    pctInp.style.display='none';
+    unitSpan.textContent='';
+    if(oText&&!oText.value)setTimeout(()=>oText.focus(),0);
+  } else if(isNone){
     qtyInp.style.display='none';
     unitSpan.textContent='';
     pctInp.style.display='none';
@@ -5893,6 +5923,16 @@ function saveDpDay(dateStr){
     const existingRec=existingId?(p.dailyProgress||[]).find(x=>x.id===existingId):null;
     const existingMode=existingRec?existingRec.displayMode:undefined;
     const existingSta=existingRec?existingRec.sta:undefined;
+    if(entityId===DP_OTHER_VALUE){
+      const text=(row.querySelector('.dp-other-text').value||'').trim();
+      if(!text)return; // ไม่ได้พิมพ์รายละเอียด → ไม่บันทึกแถวนี้
+      const oq=parseFloat(row.querySelector('.dp-qty').value)||0;
+      const otherRec={id:existingId||uid(),date:dateStr,entityId,text,qty:oq,unit:(row.querySelector('.dp-other-unit').value||'').trim(),pct:0};
+      if(existingMode)otherRec.displayMode=existingMode;
+      if(existingSta)otherRec.sta=existingSta;
+      entries.push(otherRec);
+      return;
+    }
     if(entityId===DP_NONE_VALUE){
       const noneRec={id:existingId||uid(),date:dateStr,entityId,qty:0,pct:0};
       if(existingMode)noneRec.displayMode=existingMode;
@@ -7853,7 +7893,9 @@ function refreshWrAutoItemsPreview(){
     const mode=modes[l.entityId]||'pct';
     const hidden=mode==='hide';
     const lineText=l.covered==='full'?l.name+' — อยู่ในหัวข้อชิ้นส่วนด้านบน':l.covered==='part'?l.text+' + ส่วนที่เหลืออยู่ในหัวข้อชิ้นส่วน':l.text;
-    const opts=`<option value="pct" ${mode==='pct'?'selected':''}>ชื่อ + %</option>
+    const opts=l.isOther?`<option value="pct" ${mode!=='name'&&!hidden?'selected':''}>รายละเอียด + ปริมาณ (ถ้ามี)</option>
+      <option value="name" ${mode==='name'?'selected':''}>รายละเอียดอย่างเดียว</option>
+      <option value="hide" ${hidden?'selected':''}>ไม่แสดงในรายงาน</option>`:`<option value="pct" ${mode==='pct'?'selected':''}>ชื่อ + %</option>
       ${l.isSub?`<option value="qty" ${mode==='qty'?'selected':''}>ชื่อ + ปริมาณ</option>`:''}
       <option value="name" ${mode==='name'?'selected':''}>ชื่ออย่างเดียว</option>
       <option value="hide" ${hidden?'selected':''}>ไม่แสดงในรายงาน</option>`;
@@ -8272,6 +8314,10 @@ function refreshDrAutoItemsPreview(){
     const fullLine=thDate(e.date)+' — '+lineText;
     const opts=isNone
       ?`<option value="pct" ${!hidden?'selected':''}>แสดงในรายงาน</option>
+        <option value="hide" ${hidden?'selected':''}>ไม่แสดงในรายงาน</option>`
+      :disp.isOther
+      ?`<option value="pct" ${modeVal==='pct'||modeVal==='qty'?'selected':''}>รายละเอียด + ปริมาณ (ถ้ามี)</option>
+        <option value="name" ${modeVal==='name'?'selected':''}>รายละเอียดอย่างเดียว</option>
         <option value="hide" ${hidden?'selected':''}>ไม่แสดงในรายงาน</option>`
       :`<option value="pct" ${modeVal==='pct'?'selected':''}>ชื่อ + %</option>
         ${disp.isSub?`<option value="qty" ${modeVal==='qty'?'selected':''}>ชื่อ + ปริมาณ</option>`:''}
