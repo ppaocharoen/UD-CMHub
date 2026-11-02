@@ -31,6 +31,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='white'%3EUD%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='white'%3EUD%3C/text%3E%3C/svg%3E">
 <script data-lib="Chart.js 4.4.1">/* Chart.js 4.4.1 — ฝังในไฟล์เพื่อใช้งานออฟไลน์ (ลิขสิทธิ์ตามสัญญาอนุญาตของไลบรารี) */
 /*!
  * Chart.js v4.4.1
@@ -164,6 +168,18 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(15,1
 .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
 .page-title{font-size:20px;font-weight:700}
 .page-sub{font-size:13px;color:var(--gray-400);margin-top:2px}
+.pg-panel{display:grid;grid-template-columns:1.75fr 1fr;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:12px}
+.pg-panel>div{padding:14px 18px;min-width:0}.pg-panel>div+div{border-left:1px solid var(--gray-100)}
+.pg-h{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--gray-500);font-weight:600;margin-bottom:10px;flex-wrap:wrap}
+.pg-pill{font-size:11.5px;font-weight:700;padding:2px 10px;border-radius:10px;white-space:nowrap}
+.pg-kv{display:grid;grid-template-columns:1fr auto;gap:5px 10px;font-size:12.5px}.pg-kv .k{color:var(--gray-500)}.pg-kv .v{text-align:right;font-weight:700;white-space:nowrap}
+.pg-sep{border-top:1px dashed var(--gray-200);margin:10px 0}
+.pg-sm{font-size:11px;color:var(--gray-400);font-weight:500}
+.pg-row{display:grid;grid-template-columns:78px 1fr 168px;gap:10px;align-items:center;margin-bottom:9px}
+.pg-row .pv{font-size:12px;color:var(--gray-500);white-space:nowrap}.pg-row .pv b{font-size:17px;margin-right:6px}
+.pg-ticks{display:grid;grid-template-columns:78px 1fr 168px;gap:10px;margin-top:-3px}.pg-ticks>div{display:flex;justify-content:space-between;font-size:9.5px;color:var(--gray-400)}
+@media(max-width:600px){.pg-row,.pg-ticks{grid-template-columns:62px 1fr 92px;gap:6px}.pg-row .pv{white-space:normal;font-size:10.5px;line-height:1.25}.pg-row .pv b{display:block;font-size:15px}.pg-ticks span.t2{display:none}}
+@media(max-width:900px){.pg-panel{grid-template-columns:1fr}.pg-panel>div+div{border-left:none;border-top:1px solid var(--gray-100)}}
 .metric-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
 .metric{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:12px 14px}
 .metric-label{font-size:10px;color:var(--gray-400);font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
@@ -1221,7 +1237,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.8';
+const APP_VERSION='11.9';
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
 const STORE_KEY='scurve_v4';
@@ -1938,7 +1954,7 @@ function buildWeekSel(selId,p,includeLatest=true){
     const o=document.createElement('option');
     const l=latestEntry(p);
     o.value='latest';
-    o.textContent=l?`ล่าสุด (W${l.period})`:'ล่าสุด (ยังไม่มีข้อมูล)';
+    o.textContent=l?`ล่าสุด (W${l.period} · ${wkRangeTxt(p.startDate,Number(l.period))})`:'ล่าสุด (ยังไม่มีข้อมูล)';
     sel.appendChild(o);
   }
   const T=totalPeriods(p);
@@ -2981,9 +2997,10 @@ const MANUAL_SECTIONS=[
 <p>เมื่อก่อสร้างเสร็จจริง ติ๊ก <b>การก่อสร้างแล้วเสร็จ</b> ในหน้าต่างบันทึกและเลือกวันที่แล้วเสร็จ (ใช้คำนวณค่าปรับ/การนับวัน)</p>
 <h4>อ่านแท็บ S-Curve</h4>
 <ul>
-<li><b>% แผนเดิม / แผน REV / % จริง / ผลต่าง</b> — % ความก้าวหน้ารวมถ่วงน้ำหนักด้วยมูลค่า ณ สัปดาห์ที่เลือก ผลต่างติดลบ = ล่าช้ากว่าแผน</li>
+<li><b>แถบความก้าวหน้า</b> (แบบเดียวกับรายงานประจำสัปดาห์) — แผนเดิม / แผน REV (ถ้ามี) / ผลงานจริง / เวลาสัญญา บนสเกล 0–100% เดียวกัน ส่วนสีเหลือง = ที่เพิ่มขึ้นในสัปดาห์นั้น ผลงานจริงสีเขียว = ตามแผน สีแดง = ช้ากว่าแผน · เทียบแถบผลงานกับแถบเวลาจะเห็นทันทีว่างานตามทันเวลาหรือไม่</li>
+<li>ป้ายมุมขวาบนบอกสถานะและผลต่างเทียบแผนที่แสดงอยู่ (แผนเดิม หรือแผน REV ถ้าเปิดเส้น REV ไว้)</li>
+<li><b>มูลค่างาน</b> — ใช้ <b>วงเงินค่าจ้าง</b> ที่กรอกในหน้าโครงการเป็นวงเงินตามสัญญา (ถ้าไม่ได้กรอก ใช้ผลรวมรายการงาน) แสดงมูลค่าแล้วเสร็จ (% จริง × วงเงิน) มูลค่าที่ทำได้ในสัปดาห์นั้น และคงเหลือ — ตรงกับวงเงินในรายงานประจำสัปดาห์</li>
 <li><b>กราฟ</b> — ชี้ที่จุดใดก็ได้ จะแสดงสัปดาห์และช่วงวันที่ของสัปดาห์นั้น (เช่น W3 · 19–25 ต.ค. 2569) พร้อม % ของแต่ละเส้นที่มีข้อมูล ใต้แกน X มีแถบบอกเดือน (สัปดาห์ที่คร่อมสองเดือนนับเข้าเดือนที่มีวันมากกว่า)</li>
-<li><b>ก้าวหน้าประจำสัปดาห์</b> — % ที่เพิ่มขึ้นในสัปดาห์นั้น (แผน/จริง)</li>
 <li><b>แสดงข้อมูล ณ :</b> เลือกสัปดาห์ที่ต้องการดู · ปุ่ม <span class="k">ล่าสุด</span> = สัปดาห์ล่าสุดที่มีการบันทึก · <span class="k">ปัจจุบัน</span> = สัปดาห์ตามปฏิทินวันนี้</li>
 <li><b>เฝ้าระวังเร่งรัดงาน</b> — วันที่ถึง 1/4, 1/2 และ 3/4 ของสัญญา</li>
 <li>แท็บ <b>รายการงาน</b> ดูมูลค่า น้ำหนัก% ระยะเวลา และ % แผน/จริงรายหมวด</li>
@@ -3078,7 +3095,7 @@ const MANUAL_SECTIONS=[
 {id:'pdf',title:'ออก PDF และบันทึกเป็นไฟล์',html:`
 <h4>ปุ่ม <svg class=ic aria-hidden=true><use href=#i-printer></use></svg> PDF ของโครงการ</h4>
 <ul>
-<li><b>ออกสรุป</b> (1 หน้า แนวตั้ง) — รายละเอียดโครงการ + ความก้าวหน้า + S-Curve + รายการงาน เลือก "ณ สัปดาห์ที่" ได้</li>
+<li><b>ออกสรุป</b> (1 หน้า แนวตั้ง) — รายละเอียดโครงการ + แถบความก้าวหน้า + มูลค่า/ระยะเวลา + กราฟ S-Curve ขนาดใหญ่ (วาดใหม่ให้คมชัดสำหรับพิมพ์ พร้อมกรอบรายละเอียดของสัปดาห์ที่ออกรายงาน) + รายการงานและยอดรวม เลือก "ณ สัปดาห์ที่" ได้ · ถ้าผลรวมรายการงานไม่ตรงกับวงเงินตามสัญญา (จากการปัดเศษ) จะมีหมายเหตุบอกส่วนต่างใต้ตาราง</li>
 <li><b>ออกประวัติย้อนหลัง</b> (หลายหน้า)</li>
 <li><b>ออกรายงานติดตามเอกสาร</b> (แนวนอน หลายหน้า) แยกตามเฟส</li>
 </ul>
@@ -3204,6 +3221,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.9</b> — หน้า S-Curve: สรุปความก้าวหน้าใหม่เป็นแผงเดียว — แถบสะสมแบบรายงานประจำสัปดาห์ (แผนเดิม / แผน REV / ผลงานจริง / เวลาสัญญา) + มูลค่างาน + ระยะเวลา ใช้พื้นที่น้อยลง · ช่องเลือกสัปดาห์แสดงช่วงวันที่ · มูลค่างานใช้วงเงินค่าจ้างตามสัญญา (ตรงกับรายงานประจำสัปดาห์) · รายงานสรุป: จัดหน้าใหม่ กราฟ S-Curve ใหญ่ขึ้นและคมชัด มีกรอบรายละเอียดสัปดาห์ที่ออกรายงาน แถวรวมในตารางรายการงาน และหมายเหตุส่วนต่างจากการปัดเศษ · กรอบรายละเอียดบนกราฟไม่ทับป้าย W ที่เลือก</li>
 <li><b>v11.8</b> — อัปเกรดไลบรารีอ่าน/เขียน Excel (SheetJS) จาก 0.18.5 เป็น 0.20.3 ปิดช่องโหว่ที่ไฟล์ Excel ที่ถูกแต่งมาใช้แทรกค่าเข้าระบบหรือทำให้หน้าเว็บค้างได้</li>
 <li><b>v11.7</b> — <b>ความปลอดภัย:</b> ตรวจข้อมูลก่อนนำเข้า (ไฟล์สำรอง .json / กู้จากโฟลเดอร์ / ZIP / ดึงจากคลาวด์) ไม่รับไฟล์ที่ถูกแก้ให้แทรกโค้ด · แก้จุดแสดงข้อความที่ไม่ได้แปลงอักขระพิเศษ (สรุปงวดงาน จำนวนเครื่องจักร งานอื่นในรายงานประจำสัปดาห์ และค่าในปุ่ม) · ดูตัวอย่างไฟล์แนบเปิดได้เฉพาะรูปและ PDF จริง · ออกจากระบบแบบลบข้อมูล ลบรูป/ไฟล์แนบของโครงการนั้นด้วย · เพิ่มนโยบายความปลอดภัยของหน้าเว็บ (CSP) · <b>คลาวด์:</b> ผู้ใช้ใหม่ลงทะเบียน (ชื่อ ตำแหน่ง หน่วยงาน) และรอผู้ดูแลระบบอนุมัติก่อนซิงก์ · หน้าอนุมัติ/ไม่อนุมัติ/ระงับผู้ใช้สำหรับผู้ดูแลระบบ</li>
 <li><b>v11.6</b> — กราฟ S-Curve: ชี้ที่กราฟแล้วแสดงช่วงวันที่ของสัปดาห์นั้น (เช่น W3 · 19–25 ต.ค. 2569) · เพิ่มแถบเดือนใต้แกน X</li>
@@ -3443,7 +3461,84 @@ function renderMilestone(p){
   </div>`;
 }
 
+// ── v11.9 สรุปความก้าวหน้า (ใช้ร่วมกันระหว่างหน้าจอและรายงานสรุป) ──
+function wkRangeTxt(start,w){const a=wkStart(start,w),b=wkEnd(start,w);if(!a||!b)return'';
+  return a.getMonth()===b.getMonth()&&a.getFullYear()===b.getFullYear()?`${a.getDate()}–${b.getDate()} ${TM[b.getMonth()]} ${b.getFullYear()+543}`:`${thD(a)} – ${thD(b)}`}
+// วงเงินตามสัญญา: ใช้ "วงเงินค่าจ้าง" ที่กรอกในหน้าโครงการ (ตรงกับสัญญา) ถ้าไม่ได้กรอก ใช้ผลรวมรายการงาน
+function contractValueOf(p){const v=Number(p.contractVal);return v>0?v:totalConVal(latestPlanItems(p),p)}
+function computeProgressSummary(p,dw){
+  const T=totalPeriods(p),planMissing=!!p.planNotSubmitted;
+  const at=(c,w,TT)=>w<1?0:(c[Math.max(0,Math.min(w,TT)-1)]||0);
+  const plan=buildPlanCurve(p.items,T,p);
+  const planNow=at(plan,dw,T),planPrev=at(plan,dw-1,T);
+  const revs=p.revisions||[];
+  let rev=null;
+  if(revs.length){
+    const lr=revs[revs.length-1];
+    const revT=periodsFromDates(p.startDate,lr.endDate)||(()=>{let mx=0;(lr.items||[]).forEach(i=>{const e=Number(i.startPeriod||1)+Number(i.duration||1)-1;if(e>mx)mx=e});return mx||T})();
+    const rc=buildPlanCurve(lr.items,revT,p);
+    rev={name:lr.name,now:at(rc,dw,revT),prev:at(rc,dw-1,revT),T:revT};
+  }
+  const lastRevVisible=!!(rev&&visiblePlans.has('rev_'+(revs.length-1)));
+  const cmpNow=lastRevVisible?rev.now:planNow,cmpPrev=lastRevVisible?rev.prev:planPrev;
+  const cmpLabel=lastRevVisible?rev.name:'แผนเดิม';
+  const entry=entryAtOrBefore(p,dw);
+  const actualNow=getActualWeighted(p,entry);
+  const entryPrev=dw>1?entryAtOrBefore(p,dw-1):null;
+  const actualPrev=entryPrev?getActualWeighted(p,entryPrev):0;
+  const diff=actualNow-cmpNow;
+  const cv=contractValueOf(p),itemsTotal=totalConVal(latestPlanItems(p),p);
+  const elapsed=Math.min(Math.max(dw,0),T),remain=Math.max(0,T-dw);
+  const totalDays=contractDays(p),elapsedDays=elapsedDaysAtWeek(p,elapsed),remainDays=remainDaysFromWeek(p,dw);
+  const prevDays=dw>1?elapsedDaysAtWeek(p,Math.min(dw-1,T)):0;
+  const timeNow=totalDays?Math.min(100,elapsedDays/totalDays*100):(T?elapsed/T*100:0);
+  const timePrev=totalDays?Math.min(100,prevDays/totalDays*100):(T?Math.max(0,elapsed-1)/T*100:0);
+  let revOver=0;if(rev&&rev.T>T)revOver=rev.T-T;
+  return {T,dw,planMissing,planNow,planPrev,rev,lastRevVisible,cmpNow,cmpPrev,cmpLabel,entry,actualNow,actualPrev,diff,
+    cv,itemsTotal,earned:cv*actualNow/100,earnedWeek:cv*(actualNow-actualPrev)/100,remainVal:cv*(1-actualNow/100),
+    elapsed,remain,totalDays,elapsedDays,remainDays,timeNow,timePrev,revOver,range:wkRangeTxt(p.startDate,dw)};
+}
+// แถบสะสม 2 ช่วง (สะสมถึงสัปดาห์ก่อน + สัปดาห์นี้สีเหลือง) แบบเดียวกับรายงานประจำสัปดาห์ — inline style ใช้ได้ทั้งหน้าจอและหน้าพิมพ์
+function progressBarsHtml(S,pr){
+  const C={plan:'#1a6fc4',rev:'#6d4fc2',week:'#FFC000',time:'#8a94a3',good:'#1D9E75',bad:'#C00000',na:'#1a6fc4'};
+  const actCol=S.planMissing?C.na:(S.actualNow>=S.cmpNow?C.good:C.bad);
+  const clamp=v=>Math.max(0,Math.min(100,Number(v)||0));
+  const lw=pr?92:78,vw=pr?200:168,bh=pr?15:14;
+  const bar=(prev,now,col,empty)=>{
+    if(empty)return `<div style="height:${bh}px;background:${pr?'#f2f2f2':'#eef1f5'};border:1px solid ${pr?'#999':'#d9dee6'};border-radius:${pr?0:3}px"></div>`;
+    const a=clamp(Math.min(prev,now)),b=clamp(now);
+    return `<div style="position:relative;height:${bh}px;background:${pr?'#f2f2f2':'#eef1f5'};border:1px solid ${pr?'#999':'#d9dee6'};border-radius:${pr?0:3}px;overflow:hidden">
+      <div style="position:absolute;left:0;top:0;bottom:0;width:${a.toFixed(3)}%;background:${col}"></div>
+      <div style="position:absolute;left:${a.toFixed(3)}%;top:0;bottom:0;width:${Math.max(0,b-a).toFixed(3)}%;background:${C.week}"></div></div>`;
+  };
+  const sgn=v=>(v>=0?'+':'−')+fmt(Math.abs(v))+'%';
+  const row=(name,bh_,valHtml)=>pr?`<div style="display:grid;grid-template-columns:${lw}px 1fr ${vw}px;gap:10px;align-items:center;margin-bottom:6px">
+    <span style="font-size:15px;font-weight:600;color:#1a1a2e;white-space:nowrap">${name}</span>${bh_}<span style="font-size:13.5px;color:#555;white-space:nowrap">${valHtml}</span></div>`
+    :`<div class="pg-row"><span style="font-size:12.5px;font-weight:600;color:var(--gray-600);white-space:nowrap">${name}</span>${bh_}<span class="pv">${valHtml}</span></div>`;
+  const big=(v,col)=>pr?`<b style="font-size:19px;color:${col};margin-right:6px">${v}</b>`:`<b style="color:${col}">${v}</b>`;
+  const miss=`<span style="color:#999">ยังไม่ส่งแผน</span>`;
+  let h='';
+  h+=row('แผนเดิม',bar(S.planPrev,S.planNow,C.plan,S.planMissing),S.planMissing?miss:big(fmt(S.planNow)+'%','#1a6fc4')+'สัปดาห์นี้ '+sgn(S.planNow-S.planPrev));
+  if(S.rev)h+=row(`<span title="${escH(S.rev.name)}">แผน REV</span>`,bar(S.rev.prev,S.rev.now,C.rev,S.planMissing),S.planMissing?miss:big(fmt(S.rev.now)+'%','#6d4fc2')+'สัปดาห์นี้ '+sgn(S.rev.now-S.rev.prev));
+  h+=row('ผลงานจริง',bar(S.actualPrev,S.actualNow,actCol),big(fmt(S.actualNow)+'%',actCol)+'สัปดาห์นี้ '+sgn(S.actualNow-S.actualPrev));
+  h+=row('เวลาสัญญา',bar(S.timePrev,S.timeNow,C.time),big(fmt(S.timeNow)+'%',pr?'#444':'var(--gray-800)')+`${S.elapsed} / ${S.T} สัปดาห์`);
+  const ticks=[];for(let t=0;t<=100;t+=10)ticks.push(`<span${t%50?' class="t2"':''}>${t}${t===0||t===100?'%':''}</span>`);
+  h+=pr?`<div style="display:grid;grid-template-columns:${lw}px 1fr ${vw}px;gap:10px;margin-top:-3px"><span></span><div style="display:flex;justify-content:space-between;font-size:11px;color:#666">${ticks.join('')}</div><span></span></div>`
+    :`<div class="pg-ticks"><span></span><div>${ticks.join('')}</div><span></span></div>`;
+  const sw=(c,t)=>`<span style="white-space:nowrap;margin-right:${pr?14:16}px"><span style="display:inline-block;width:${pr?12:10}px;height:${pr?12:10}px;border-radius:2px;background:${c};vertical-align:-1px;margin-right:4px"></span>${t}</span>`;
+  h+=`<div style="font-size:${pr?12.5:11}px;color:${pr?'#666':'var(--gray-500)'};margin-top:${pr?4:8}px;line-height:1.7">${S.planMissing?'':sw(C.plan,'แผนสะสมถึงสัปดาห์ก่อน')}${S.rev&&!S.planMissing?sw(C.rev,'แผน REV สะสมถึงสัปดาห์ก่อน'):''}${sw(actCol,'ผลงานสะสมถึงสัปดาห์ก่อน'+(S.planMissing?'':' (เขียว = ตามแผน / แดง = ช้ากว่าแผน)'))}${sw(C.time,'เวลาที่ใช้ไป')}${sw(C.week,'สัปดาห์นี้')}</div>`;
+  return h;
+}
+function progressPillHtml(S,pr){
+  const bad=!S.planMissing&&S.diff<0;
+  const bg=S.planMissing?'#eef0f3':(bad?'#fdecea':'#e4f5ee'),col=S.planMissing?'#5a6270':(bad?'#b4362b':'#1d6b45'),bd=S.planMissing?'#d8dce3':(bad?'#f4c7c2':'#b9dfc9');
+  const txt=S.planMissing?'ยังไม่ส่งแผนงาน':(bad?'ล่าช้ากว่าแผน ':'ตามแผน / เกินแผน ')+(S.diff>=0?'+':'−')+fmt(Math.abs(S.diff))+'%';
+  return `<span style="font-size:${pr?13:11.5}px;font-weight:700;padding:${pr?'2px 12px':'2px 10px'};border-radius:10px;white-space:nowrap;background:${bg};color:${col};border:1px solid ${bd}">${txt}</span>`;
+}
 function renderInfoRow(p){
+  const el=document.getElementById('dash-info');if(el){el.innerHTML='';el.style.display='none'}
+}
+function renderInfoRowOld(p){
   const T=totalPeriods(p);
   const cp=currentPeriod(p);
   const dw=getDisplayWeek(p);
@@ -3481,57 +3576,36 @@ function renderInfoRow(p){
 }
 
 function renderMetrics(p){
-  const T=totalPeriods(p);
   const dw=getDisplayWeek(p);
-  const plan=buildPlanCurve(p.items,T,p);
-  const planNow=plan[Math.max(0,Math.min(dw,T)-1)]||0;
-  const entry=entryAtOrBefore(p,dw);
-  const actualNow=getActualWeighted(p,entry);
-  const revs=p.revisions||[];
-
-  let revPlanNow=null, revLabel='แผน Rev';
-  if(revs.length){
-    const lr=revs[revs.length-1];
-    const revT=periodsFromDates(p.startDate,lr.endDate)||
-      (()=>{let mx=0;(lr.items||[]).forEach(i=>{const e=Number(i.startPeriod||1)+Number(i.duration||1)-1;if(e>mx)mx=e});return mx||T})();
-    const revPlan=buildPlanCurve(lr.items,revT,p);
-    revPlanNow=revPlan[Math.max(0,Math.min(dw,revT)-1)]||0;
-    revLabel=escH(lr.name);
-  }
-
-  const lastRevVisible=revs.length&&visiblePlans.has('rev_'+(revs.length-1));
-  const comparePlan=lastRevVisible&&revPlanNow!==null?revPlanNow:planNow;
-  const diff=actualNow-comparePlan;
-  // ข้อ 8: ยอดเงินตาม % จริง
-  const tv=totalConVal(latestPlanItems(p),p);
-  const earnedValue=tv*(actualNow/100);
-
-  // % ความก้าวหน้าประจำสัปดาห์ (แผน/จริง) ของสัปดาห์ที่เลือก = ผลต่างสะสมเทียบสัปดาห์ก่อนหน้า
-  const planCurveForWeek=lastRevVisible&&revs.length?buildPlanCurve(revs[revs.length-1].items,periodsFromDates(p.startDate,revs[revs.length-1].endDate)||T,p):plan;
-  const planPrevIdx=Math.max(0,Math.min(dw,T)-2);
-  const planPrevVal=dw>1?(planCurveForWeek[planPrevIdx]||0):0;
-  const planWeekPct=Math.max(0,comparePlan-planPrevVal);
-  const entryPrev=dw>1?entryAtOrBefore(p,dw-1):null;
-  const actualPrevVal=entryPrev?getActualWeighted(p,entryPrev):0;
-  const actualWeekPct=actualNow-actualPrevVal;
-
-  const wLbl=dashWeek?`W${dw}`:(entry?`W${entry.period} (ล่าสุด)`:'ยังไม่มีข้อมูล');
-  const planMissing=!!p.planNotSubmitted;
-  const missVal='<span style="color:var(--gray-400);font-size:13px;font-weight:600">ยังไม่ส่งแผน</span>';
-  document.getElementById('dash-metrics').innerHTML=`
-    <div class="metric"><div class="metric-label">แสดง ณ สัปดาห์</div><div class="metric-value blue">${wLbl}</div><div class="metric-sub">จาก ${T} สัปดาห์</div></div>
-    <div class="metric"><div class="metric-label">% แผนเดิม</div><div class="metric-value">${planMissing?missVal:fmt(planNow)+'%'}</div></div>
-    <div class="metric"><div class="metric-label">${!planMissing&&revPlanNow!==null?revLabel:'แผน Rev'}</div><div class="metric-value ${!planMissing&&revPlanNow!==null?'purple':''}">${planMissing?missVal:(revPlanNow!==null?fmt(revPlanNow)+'%':'-')}</div></div>
-    <div class="metric"><div class="metric-label">% จริง</div><div class="metric-value ${planMissing?'blue':(actualNow>=comparePlan?'green':'red')}">${fmt(actualNow)}%</div></div>
-    <div class="metric"><div class="metric-label">ผลต่าง${planMissing?'':' (เทียบ'+(lastRevVisible&&revPlanNow!==null?' Rev':' แผนเดิม')+')'}</div><div class="metric-value ${planMissing?'':(diff>=0?'green':'red')}">${planMissing?missVal:(diff>=0?'+':'')+fmt(diff)+'%'}</div></div>
-    <div class="metric"><div class="metric-label">ก้าวหน้าประจำสัปดาห์ W${dw} (แผน)</div><div class="metric-value ${planMissing?'':'blue'}">${planMissing?missVal:fmt(planWeekPct)+'%'}</div></div>
-    <div class="metric"><div class="metric-label">ก้าวหน้าประจำสัปดาห์ W${dw} (จริง)</div><div class="metric-value ${planMissing?'blue':(actualWeekPct>=planWeekPct?'green':'red')}">${actualWeekPct>=0?'':'-'}${fmt(Math.abs(actualWeekPct))}%</div></div>
-    <div class="metric" style="grid-column:1/-1;border-top:1px solid var(--gray-100);padding-top:8px;margin-top:4px">
-      <div class="metric-label">มูลค่างานที่แล้วเสร็จ (${fmt(actualNow)}% × ${fmtMoney(tv)} บาท)</div>
-      <div class="metric-value ${planMissing?'blue':(actualNow>=comparePlan?'green':'red')}" style="font-size:18px">${fmtMoney(earnedValue)} <span style="font-size:12px;font-weight:400;color:var(--gray-400)">บาท</span></div>
+  const S=computeProgressSummary(p,dw);
+  const cp=currentPeriod(p);
+  const wLbl=dashWeek?`สัปดาห์ที่ ${dw}`:(S.entry?`สัปดาห์ที่ ${S.entry.period} (ล่าสุด)`:'ยังไม่มีข้อมูล');
+  const el=document.getElementById('dash-metrics');
+  el.className='pg-panel';
+  const actCol=S.planMissing?'var(--blue)':(S.actualNow>=S.cmpNow?'var(--green)':'var(--red)');
+  el.innerHTML=`<div>
+      <div class="pg-h"><span>ความก้าวหน้า ณ ${wLbl}${S.range?' · '+S.range:''}${S.planMissing?'':' · เทียบ'+escH(S.cmpLabel)}</span>${progressPillHtml(S,false)}</div>
+      ${progressBarsHtml(S,false)}
+    </div>
+    <div>
+      <div class="pg-h" style="margin-bottom:6px"><span>มูลค่างาน${Number(p.contractVal)>0?' (วงเงินตามสัญญา)':' (ผลรวมรายการงาน)'}</span></div>
+      <div class="pg-kv">
+        <span class="k">วงเงินตามสัญญา</span><span class="v" style="color:#1a3a6b">${fmtMoney(S.cv)}</span>
+        <span class="k">แล้วเสร็จ (${fmt(S.actualNow)}%)</span><span class="v" style="color:${actCol}">${fmtMoney(S.earned)}</span>
+        <span class="k">&nbsp;&nbsp;· สัปดาห์นี้</span><span class="v" style="font-weight:500">${S.earnedWeek>=0?'+':'−'}${fmtMoney(Math.abs(S.earnedWeek))}</span>
+        <span class="k">คงเหลือ</span><span class="v">${fmtMoney(S.remainVal)}</span>
+      </div>
+      <div class="pg-sep"></div>
+      <div class="pg-h" style="margin-bottom:6px"><span>ระยะเวลา</span><span class="pg-sm">${thDate(p.startDate)} – ${thDate(p.endDate)}</span></div>
+      <div class="pg-kv">
+        <span class="k">ดำเนินการไปแล้ว</span><span class="v">${S.elapsed} สัปดาห์ <span class="pg-sm">(${S.elapsedDays} วัน)</span></span>
+        <span class="k">คงเหลือ</span><span class="v" style="color:${S.remain<=0?'var(--red)':'var(--green)'}">${S.remain} สัปดาห์ <span class="pg-sm">(${S.remainDays} วัน)</span></span>
+        <span class="k">สัปดาห์ปัจจุบัน (วันนี้)</span><span class="v" style="font-weight:500">W${cp}</span>
+      </div>
+      ${S.revOver?`<div style="font-size:10.5px;color:var(--red);margin-top:6px"><svg class=ic aria-hidden=true><use href=#i-alert></use></svg> แผน REV เกินสัญญา ${S.revOver} สัปดาห์</div>`:''}
     </div>`;
-
-  checkTerminationAlert(p,dw,actualNow,T,plan);
+  const plan=buildPlanCurve(p.items,S.T,p);
+  checkTerminationAlert(p,dw,S.actualNow,S.T,plan);
 }
 
 // ── เงื่อนไขบอกเลิกสัญญา กวจ 0405.2/ว124 ───────────────
@@ -3808,9 +3882,11 @@ function renderScurve(p){
       const rng=wkRange(dw);
       const pad=8,lineH=16,titleH=rng?31:18;
       const boxW=rng?172:150,boxH=titleH+lines.length*lineH+pad;
-      // ข้อ 2: วางมุมซ้ายบน
-      const bx=chartArea.left+6;
-      const by=chartArea.top+6;
+      // v11.9 วางใต้แถวป้าย (1/2, 3/4, W ที่เลือก) และหลบเส้นสัปดาห์ที่เลือก ไม่ให้ทับกัน
+      const selX=(dw>=1&&dw<=maxT)?scales.x.getPixelForValue(dw-1):-1e9;
+      let bx=chartArea.left+6;
+      if(selX>=bx-4&&selX<=bx+boxW+4)bx=Math.min(chartArea.right-boxW-6,selX+10);
+      const by=chartArea.top+22;
       ctx.fillStyle='rgba(255,255,255,0.93)';
       ctx.strokeStyle='rgba(26,111,196,0.35)';
       ctx.lineWidth=1;
@@ -7777,6 +7853,29 @@ function doPdf(){
     else printHistory(p);
   },200);
 }
+// v11.9 วาดกราฟ S-Curve ใหม่สำหรับหน้าพิมพ์: สัดส่วนกว้าง:สูง ≈ 1.9:1 ความละเอียด ×3 และกรอบรายละเอียดเป็นสัปดาห์ที่ออกรายงาน
+function captureScurveForPrint(p,dw){
+  if(!scurveChart)return '';
+  const keep=dashWeek,needWeek=getDisplayWeek(p)!==dw;
+  let img='';
+  if(needWeek){dashWeek=dw;renderScurve(p);}
+  const c=scurveChart,wrap=c.canvas.parentElement;
+  const ow=wrap.style.width,oh=wrap.style.height,oAnim=c.options.animation;
+  try{
+    wrap.style.width='760px';wrap.style.height='400px';
+    c.stop();c.options.animation=false;c.options.devicePixelRatio=3;
+    c.resize();c.update('none');c.draw();
+    img=c.toBase64Image('image/png');
+  }catch(e){try{img=c.toBase64Image()}catch(e2){}}
+  finally{
+    wrap.style.width=ow;wrap.style.height=oh;
+    try{
+      if(needWeek){dashWeek=keep;renderScurve(p);}
+      else{c.options.devicePixelRatio=undefined;c.options.animation=oAnim;c.resize();c.update('none');}
+    }catch(e){}
+  }
+  return img;
+}
 function printSummary(p,pdfW){
   const T=totalPeriods(p);
   const dw=pdfW||(latestEntry(p)?Number(latestEntry(p).period):currentPeriod(p));
@@ -7812,7 +7911,8 @@ function printSummary(p,pdfW){
   const actualWeekPctPdf=actualNow-actualPrevValPdf;
   const ws=wkStart(p.startDate,dw);const we2=wkEnd(p.startDate,dw);
   const wkRange=ws&&we2?thD(ws)+' – '+thD(we2):'';
-  const chartImg=scurveChart?scurveChart.toBase64Image():'';
+  const S=computeProgressSummary(p,dw);
+  const chartImg=captureScurveForPrint(p,dw);
   const elapsed=Math.min(dw,T);
   const remain=Math.max(0,T-dw);
   // ข้อ 1: วันจริง
@@ -7875,9 +7975,13 @@ function printSummary(p,pdfW){
     table{width:100%;border-collapse:collapse;font-size:15.5px}
     th{background:#1a3a6b;color:#fff;padding:7px 8px;text-align:left;font-weight:600;font-size:14px;white-space:nowrap}
     td{padding:6.5px 8px;border-bottom:1px solid #e8ecf3;vertical-align:middle;white-space:nowrap}
-    td:nth-child(2){white-space:normal}
+    td:nth-child(2){white-space:normal;min-width:150px}
+    thead th{white-space:normal;line-height:1.25;vertical-align:bottom}
     tr:nth-child(even) td{background:#f7f9fc}
-    img.scurve-img{width:100%;margin:4px 0 12px;border:1px solid #e0e0e0;border-radius:4px}
+    img.scurve-img{width:100%;margin:2px 0 10px;border:1px solid #e0e0e0;border-radius:4px;display:block}
+    table.kt{margin:8px 0 2px;table-layout:fixed}table.kt td{border:1px solid #d6deea;padding:5px 10px;background:#f7f9fc}table.kt .l{display:block;font-size:12.5px;color:#666;white-space:nowrap}table.kt .v{display:block;font-size:16px;font-weight:700;white-space:nowrap}table.kt td.l{color:#666;background:#f7f9fc}table.kt td.v{font-weight:700;text-align:right}
+    tr.tot td{font-weight:700;border-top:2px solid #1a3a6b;background:#eef2f8 !important}
+    .tot-note{font-size:11px;color:#777;text-align:right;margin-top:3px}
     .footer{margin-top:16px;padding-top:10px;border-top:1px solid #c8d4e8;display:flex;justify-content:space-between;align-items:flex-end;font-size:12px;color:#666}
     .footer-agency{font-weight:600;color:#1a3a6b;font-size:12px}
     .status-pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12.5px;font-weight:700;white-space:nowrap;background:${planMissing?'#eef0f3':(diff>=0?'#e4f5ee':'#fdecea')};color:${diffColor};border:1px solid ${planMissing?'#d8dce3':(diff>=0?'#a8ddc9':'#f5c6c2')}}
@@ -7892,41 +7996,20 @@ function printSummary(p,pdfW){
     <div><div class="info-lbl">ผู้ว่าจ้าง</div><div class="info-val">${escH(p.owner||'-')}</div></div>
     <div><div class="info-lbl">ผู้รับจ้าง</div><div class="info-val">${escH(p.contractor||'-')}</div></div>
     <div><div class="info-lbl">เลขที่สัญญา</div><div class="info-val">${escH(p.contractNo||'-')}</div></div>
-    <div><div class="info-lbl">มูลค่าก่อสร้าง</div><div class="info-val">${fmtMoney(tv)} บาท</div></div>
+    <div><div class="info-lbl">${Number(p.contractVal)>0?'วงเงินตามสัญญา':'มูลค่าก่อสร้าง (ผลรวมรายการงาน)'}</div><div class="info-val">${fmtMoney(S.cv)} บาท</div></div>
     <div><div class="info-lbl">วันเริ่มต้น – สิ้นสุดสัญญา</div><div class="info-val">${thDate(p.startDate)} – ${thDate(p.endDate)} (${T} สัปดาห์)</div></div>
-    <div><div class="info-lbl">รายงาน ณ สัปดาห์ที่</div><div class="info-val">W${dw} &nbsp;|&nbsp; ${wkRange} &nbsp;<span class="status-pill">${statusText}</span></div></div>
+    <div><div class="info-lbl">รายงาน ณ สัปดาห์ที่</div><div class="info-val">สัปดาห์ที่ ${dw} &nbsp;|&nbsp; ${wkRange}</div></div>
   </div>
-  <div class="section-title">ความก้าวหน้าโครงการ${planMissing?'':' (เทียบกับ '+escH(compareLabel)+')'}</div>
-  <div class="metrics-grid">
-    ${showBothPlans&&!planMissing?`<div class="mb"><div class="l">% แผนเดิม</div><div class="v" style="color:#1a3a6b">${fmt(planNow)}%</div></div>`:''}
-    <div class="mb"><div class="l">% ${planMissing?'แผน':escH(compareLabel)}</div><div class="v" style="${planMissing?'color:#999;font-size:14px':'color:'+(lastRevVisible?'#6d4fc2':'#1a3a6b')}">${planMissing?'ยังไม่ส่งแผน':fmt(comparePlanNow)+'%'}</div></div>
-    <div class="mb"><div class="l">% จริงสะสม</div><div class="v" style="color:${planMissing?'#1a6fc4':(diff>=0?'#1D9E75':'#c0392b')}">${fmt(actualNow)}%</div></div>
-    <div class="mb"><div class="l">ผลต่าง</div><div class="v" style="${planMissing?'color:#999;font-size:14px':'color:'+diffColor}">${planMissing?'ยังไม่ส่งแผน':(diff>=0?'+':'')+fmt(diff)+'%'}</div></div>
-    <div class="mb"><div class="l">ก้าวหน้าประจำสัปดาห์ W${dw} (แผน)</div><div class="v" style="${planMissing?'color:#999;font-size:14px':'color:#1a3a6b'}">${planMissing?'ยังไม่ส่งแผน':fmt(planWeekPctPdf)+'%'}</div></div>
-    <div class="mb"><div class="l">ก้าวหน้าประจำสัปดาห์ W${dw} (จริง)</div><div class="v" style="color:${planMissing?'#1a6fc4':(actualWeekPctPdf>=planWeekPctPdf?'#1D9E75':'#c0392b')}">${actualWeekPctPdf>=0?'':'-'}${fmt(Math.abs(actualWeekPctPdf))}%</div></div>
-  </div>
-  <!-- ข้อ 8: สรุปมูลค่าที่แล้วเสร็จ -->
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
-    <div class="mb" style="text-align:left;padding:10px 14px">
-      <div class="l">วงเงินสัญญา (รวม Factor F/VAT)</div>
-      <div style="font-size:16px;font-weight:700;color:#1a3a6b;margin-top:2px">${fmtMoney(tv)} <span style="font-size:11px;font-weight:400;color:#888">บาท</span></div>
-    </div>
-    <div class="mb" style="text-align:left;padding:10px 14px">
-      <div class="l">มูลค่างานที่แล้วเสร็จ (${fmt(actualNow)}%)</div>
-      <div style="font-size:16px;font-weight:700;color:${planMissing?'#1a6fc4':(diff>=0?'#1D9E75':'#c0392b')};margin-top:2px">${fmtMoney(tv*(actualNow/100))} <span style="font-size:11px;font-weight:400;color:#888">บาท</span></div>
-    </div>
-    <div class="mb" style="text-align:left;padding:10px 14px">
-      <div class="l">มูลค่างานคงเหลือ</div>
-      <div style="font-size:16px;font-weight:700;color:#666;margin-top:2px">${fmtMoney(tv*(1-actualNow/100))} <span style="font-size:11px;font-weight:400;color:#888">บาท</span></div>
-    </div>
-  </div>
-  <div class="section-title">ระยะเวลาดำเนินการ</div>
-  <div class="timeline-row">
-    <div class="tb"><div class="l">ระยะเวลาสัญญา</div><div class="v">${T} สัปดาห์ <span style="font-size:11px;color:#888">(${totalDaysReal} วัน)</span></div><div class="s">${thDate(p.startDate)} – ${thDate(p.endDate)}</div></div>
-    <div class="tb"><div class="l">ดำเนินการไปแล้ว (ณ W${dw})</div><div class="v" style="color:#1a6fc4">${elapsed} สัปดาห์ <span style="font-size:11px;color:#888">(${elapsedDaysReal} วัน)</span></div><div class="s">คิดเป็น ${fmt(elapsed/T*100)}% ของสัญญา${elapsedWkEnd?' · ถึง '+thD(elapsedWkEnd):''}</div></div>
-    <div class="tb"><div class="l">ระยะเวลาคงเหลือ (จาก W${dw})</div><div class="v" style="color:${remain<=0?'#c0392b':'#1D9E75'}">${remain} สัปดาห์ <span style="font-size:11px;color:#888">(${remainDaysReal} วัน)</span></div><div class="s">${remain<=0?'<svg class=ic aria-hidden=true><use href=#i-alert></use></svg> หมดระยะเวลาสัญญาแล้ว':'สิ้นสุดสัญญา '+remainWkEnd}</div></div>
-  </div>
-  <div class="section-title">กราฟ S-Curve (แสดงเฉพาะเส้นที่เลือก)</div>
+  <div class="section-title" style="display:flex;justify-content:space-between;align-items:center"><span>ความก้าวหน้าโครงการ ณ สัปดาห์ที่ ${dw}${planMissing?'':' (เทียบ'+escH(compareLabel)+')'}</span>${progressPillHtml(S,true)}</div>
+  ${progressBarsHtml(S,true)}
+  <table class="kt"><tr>
+    <td><span class="l">มูลค่างานแล้วเสร็จ (${fmt(S.actualNow)}%)</span><span class="v" style="color:${planMissing?'#1a6fc4':(S.diff>=0?'#1D9E75':'#c0392b')}">${fmtMoney(S.earned)} <small style="font-weight:400;color:#888">บาท</small></span></td>
+    <td><span class="l">มูลค่างานสัปดาห์นี้</span><span class="v">${S.earnedWeek>=0?'+':'−'}${fmtMoney(Math.abs(S.earnedWeek))} <small style="font-weight:400;color:#888">บาท</small></span></td>
+    <td><span class="l">มูลค่างานคงเหลือ</span><span class="v">${fmtMoney(S.remainVal)} <small style="font-weight:400;color:#888">บาท</small></span></td></tr>
+  <tr><td><span class="l">ดำเนินการไปแล้ว</span><span class="v">${S.elapsed} สัปดาห์ <small style="font-weight:400;color:#888">(${S.elapsedDays} วัน)</small></span></td>
+    <td><span class="l">ระยะเวลาคงเหลือ</span><span class="v" style="color:${S.remain<=0?'#c0392b':'#1D9E75'}">${S.remain} สัปดาห์ <small style="font-weight:400;color:#888">(${S.remainDays} วัน)</small></span></td>
+    <td><span class="l">สิ้นสุดสัญญา</span><span class="v">${thDate(p.endDate)}</span></td></tr></table>
+  <div class="section-title">กราฟ S-Curve</div>
   ${chartImg?`<img class="scurve-img" src="${chartImg}">`:'<div style="padding:30px;text-align:center;border:1px solid #eee;color:#aaa;border-radius:4px">S-Curve</div>'}
   <div class="section-title">รายการงาน${planMissing?'':' (เทียบกับ '+escH(compareLabel)+')'}</div>
   ${planMissing?`<div style="font-size:11.5px;color:#7a5200;background:#fff3dc;border:1px solid #f0d9a0;border-radius:4px;padding:6px 10px;margin-bottom:8px"><svg class=ic aria-hidden=true><use href=#i-alert></use></svg> ผู้รับจ้างยังไม่ส่งแผนงานก่อสร้าง (S-Curve) — รายงานฉบับนี้แสดงเฉพาะผลงานจริง ยังไม่มีข้อมูลแผนสำหรับเปรียบเทียบ</div>`:''}
@@ -7937,7 +8020,8 @@ function printSummary(p,pdfW){
     <th style="text-align:right">% แผนเดิม</th>
     ${revs.length?`<th style="text-align:right;background:#4a3080">% ${escH(revs[revs.length-1].name)}</th>`:''}
     <th style="text-align:right">% จริง</th><th style="text-align:right">ผลต่าง${planMissing?'':'<br><span style="font-weight:400;font-size:9px">(เทียบ '+escH(compareLabel)+')</span>'}</th>
-  </tr></thead><tbody>${itemRows}</tbody></table>
+  </tr></thead><tbody>${itemRows}<tr class="tot"><td></td><td>รวม</td><td style="text-align:right">${fmtMoney(S.itemsTotal)}</td><td style="text-align:right">100.00%</td><td colspan="${revs.length?5:4}"></td></tr></tbody></table>
+  ${Number(p.contractVal)>0&&Math.abs(S.itemsTotal-S.cv)>=0.005?`<div class="tot-note">ผลรวมรายการ ${fmtMoney(S.itemsTotal)} บาท · วงเงินตามสัญญา ${fmtMoney(S.cv)} บาท (ต่าง ${fmtMoney(Math.abs(S.itemsTotal-S.cv))} บาท จากการปัดเศษรายการ)</div>`:''}
   <div class="footer">
     <div><div class="footer-agency">ส่วนควบคุมการก่อสร้าง สำนักช่าง เทศบาลนครอุดรธานี</div>
     <div>พัฒนาระบบโดย ส่วนควบคุมการก่อสร้าง สำนักช่าง เทศบาลนครอุดรธานี</div></div>
@@ -7952,13 +8036,13 @@ function printSummary(p,pdfW){
     var ref=document.createElement('div');
     ref.style.cssText='position:absolute;visibility:hidden;height:calc(297mm - 22mm);width:1px;top:0;left:0';
     document.body.appendChild(ref);
-    var targetHeight=ref.getBoundingClientRect().height;
+    var targetHeight=ref.getBoundingClientRect().height*0.97; // เผื่อระยะ กันบรรทัดท้ายตกไปหน้า 2
     document.body.removeChild(ref);
     wrap.style.zoom=1;
     var h=wrap.scrollHeight;
-    if(h>targetHeight){
-      wrap.style.zoom=Math.max(0.5,targetHeight/h);
-    }
+    var wr=wrap.scrollWidth>wrap.clientWidth+1?wrap.clientWidth/wrap.scrollWidth:1; // ตารางกว้างเกิน → ย่อให้พอดีด้วย
+    var z=Math.min(wr,h>targetHeight?targetHeight/h:1);
+    if(z<1)wrap.style.zoom=Math.max(0.5,z);
   }
   window.onload=function(){
     try{fitSummaryToOnePage();}catch(e){}
