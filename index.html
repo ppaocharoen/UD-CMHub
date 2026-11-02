@@ -14,6 +14,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='white'%3EUD%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='white'%3EUD%3C/text%3E%3C/svg%3E">
 <script data-lib="Chart.js 4.4.1">/* Chart.js 4.4.1 — ฝังในไฟล์เพื่อใช้งานออฟไลน์ (ลิขสิทธิ์ตามสัญญาอนุญาตของไลบรารี) */
 /*!
  * Chart.js v4.4.1
@@ -195,6 +199,10 @@ tr:hover td{background:var(--gray-50)}
 .toast.show{opacity:1;transform:translateY(0)}
 .wk-row{display:grid;grid-template-columns:1fr auto auto 110px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100)}
 .plan-sched-row{display:grid;grid-template-columns:24px 2fr 90px 90px 60px 150px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--gray-100)}
+.plan-sched-row.sub-follow > :not(.plan-sched-badge){opacity:.45}
+.plan-sched-row.sub-follow input{background:var(--gray-50)}
+.submode-btn{font-size:10.5px;padding:2px 7px;border-radius:10px;border:1px solid var(--gray-200);background:#fff;color:var(--gray-600);cursor:pointer;white-space:nowrap;flex-shrink:0}
+.submode-btn.on{background:var(--purple-light);border-color:#d4c8f5;color:var(--purple)}
 .plan-sched-row-hdr{display:grid;grid-template-columns:24px 2fr 90px 90px 60px 150px;gap:8px;padding:5px 0}
 .plan-sched-row-hdr span{font-size:10px;font-weight:500;color:var(--gray-400);text-transform:uppercase}
 .plan-inst-card{border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:12px;background:#fff}
@@ -1167,7 +1175,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.4';
+const APP_VERSION='11.5';
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
 const STORE_KEY='scurve_v4';
@@ -1703,9 +1711,12 @@ function buildItemPlanCurve(item,T){
     subs.forEach(s=>{
       const amt=Number(s.amount)||0;
       if(!amt||s.needsPlan)return;
+      const own=s.duration||s.startPeriod||(s.schedule&&s.schedule.length);
       const dur=Math.max(1,Math.min(Number(s.duration||item.duration||1),T));
       const startAt=Math.max(0,Number(s.startPeriod||item.startPeriod||1)-1);
-      if(s.schedule&&s.schedule.length){
+      if(!own&&item.schedule&&item.schedule.length){ // v11.5 งานย่อยที่ไม่ได้กำหนดเอง ใช้ %/W ของหมวดหลักด้วย
+        item.schedule.forEach((sc,si)=>{const t=startAt+si;if(t<T)pv[t]+=amt*(Number(sc.pct||0)/100);});
+      }else if(s.schedule&&s.schedule.length){
         s.schedule.forEach((sc,si)=>{const t=startAt+si;if(t<T)pv[t]+=amt*(Number(sc.pct||0)/100);});
       }else{
         const pp=amt/dur;
@@ -2723,6 +2734,8 @@ const MANUAL_SECTIONS=[
 <h4>วิธีที่ 2: แท็บ "กำหนดเอง (รายรายการ)"</h4>
 <ul>
 <li>ต่อรายการ ระบุ <b>ระยะเวลา(W)</b> (กี่สัปดาห์) และ <b>เริ่ม W ที่</b> (เริ่มสัปดาห์ที่เท่าไร) และ %/W ถ้าต้องการกำหนดเอง</li>
+<li>หมวดงานที่มีงานย่อย ค่าเริ่มต้นคือ <b>กำหนดที่หมวดหลัก</b> กรอกบรรทัดหมวดหลักบรรทัดเดียวพอ งานย่อยจะแสดงสีจางพร้อมป้าย "ตามหมวดหลัก" (ใช้ระยะเวลา เริ่ม W และ %/W เดียวกับหมวดหลัก) ไว้ตรวจว่ามีงานย่อยอะไรอยู่ในหมวดบ้าง</li>
+<li>ถ้าต้องการกรอกแยกทีละงานย่อย กดปุ่ม <span class="k">แยกงานย่อย</span> ที่บรรทัดหมวดหลัก งานย่อยที่ไม่ได้กรอกยังใช้ค่าของหมวดหลัก กดปุ่มเดิมอีกครั้งเพื่อกลับไปกำหนดที่หมวดหลัก (ตอนบันทึก ค่าที่กรอกแยกไว้ของหมวดนั้นจะถูกล้าง)</li>
 <li>หลายรายการพร้อมกัน: ติ๊กรายการ (หรือ "เลือกทั้งหมด") แล้วใช้ <span class="k">✓ ใช้ระยะ/เริ่มW กับรายการที่เลือก</span> หรือ <span class="k">%/W ให้รายการที่เลือก</span></li>
 </ul>
 <p>สุดท้ายกด <span class="k"><svg class=ic aria-hidden=true><use href=#i-save></use></svg> บันทึกแผนงาน</span> (ถ้าปิดหน้าโดยไม่บันทึก การแก้ไขในหน้านี้จะไม่ถูกเก็บ)</p>
@@ -2966,6 +2979,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.5</b> — หน้าแผนงาน แท็บ "กำหนดเอง": หมวดงานที่มีงานย่อยกรอกที่หมวดหลักบรรทัดเดียวได้ (ค่าเริ่มต้น) งานย่อยแสดงสีจาง "ตามหมวดหลัก" · ปุ่ม "แยกงานย่อย" สำหรับกรอกทีละงานย่อย · "เลือกทั้งหมด" ไม่ติ๊กงานย่อยที่ตามหมวดหลัก · งานย่อยที่ไม่ได้กรอกใช้ %/W ของหมวดหลักด้วย (เดิมใช้แค่ระยะเวลา/เริ่ม W)</li>
 <li><b>v11.4</b> — หน้าโครงการใหม่ / แก้ไขโครงการ: เพิ่มแถบ "ปรับลดราคาทุกรายการจากราคากลาง (%)" ใต้ปุ่มนำเข้า Excel · กรอกวงเงินค่าจ้างแล้วระบบคำนวณ % ที่ต่ำกว่าราคากลาง (รวม Factor F / VAT) และเสนอให้ปรับทั้งหมดในคลิกเดียว · เก็บราคากลางไว้อ้างอิง ส่วนลดคิดจากราคากลางเสมอ (ไม่ลดทบ) · ถามก่อนปรับทับรายการที่แก้ราคาเอง · แก้ปุ่ม "ปรับราคาตามส่วนลดผู้รับจ้าง" ให้เทียบวงเงินกับมูลค่ารวม Factor F / VAT (เดิมเทียบกับต้นทุนก่อนคูณ) และปรับแผนแก้ไขที่ราคาตรงกันตามไปด้วย · แก้บรรทัดพื้นที่จัดเก็บในหน้าโครงการทั้งหมดที่แสดงโค้ดไอคอนแทนสัญลักษณ์</li>
 <li><b>v11.3</b> — บันทึกความก้าวหน้ารายวัน: เพิ่มตัวเลือก "งานอื่นนอกรายการ (พิมพ์รายละเอียดเอง)" ใส่ปริมาณ/หน่วยได้ แสดงในรายงานประจำวันและประจำสัปดาห์ (ไม่นับ % ความก้าวหน้า)</li>
 <li><b>v11.2</b> — เลิกใช้อีโมจิทั้งระบบ เปลี่ยนเป็นชุดไอคอนเส้นที่ออกแบบเฉพาะ (แบบเดียวกับ UD-Cost Hub) ในปุ่ม หัวข้อ ป้ายสถานะ คู่มือ และหน้าพิมพ์ · ข้อความแจ้งเตือน/ยืนยันใช้ตัวอักษรล้วน</li>
@@ -6290,6 +6304,7 @@ function saveSched(){
   } else {
     const row=container?container.querySelector(`[data-id="${schedTargetRowId}"]`):null;
     applySchedToRow(row);
+    if(schedTargetContainerId==='plan-sched-rows')setTimeout(refreshPlanBadges,0);
     toast('บันทึก % ต่อสัปดาห์แล้ว');
   }
   // ปิดเฉพาะ modal-sched ไม่ปิด modal ที่ซ้อนอยู่ข้างหลัง
@@ -7091,10 +7106,11 @@ function addPlanScheduleRow(entityId,name,dur,sp,schedule,isSub,touched){
   row.className='plan-sched-row';
   row.dataset.id=entityId;
   row.dataset.sched=schedule&&schedule.length?JSON.stringify(schedule):'[]';
+  if(isSub)row.dataset.parent=String(entityId).split('::')[0];
   row.dataset.touched=touched?'1':'0'; // '1' = ผู้ใช้เคยตั้งค่าจริง (จะเขียนกลับตอนบันทึก) — ถ้ายังไม่เคยแตะ จะไม่เขียนค่าเริ่มต้นทับของเดิม
   row.innerHTML=`
     <input type="checkbox" class="plan-sched-check" style="width:15px;height:15px;cursor:pointer;margin:0">
-    <span data-role="name" style="font-size:${isSub?'12px':'13px'};font-weight:${isSub?'400':'500'};color:${isSub?'var(--gray-600)':'inherit'};padding-left:${isSub?'16px':'0'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escH(name)}">${isSub?'↳ ':''}${escH(name)}</span>
+    <div style="display:flex;align-items:center;gap:6px;min-width:0"><span data-role="name" style="font-size:${isSub?'12px':'13px'};font-weight:${isSub?'400':'500'};color:${isSub?'var(--gray-600)':'inherit'};padding-left:${isSub?'16px':'0'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escH(name)}">${isSub?'↳ ':''}${escH(name)}</span><span class="submode-slot"></span></div>
     <input type="number" min="1" step="1" value="${dur||1}" data-field="duration" oninput="markPlanSchedRowTouched(this)" style="text-align:center">
     <input type="number" min="1" step="1" value="${sp||1}" data-field="startPeriod" oninput="markPlanSchedRowTouched(this)" style="text-align:center">
     <button class="btn-icon sched-btn" type="button" title="กำหนด % ต่อสัปดาห์" onclick="openPlanSchedFromRow(this)" style="font-size:11px;padding:3px 5px;color:var(--blue)">${schedule&&schedule.length?'✓ %/W':'%/W'}</button>
@@ -7103,6 +7119,14 @@ function addPlanScheduleRow(entityId,name,dur,sp,schedule,isSub,touched){
 }
 function markPlanSchedRowTouched(inp){
   inp.closest('.plan-sched-row').dataset.touched='1';
+  refreshPlanBadges();
+}
+// v11.5 หมวดหลักที่มีงานย่อย: "กำหนดที่หมวดหลัก" (ค่าเริ่มต้น งานย่อยแสดงสีจาง ตามหมวดหลัก) หรือ "แยกกำหนดรายงานย่อย"
+function togglePlanSubMode(btn){
+  const row=btn.closest('.plan-sched-row');
+  row.dataset.subMode=row.dataset.subMode==='1'?'0':'1';
+  if(row.dataset.subMode==='0')document.querySelectorAll(`#plan-sched-rows .plan-sched-row[data-parent="${row.dataset.id}"] .plan-sched-check`).forEach(c=>c.checked=false);
+  refreshPlanBadges();
 }
 
 function openPlanSchedFromRow(btn){
@@ -7152,23 +7176,45 @@ function getInstallmentCoveredItemIds(){
 }
 function refreshPlanBadges(){
   const covered=getInstallmentCoveredItemIds();
-  document.querySelectorAll('#plan-sched-rows .plan-sched-row').forEach(row=>{
+  const rowsAll=[...document.querySelectorAll('#plan-sched-rows .plan-sched-row')];
+  const byId={};rowsAll.forEach(r=>{byId[r.dataset.id]=r});
+  const setEnabled=(row,on,bg)=>{
+    ['[data-field=duration]','[data-field=startPeriod]','.sched-btn','.plan-sched-check'].forEach(sel=>{const el=row.querySelector(sel);if(el)el.disabled=!on});
+    ['[data-field=duration]','[data-field=startPeriod]'].forEach(sel=>{const el=row.querySelector(sel);if(el)el.style.background=bg||''});
+    if(!on){const c=row.querySelector('.plan-sched-check');if(c)c.checked=false;}
+  };
+  rowsAll.forEach(row=>{
     const badge=row.querySelector('.plan-sched-badge');
-    const durInp=row.querySelector('[data-field=duration]');
-    const spInp=row.querySelector('[data-field=startPeriod]');
-    const schedBtn=row.querySelector('.sched-btn');
-    const checkInp=row.querySelector('.plan-sched-check');
+    const parent=row.dataset.parent?byId[row.dataset.parent]:null;
+    row.classList.remove('sub-follow');
+    // ปุ่มสลับโหมดที่บรรทัดหมวดหลักที่มีงานย่อย
+    const slot=row.querySelector('.submode-slot');
+    if(slot){
+      const n=rowsAll.filter(r=>r.dataset.parent===row.dataset.id).length;
+      slot.innerHTML=n?`<button type="button" class="submode-btn${row.dataset.subMode==='1'?' on':''}" onclick="togglePlanSubMode(this)" title="${row.dataset.subMode==='1'?'กดเพื่อกลับไปกำหนดที่หมวดหลักบรรทัดเดียว':'กดเพื่อกรอกแผนแยกทีละงานย่อย'}">${row.dataset.subMode==='1'?'แยกรายงานย่อย ('+n+')':'แยกงานย่อย'}</button>`:'';
+    }
     if(covered.has(row.dataset.id)){
       badge.innerHTML='<span class="badge badge-rev"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> จากงวดงาน</span>';
-      durInp.disabled=true;spInp.disabled=true;schedBtn.disabled=true;
-      durInp.style.background='var(--gray-50)';spInp.style.background='var(--gray-50)';
-      if(checkInp){checkInp.checked=false;checkInp.disabled=true;}
-    } else {
-      badge.innerHTML='<span class="badge badge-done">กำหนดเอง</span>';
-      durInp.disabled=false;spInp.disabled=false;schedBtn.disabled=false;
-      durInp.style.background='';spInp.style.background='';
-      if(checkInp)checkInp.disabled=false;
+      setEnabled(row,false,'var(--gray-50)');
+      return;
     }
+    const follow=parent&&(parent.dataset.subMode!=='1'||row.dataset.touched!=='1');
+    const dI=row.querySelector('[data-field=duration]'),sI=row.querySelector('[data-field=startPeriod]'),bI=row.querySelector('.sched-btn');
+    if(follow&&row.dataset.touched==='1'&&row.dataset.ownDur===undefined){row.dataset.ownDur=dI.value;row.dataset.ownSp=sI.value;row.dataset.ownBtn=bI?bI.innerHTML:'';}
+    if(!follow&&row.dataset.ownDur!==undefined){dI.value=row.dataset.ownDur;sI.value=row.dataset.ownSp;if(bI)bI.innerHTML=row.dataset.ownBtn;delete row.dataset.ownDur;delete row.dataset.ownSp;delete row.dataset.ownBtn;}
+    if(follow){
+      // แสดงค่าของหมวดหลักแบบสีจาง (ไม่ใช้ค่าของแถวนี้ตอนบันทึก)
+      row.querySelector('[data-field=duration]').value=parent.querySelector('[data-field=duration]').value;
+      row.querySelector('[data-field=startPeriod]').value=parent.querySelector('[data-field=startPeriod]').value;
+      const pb=parent.querySelector('.sched-btn'),sb=row.querySelector('.sched-btn');
+      if(pb&&sb)sb.innerHTML=pb.innerHTML;
+      badge.innerHTML='<span class="badge" style="background:var(--gray-100);color:var(--gray-500)">ตามหมวดหลัก</span>';
+      if(parent.dataset.subMode!=='1'){row.classList.add('sub-follow');setEnabled(row,false);}
+      else setEnabled(row,true);
+      return;
+    }
+    badge.innerHTML='<span class="badge badge-done">กำหนดเอง</span>';
+    setEnabled(row,true);
   });
 }
 function syncPlanScheduleRows(){
@@ -7188,6 +7234,7 @@ function syncPlanScheduleRows(){
       const d=planScheduleDataById[r.id]||{};
       const hasExisting=(d.duration!==undefined&&d.duration!==null)||(d.schedule&&d.schedule.length>0);
       addPlanScheduleRow(r.id,r.name,d.duration||1,d.startPeriod||1,d.schedule||[],r.isSub,hasExisting);
+      if(r.isSub&&hasExisting){const pr=container.querySelector(`.plan-sched-row[data-id="${String(r.id).split('::')[0]}"]`);if(pr&&pr.dataset.subMode===undefined)pr.dataset.subMode='1';}
     } else {
       const nameEl=existingById[r.id].querySelector('[data-role=name]');
       if(nameEl){const label=(r.isSub?'↳ ':'')+r.name;nameEl.textContent=label;nameEl.title=r.name;}
@@ -7253,9 +7300,15 @@ function resolveEntitySchedule(entityId,installments,projStart,T){
 }
 function resolveSubItemsSchedule(subItems,itemId,installments,projStart,T){
   if(!subItems||!subItems.length)return subItems;
+  const pr=document.querySelector(`#plan-sched-rows .plan-sched-row[data-id="${itemId}"]`);
+  const subMode=pr&&pr.dataset.subMode==='1';
   return subItems.map(s=>{
-    const r=resolveEntitySchedule(itemId+'::'+s.id,installments,projStart,T);
-    return r?{...s,duration:r.duration,startPeriod:r.startPeriod,schedule:r.schedule,needsPlan:undefined}:s;
+    const eid=itemId+'::'+s.id;
+    // กำหนดที่หมวดหลัก: งานย่อยใช้แผนของหมวดหลัก (ล้างค่าเดิมของงานย่อย) — ยกเว้นงานย่อยที่ติ๊กในงวดงาน
+    const r=subMode?resolveEntitySchedule(eid,installments,projStart,T):computeScheduleFromInstallments(eid,installments,projStart,T);
+    if(r)return {...s,duration:r.duration,startPeriod:r.startPeriod,schedule:r.schedule,needsPlan:undefined};
+    if(pr){const c={...s};delete c.duration;delete c.startPeriod;delete c.schedule;return c;}
+    return s;
   });
 }
 function savePlanPage(){
