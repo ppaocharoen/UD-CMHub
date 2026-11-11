@@ -1253,7 +1253,8 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.13';
+const APP_VERSION='11.14';
+let scurveCutoffWeek=null; // v11.14 ใช้ตอนออกรายงานย้อนหลัง: เส้น % จริงแสดงถึงสัปดาห์ที่ออกรายงานเท่านั้น
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
 const STORE_KEY='scurve_v4';
@@ -3134,7 +3135,7 @@ const MANUAL_SECTIONS=[
 {id:'pdf',title:'ออก PDF และบันทึกเป็นไฟล์',html:`
 <h4>ปุ่ม <svg class=ic aria-hidden=true><use href=#i-printer></use></svg> PDF ของโครงการ</h4>
 <ul>
-<li><b>ออกสรุป</b> (1 หน้า แนวตั้ง) — รายละเอียดโครงการ + แถบความก้าวหน้า + มูลค่า/ระยะเวลา + กราฟ S-Curve ขนาดใหญ่ (วาดใหม่ให้คมชัดสำหรับพิมพ์ พร้อมกรอบรายละเอียดของสัปดาห์ที่ออกรายงาน) + รายการงานและยอดรวม เลือก "ณ สัปดาห์ที่" ได้ · ถ้าผลรวมรายการงานไม่ตรงกับวงเงินตามสัญญา (จากการปัดเศษ) จะมีหมายเหตุบอกส่วนต่างใต้ตาราง</li>
+<li><b>ออกสรุป</b> (1 หน้า แนวตั้ง) — รายละเอียดโครงการ + แถบความก้าวหน้า + มูลค่า/ระยะเวลา + กราฟ S-Curve ขนาดใหญ่ (วาดใหม่ให้คมชัดสำหรับพิมพ์ พร้อมกรอบรายละเอียดของสัปดาห์ที่ออกรายงาน) + รายการงานและยอดรวม เลือก "ณ สัปดาห์ที่" ได้ (ถ้าเลือกสัปดาห์ย้อนหลัง เส้น % จริงในกราฟแสดงถึงสัปดาห์นั้นเท่านั้น เหมือนออกรายงาน ณ วันนั้น) · ถ้าผลรวมรายการงานไม่ตรงกับวงเงินตามสัญญา (จากการปัดเศษ) จะมีหมายเหตุบอกส่วนต่างใต้ตาราง</li>
 <li><b>ออกประวัติย้อนหลัง</b> (หลายหน้า)</li>
 <li><b>ออกรายงานติดตามเอกสาร</b> (แนวนอน หลายหน้า) แยกตามเฟส</li>
 </ul>
@@ -3280,6 +3281,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.14</b> — ออกสรุป PDF ย้อนหลัง: เส้น % จริงในกราฟ S-Curve แสดงถึงสัปดาห์ที่เลือกออกรายงานเท่านั้น (เดิมติดข้อมูลถึงสัปดาห์ล่าสุดมาด้วย)</li>
 <li><b>v11.13</b> — ปรับปรุงคู่มือให้ครบตามเวอร์ชันล่าสุด: การตั้งค่าหน้าต่างพิมพ์ ความปลอดภัยของไฟล์ที่รับมาจากคนอื่น ปัญหาที่พบบ่อยเรื่องการอนุมัติคลาวด์/การพิมพ์ และศัพท์ใหม่ (ช่วงตามแผน วงเงินตามสัญญา ราคากลาง เวลาสัญญา)</li>
 <li><b>v11.12</b> — คอลัมน์ "ระยะเวลา" ในแท็บรายการงานและรายงานสรุปเปลี่ยนเป็น "ช่วงตามแผน" คำนวณจากแผนจริงของหมวด เช่น W3–W12 (10) — เดิมแสดง 1 เมื่อแผนตั้งไว้ที่งานย่อยหรืองวดงาน</li>
 <li><b>v11.11</b> — เปลี่ยนชื่อแผนทั้งระบบ: แผนแรกเรียก "แผนงาน" (เดิม "แผนเดิม") แผนที่ปรับเรียก "แผนงาน Rev.1", "แผนงาน Rev.2" ตามลำดับโดยอัตโนมัติ — ทั้งหน้าจอ กราฟ ตาราง และรายงาน</li>
@@ -3855,6 +3857,7 @@ function renderScurve(p){
     if(p.history){
       [...p.history].sort((a,b)=>a.period-b.period).forEach(e=>{
         const t=Number(e.period)-1;
+        if(scurveCutoffWeek&&Number(e.period)>scurveCutoffWeek)return;
         if(t>=0&&t<maxT)ap[t]=getActualWeighted(p,e);
       });
     }
@@ -7918,11 +7921,14 @@ function doPdf(){
 // v11.9 วาดกราฟ S-Curve ใหม่สำหรับหน้าพิมพ์: สัดส่วนกว้าง:สูง ≈ 1.9:1 ความละเอียด ×3 และกรอบรายละเอียดเป็นสัปดาห์ที่ออกรายงาน
 function captureScurveForPrint(p,dw){
   if(!scurveChart)return '';
-  const keep=dashWeek,needWeek=getDisplayWeek(p)!==dw;
+  const keep=dashWeek;
   let img='';
-  if(needWeek){dashWeek=dw;renderScurve(p);}
-  const c=scurveChart,wrap=c.canvas.parentElement;
-  const ow=wrap.style.width,oh=wrap.style.height,oAnim=c.options.animation;
+  // วาดใหม่สำหรับพิมพ์เสมอ: สัปดาห์ที่เลือก = สัปดาห์ที่ออกรายงาน และตัดเส้น % จริงหลังสัปดาห์นั้นออก
+  dashWeek=dw;scurveCutoffWeek=dw;
+  try{renderScurve(p)}catch(e){}
+  const c=scurveChart;
+  if(!c){dashWeek=keep;scurveCutoffWeek=null;return ''}
+  const wrap=c.canvas.parentElement,ow=wrap.style.width,oh=wrap.style.height;
   try{
     wrap.style.width='760px';wrap.style.height='400px';
     c.stop();c.options.animation=false;c.options.devicePixelRatio=3;
@@ -7931,10 +7937,8 @@ function captureScurveForPrint(p,dw){
   }catch(e){try{img=c.toBase64Image()}catch(e2){}}
   finally{
     wrap.style.width=ow;wrap.style.height=oh;
-    try{
-      if(needWeek){dashWeek=keep;renderScurve(p);}
-      else{c.options.devicePixelRatio=undefined;c.options.animation=oAnim;c.resize();c.update('none');}
-    }catch(e){}
+    dashWeek=keep;scurveCutoffWeek=null;
+    try{renderScurve(p)}catch(e){}
   }
   return img;
 }
