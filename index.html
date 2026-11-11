@@ -242,6 +242,33 @@ tr:hover td{background:var(--gray-50)}
 .divider{border:none;border-top:1px solid var(--gray-100);margin:16px 0}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--gray-800);color:#fff;padding:10px 18px;border-radius:var(--radius-sm);font-size:13px;z-index:999;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none}
 .toast.show{opacity:1;transform:translateY(0)}
+.modal-xl{width:1180px}
+.wl-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0 12px}
+.wl-wk{display:flex;align-items:stretch;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden;background:#fff}
+.wl-wk>button{border:none;background:var(--gray-50);padding:0 12px;cursor:pointer;font-size:13px;color:var(--gray-600)}
+.wl-wk>button:disabled{opacity:.35;cursor:not-allowed}
+.wl-wk select{border:none;margin:0;font-weight:600;padding:7px 8px;width:auto;max-width:300px;background:#fff}
+.wl-days{display:flex;gap:6px;flex-wrap:wrap}
+.wl-d{width:58px;border:1px solid var(--gray-200);border-radius:8px;text-align:center;padding:4px 0 5px;font-size:11px;color:var(--gray-500);background:#fff;cursor:pointer;position:relative;font-family:inherit}
+.wl-d b{display:block;font-size:16px;color:var(--gray-800);line-height:1.2}
+.wl-d.on{background:var(--blue);border-color:var(--blue);color:#d8f0ec}.wl-d.on b{color:#fff}
+.wl-d.has:after{content:'';position:absolute;top:5px;right:6px;width:7px;height:7px;border-radius:50%;background:#1D9E75}
+.wl-d.on.has:after{background:#FFC000}
+.wl-d.today{box-shadow:inset 0 -3px 0 #FFC000}
+.wl-d:disabled{opacity:.35;cursor:not-allowed}
+.wl-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;align-items:start}
+.wl-card{border:1px solid var(--gray-200);border-radius:10px;padding:12px 14px;min-width:0}
+.wl-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-weight:700;font-size:14px;margin-bottom:8px}
+.wl-row{display:grid;grid-template-columns:1fr 58px 66px 104px 66px;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid var(--gray-100);font-size:12.5px}
+.wl-row.hd{font-size:10.5px;color:var(--gray-400);font-weight:600;padding:2px 0 4px}
+.wl-row .num{text-align:right;white-space:nowrap}
+.wl-tag{font-size:10px;padding:1px 7px;border-radius:8px;font-weight:600;white-space:nowrap;border:none;font-family:inherit}
+.wl-tag.auto{background:#e4f5ee;color:#1d6b45}.wl-tag.man{background:#fff4dc;color:#8a5a00;cursor:pointer}.wl-tag.none{background:transparent;color:var(--gray-400);font-weight:400}
+.wl-total{display:flex;justify-content:space-between;background:var(--gray-50);border-radius:8px;padding:8px 10px;margin-top:8px;font-size:12.5px;flex-wrap:wrap;gap:6px}
+#modal-week .dp-day-card{border:none!important;padding:0!important;margin:0!important;box-shadow:none!important}
+@media(max-width:900px){.wl-grid{grid-template-columns:1fr}.wl-row>.wl-tagcell{grid-column:1/-1;text-align:right}.wl-row.hd>.wl-tagcell{display:none}}
+@media(max-width:600px){.wl-wk{width:100%}.wl-wk select{flex:1;min-width:0;max-width:none}.wl-days{width:100%;gap:4px;flex-wrap:nowrap}.wl-d{flex:1;width:auto;min-width:0;font-size:10px}.wl-d b{font-size:14px}
+ .wl-row{grid-template-columns:1fr 1fr 108px}.wl-row>:first-child{grid-column:1/-1}.wl-row.hd>:first-child{display:none}.wl-row .num{text-align:left}.wl-row.hd .num:nth-child(4){text-align:right}}
 .wk-row{display:grid;grid-template-columns:1fr auto auto 110px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100)}
 .plan-sched-row{display:grid;grid-template-columns:24px 2fr 90px 90px 60px 150px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--gray-100)}
 .plan-sched-row.sub-follow > :not(.plan-sched-badge){opacity:.45}
@@ -447,8 +474,7 @@ tr:hover td{background:var(--gray-50)}
       <div class="page-sub" id="dash-sub"></div>
     </div>
     <div style="display:flex;gap:7px;flex-wrap:wrap">
-      <button class="btn-primary btn-sm" onclick="showWeekEntry(null)">+ บันทึกสัปดาห์นี้</button>
-      <button class="btn-secondary btn-sm" onclick="openDailyProgressToday()" title="บันทึกปริมาณ/ร้อยละงานที่ทำวันนี้ (ใช้ในรายงานประจำวัน/สัปดาห์)"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> บันทึกงานวันนี้</button>
+      <button class="btn-primary btn-sm" onclick="openWorkLog()" title="บันทึกงานที่ทำในแต่ละวัน — ความก้าวหน้ารายสัปดาห์คำนวณให้อัตโนมัติ"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> + บันทึกการทำงาน</button>
       <button class="btn-warning btn-sm" onclick="openPlanPage('original')"><svg class=ic aria-hidden=true><use href=#i-plan></use></svg> แผนงาน</button>
       <button class="btn-purple btn-sm" onclick="showPdfModal()"><svg class=ic aria-hidden=true><use href=#i-printer></use></svg> PDF</button>
       <button class="btn-secondary btn-sm" onclick="downloadAttachmentsZipForProject(projects.find(x=>x.id===currentId))" title="สำรองไฟล์แนบเอกสารและรูปภาพรายสัปดาห์ของโครงการนี้เป็น ZIP"><svg class=ic aria-hidden=true><use href=#i-clip></use></svg> สำรองไฟล์แนบ+รูป</button>
@@ -725,39 +751,42 @@ tr:hover td{background:var(--gray-50)}
 
 <!-- MODAL: Week Entry -->
 <div class="modal-overlay" id="modal-week">
-  <div class="modal">
-    <div class="modal-title" id="week-modal-title">บันทึกความก้าวหน้า</div>
-    <div class="modal-sub" id="week-modal-sub"></div>
-    <div class="form-row">
-      <div>
-        <label>สัปดาห์ที่</label>
-        <select id="w-period" onchange="onWeekPeriodChange()"></select>
-        <div id="w-period-range" style="font-size:11px;color:var(--gray-400);margin-top:3px"></div>
-      </div>
-      <div><label>วันที่บันทึก</label><input id="w-date" type="date"></div>
+  <div class="modal modal-xl">
+    <div class="modal-title" id="week-modal-title"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> บันทึกการทำงาน</div>
+    <div class="modal-sub" id="week-modal-sub">เลือกวัน → กรอกงานที่ทำ → กดบันทึก · ความก้าวหน้ารายสัปดาห์ (S-Curve / รายงาน) คำนวณให้อัตโนมัติจากงานรายวัน</div>
+    <div class="wl-bar">
+      <div class="wl-wk"><button type="button" id="wl-prev" onclick="wlShiftWeek(-1)" title="สัปดาห์ก่อนหน้า">◀</button><select id="w-period" onchange="onWeekPeriodChange()"></select><button type="button" id="wl-next" onclick="wlShiftWeek(1)" title="สัปดาห์ถัดไป">▶</button></div>
+      <div class="wl-days" id="wl-days"></div>
+      <div id="w-period-range" style="display:none"></div><input id="w-date" type="hidden">
     </div>
-    <div style="margin:8px 0 4px">
-      <button class="btn-secondary btn-sm" type="button" onclick="openDailyProgressModal()" title="เลือกรายการที่ปฏิบัติงานและระบุปริมาณ/ร้อยละแยกเป็นรายวัน (ไม่บังคับ ใช้ช่วยกรอกร้อยละสะสมด้านล่าง)"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> บันทึกความก้าวหน้ารายวัน (สัปดาห์นี้)</button>
-      <button class="btn-purple btn-sm" type="button" onclick="applyAllDailyProgress()" title="เติม % สะสมของทุกรายการที่แสดงอยู่ จากบันทึกความก้าวหน้ารายวันของสัปดาห์นี้ (ตรวจสอบก่อนกดบันทึก)">⤵ ดึงค่าจากบันทึกรายวันทั้งหมด</button>
-    </div>
-    <hr class="divider">
-    <div style="font-weight:600;font-size:13px;margin-bottom:10px">% จริงสะสมแต่ละรายการ (0–100)</div>
     <div id="w-done-note"></div>
-    <div id="w-plan-pick"></div>
-    <div id="week-items-form"></div>
-    <hr class="divider">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-      <input type="checkbox" id="w-completed" onchange="toggleCompletedDate()" style="width:16px;height:16px;cursor:pointer">
-      <label for="w-completed" style="font-weight:600;font-size:13px;cursor:pointer">การก่อสร้างแล้วเสร็จ</label>
+    <div class="wl-grid">
+      <div class="wl-card">
+        <div class="wl-h"><span id="wl-day-title">งานประจำวัน</span><span style="display:flex;gap:6px" id="wl-day-btns"></span></div>
+        <div id="dp-days"></div>
+        <div style="font-size:11px;color:var(--gray-400);margin-top:6px">กรอกปริมาณ (งานย่อย) หรือ % ที่ทำได้ในวันนี้ · งานอื่นนอกรายการเลือก "งานอื่น" ในช่องรายการ · วันที่มีบันทึกแล้วมีจุดสีเขียวที่ปฏิทิน</div>
+      </div>
+      <div class="wl-card">
+        <div class="wl-h"><span id="wl-sum-title">สรุปความก้าวหน้าประจำสัปดาห์</span><span style="font-size:11px;font-weight:500;color:var(--gray-400)">% สะสม (0–100)</span></div>
+        <div id="w-plan-pick"></div>
+        <div class="wl-row hd"><span>รายการงาน</span><span class="num">ก่อนหน้า</span><span class="num">+ สัปดาห์นี้</span><span class="num">สะสม</span><span class="wl-tagcell"></span></div>
+        <div id="week-items-form"></div>
+        <div class="wl-total" id="wl-total"></div>
+        <div style="display:flex;align-items:center;gap:8px;margin:10px 0 4px">
+          <input type="checkbox" id="w-completed" onchange="toggleCompletedDate()" style="width:16px;height:16px;cursor:pointer">
+          <label for="w-completed" style="font-weight:600;font-size:13px;cursor:pointer;margin:0">การก่อสร้างแล้วเสร็จ</label>
+        </div>
+        <div id="completed-date-row" style="display:none;margin-bottom:4px">
+          <label style="font-size:12px;color:var(--gray-500)">วันที่แล้วเสร็จ</label>
+          <input id="w-completed-date" type="date" style="margin-top:4px;width:200px">
+          <div style="font-size:11px;color:var(--gray-400);margin-top:3px"><svg class=ic aria-hidden=true><use href=#i-alert></use></svg> เมื่อระบุวันแล้วเสร็จ ระบบจะไม่ให้บันทึกสัปดาห์หลังจากนั้น</div>
+        </div>
+      </div>
     </div>
-    <div id="completed-date-row" style="display:none;margin-bottom:4px">
-      <label style="font-size:12px;color:var(--gray-500)">วันที่แล้วเสร็จ</label>
-      <input id="w-completed-date" type="date" style="margin-top:4px;width:200px">
-      <div style="font-size:11px;color:var(--gray-400);margin-top:3px"><svg class=ic aria-hidden=true><use href=#i-alert></use></svg> เมื่อระบุวันแล้วเสร็จ ระบบจะหยุดนับระยะเวลาโครงการ ณ วันนี้</div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-danger" type="button" id="w-delete-btn" onclick="deleteWeekEntry(Number(document.getElementById('w-period').value),true)" style="display:none;margin-right:auto"><svg class=ic aria-hidden=true><use href=#i-trash></use></svg> ลบสัปดาห์นี้</button>
-      <button class="btn-secondary" type="button" onclick="closeModal('modal-week')">ยกเลิก</button>
+    <div class="modal-footer" style="align-items:center">
+      <button class="btn-danger" type="button" id="w-delete-btn" onclick="deleteWeekEntry(Number(document.getElementById('w-period').value),true)" style="display:none;margin-right:auto"><svg class=ic aria-hidden=true><use href=#i-trash></use></svg> ลบความก้าวหน้าสัปดาห์นี้</button>
+      <span style="font-size:11px;color:var(--gray-400);margin-right:auto" id="wl-foot-note">กด "บันทึก" ครั้งเดียว = บันทึกงานรายวันที่กรอก + ความก้าวหน้าของสัปดาห์</span>
+      <button class="btn-secondary" type="button" onclick="wlClose()">ปิด</button>
       <button class="btn-primary" type="button" onclick="saveWeekEntry()">บันทึก</button>
     </div>
   </div>
@@ -769,7 +798,7 @@ tr:hover td{background:var(--gray-50)}
     <div class="modal-title"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> บันทึกความก้าวหน้ารายวัน</div>
     <div class="modal-sub" id="dp-modal-sub"></div>
     <div style="font-size:11px;color:var(--gray-400);margin-bottom:8px">บันทึกปริมาณหรือร้อยละงานที่ทำได้ในแต่ละวัน<span class="help-hint" title="เลือกรายการที่ปฏิบัติงานในแต่ละวัน แล้วระบุปริมาณ (กรณีงานย่อยที่มีจำนวน/หน่วย) หรือร้อยละที่ทำได้ของวันนั้น จากนั้นกด &quot;ใช้ค่านี้&quot; ที่หน้าบันทึกความก้าวหน้าเพื่อรวมเป็นร้อยละสะสมของสัปดาห์">?</span></div>
-    <div id="dp-days"></div>
+    <div id="dp-days-old"></div>
     <div class="modal-footer">
       <button class="btn-secondary" type="button" onclick="closeModal('modal-daily-progress')">ปิด</button>
     </div>
@@ -1253,7 +1282,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.14';
+const APP_VERSION='11.15';
 let scurveCutoffWeek=null; // v11.14 ใช้ตอนออกรายงานย้อนหลัง: เส้น % จริงแสดงถึงสัปดาห์ที่ออกรายงานเท่านั้น
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
@@ -2933,7 +2962,7 @@ const MANUAL_SECTIONS=[
 <li><b>สร้างโครงการ</b> — กด <span class="k">+ โครงการใหม่</span> กรอกข้อมูลสัญญา</li>
 <li><b>ใส่รายการงาน</b> — นำเข้าจากไฟล์ BOQ (ปร.4) ด้วยปุ่ม <span class="k"><svg class=ic aria-hidden=true><use href=#i-download></use></svg> นำเข้าจาก Excel (ปร.4)</span> หรือพิมพ์เอง แล้วกด <span class="k">บันทึกโครงการ</span></li>
 <li><b>ตั้งแผนงาน</b> — เปิดโครงการ กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-plan></use></svg> แผนงาน</span> กำหนดระยะเวลาและร้อยละต่อสัปดาห์/งวดงาน แล้วกด <span class="k"><svg class=ic aria-hidden=true><use href=#i-save></use></svg> บันทึกแผนงาน</span></li>
-<li><b>บันทึกความก้าวหน้าทุกสัปดาห์</b> — กด <span class="k">+ บันทึกสัปดาห์นี้</span> กรอก % จริงสะสมของแต่ละรายการ (งานรายวันกด <span class="k"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> บันทึกงานวันนี้</span>)</li>
+<li><b>บันทึกการทำงาน</b> — กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> + บันทึกการทำงาน</span> เลือกวัน กรอกงานที่ทำ แล้วกด "บันทึก" ครั้งเดียว — % ความก้าวหน้ารายสัปดาห์ (S-Curve / รายงาน) คำนวณให้อัตโนมัติ</li>
 <li><b>ออกรายงาน</b> — แท็บ <span class="k">รายงานราชการ</span> (ประจำสัปดาห์ ประจำวัน ภาพถ่าย) และปุ่ม <span class="k"><svg class=ic aria-hidden=true><use href=#i-printer></use></svg> PDF</span> (สรุป ประวัติ ติดตามเอกสาร)</li>
 </ol>
 <div class="tip">เอกสารและไฟล์แนบใช้แท็บ <b>ติดตามเอกสาร</b> — ทำได้ตลอดอายุโครงการ ไม่ต้องรอลำดับข้างบน</div>`},
@@ -3021,17 +3050,15 @@ const MANUAL_SECTIONS=[
 <div class="tip">เพิ่ม/ลบ/เปลี่ยนมูลค่ารายการงาน ทำที่ปุ่ม <b>แก้ไข</b> ของโครงการ ไม่ใช่ที่หน้าแผนงาน</div>`},
 
 {id:'weekly',title:'บันทึกความก้าวหน้ารายสัปดาห์ และอ่านหน้า S-Curve',html:`
-<h4>บันทึก</h4>
+<h4>บันทึกการทำงาน (รายวัน + รายสัปดาห์ในหน้าเดียว)</h4>
 <ol>
-<li>เปิดโครงการ → กด <span class="k">+ บันทึกสัปดาห์นี้</span> ระบบเปิดสัปดาห์ถัดจากที่บันทึกล่าสุดให้ (โครงการใหม่เริ่มที่ W1)</li>
-<li>ตรวจ <b>สัปดาห์ที่</b> (W1, W2, … แสดงช่วงวันที่กำกับ) และ <b>วันที่บันทึก</b> ให้ถูกต้อง เปลี่ยนได้</li>
-<li>กรอก <b>% จริงสะสม (0–100)</b> ของแต่ละรายการงาน — เป็นค่าสะสมตั้งแต่เริ่มโครงการ ไม่ใช่เฉพาะสัปดาห์นี้ ข้างช่องกรอกจะเห็น "แผน" และ "ก่อนหน้า" ให้เทียบ</li>
-<li>แก้ไขสัปดาห์ที่บันทึกแล้ว กด <svg class=ic aria-hidden=true><use href=#i-edit></use></svg> ในแท็บประวัติ · <b>ลบ</b> กด <svg class=ic aria-hidden=true><use href=#i-trash></use></svg> (หรือปุ่ม "<svg class=ic aria-hidden=true><use href=#i-trash></use></svg> ลบสัปดาห์นี้" ในหน้าต่างแก้ไข) — ลบเฉพาะ % ความก้าวหน้าและรายละเอียดรายงานประจำสัปดาห์ของสัปดาห์นั้น รายงานประจำวัน ภาพถ่าย และบันทึกรายวันยังอยู่</li>
-<li>ติ๊ก <b>การก่อสร้างแล้วเสร็จ</b> และระบุวันที่ → ระบบหยุดนับระยะเวลา และบันทึกได้ถึงสัปดาห์ที่แล้วเสร็จเท่านั้น (ถ้ามีบันทึกหลังวันนั้นอยู่ ต้องลบก่อน) ยกเลิกติ๊กถ้าต้องการบันทึกต่อ</li>
-<li>ถ้าโครงการมีแผนรีไวส์ จะมีแถบ <b>แสดงรายการงานของแผน</b> ติ๊กเลือกได้หลายแผน (แผนงาน / แผนงาน Rev.1 / แผนงาน Rev.2 …) — ค่าเริ่มต้นคือแผนล่าสุด ใช้บันทึก % จริงของรายการที่เพิ่มในแผนรีไวส์ รายการที่ซ่อนไว้ยังคงค่าเดิม</li>
-<li>ถ้าบันทึกความก้าวหน้ารายวันไว้ กด <span class="k">⤵ ดึงค่าจากบันทึกรายวันทั้งหมด</span> เพื่อเติม % ของทุกรายการที่แสดงในครั้งเดียว (หรือกด "ใช้ค่านี้" ทีละรายการ) แล้วตรวจก่อนบันทึก</li>
-<li>ถ้ารายการมีงานย่อย กดปุ่ม <span class="k"><svg class=ic aria-hidden=true><use href=#i-plan></use></svg></span> กรอกเป็น "จำนวนที่ทำแล้ว" หรือ % ของงานย่อยแต่ละตัว ระบบคำนวณอีกช่องให้ตรงกันและรวมเป็น % ของรายการ</li>
-<li>กด <span class="k">บันทึก</span></li>
+<li>เปิดโครงการ → กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> + บันทึกการทำงาน</span> ระบบเปิดสัปดาห์และวันของวันนี้ให้ (เปลี่ยนสัปดาห์ด้วยปุ่ม ◀ ▶ หรือช่องเลือก · เลือกวันจากปฏิทิน 7 วัน — วันที่มีบันทึกแล้วมีจุดสีเขียว วันนี้มีขีดเหลือง)</li>
+<li><b>ฝั่งซ้าย — งานของวันที่เลือก:</b> กด <span class="k">+ เพิ่มรายการ</span> เลือกรายการงาน/งานย่อย ใส่ปริมาณหรือ % ที่ทำได้ในวันนั้น หรือ <span class="k">+ จากชิ้นส่วน</span> · งานนอกรายการ BOQ เลือก "งานอื่นนอกรายการ" · กรอกหลายวันแล้วค่อยบันทึกทีเดียวได้ (ระบบเก็บร่างของแต่ละวันไว้)</li>
+<li><b>ฝั่งขวา — สรุปความก้าวหน้าของสัปดาห์:</b> แต่ละรายการแสดง % ก่อนหน้า, + สัปดาห์นี้ และ % สะสม คำนวณจากงานรายวันทันทีที่กรอก (ป้าย <b>จากรายวัน</b>) · รายการที่ไม่ได้บันทึกรายวัน กรอก % สะสมเองในช่องเดียวกัน · ด้านล่างแสดงรวมทั้งโครงการเทียบแผน</li>
+<li>ถ้าต้องการใช้ค่าอื่นแทนค่าจากรายวัน พิมพ์ทับได้เลย ป้ายจะเป็น <b>แก้เอง ↺</b> และระบบจะไม่เขียนทับครั้งต่อไป · กดป้ายนั้นเพื่อกลับไปใช้ค่าจากรายวัน · รายการที่มีงานย่อยกดปุ่ม <span class="k"><svg class=ic aria-hidden=true><use href=#i-plan></use></svg></span> เพื่อกรอกงานย่อยเอง</li>
+<li>กด <span class="k">บันทึก</span> ครั้งเดียว = บันทึกงานรายวันทุกวันที่กรอก + ความก้าวหน้าของสัปดาห์ · เปลี่ยนสัปดาห์หรือปิดหน้าต่างระหว่างกรอก ระบบถามก่อนเสมอ</li>
+<li>แก้งานรายวันของสัปดาห์ย้อนหลัง → % สะสมของสัปดาห์ถัด ๆ ไปที่มาจากรายวันจะคำนวณใหม่ต่อเนื่องให้เอง (รายการที่แก้เองไม่ถูกแตะ)</li>
+<li>ถ้าโครงการมีแผน Rev. จะมีแถบ <b>แสดงรายการงานของแผน</b> ติ๊กเลือกได้หลายแผน · ติ๊ก <b>การก่อสร้างแล้วเสร็จ</b> และระบุวันที่ → ระบบหยุดนับระยะเวลา และบันทึกได้ถึงสัปดาห์ที่แล้วเสร็จเท่านั้น</li>
 </ol>
 <p><b>แก้ไขสัปดาห์ที่บันทึกแล้ว:</b> แท็บ <b>ประวัติย้อนหลัง</b> → กดปุ่ม <svg class=ic aria-hidden=true><use href=#i-edit></use></svg> ท้ายแถวของสัปดาห์นั้น</p>
 <p>เมื่อก่อสร้างเสร็จจริง ติ๊ก <b>การก่อสร้างแล้วเสร็จ</b> ในหน้าต่างบันทึกและเลือกวันที่แล้วเสร็จ (ใช้คำนวณค่าปรับ/การนับวัน)</p>
@@ -3046,17 +3073,16 @@ const MANUAL_SECTIONS=[
 <li>แท็บ <b>รายการงาน</b> ดูมูลค่า น้ำหนัก% <b>ช่วงตามแผน</b> และ % แผน/จริงรายหมวด — ช่วงตามแผนคำนวณจากเส้นแผนจริงของหมวด เช่น "W3–W12 (10)" = เริ่มสัปดาห์ที่ 3 เสร็จสัปดาห์ที่ 12 รวม 10 สัปดาห์ (ใช้ได้ทั้งแผนที่ตั้งที่หมวดหลัก งานย่อย หรืองวดงาน)</li>
 </ul>`},
 
-{id:'daily-progress',title:'บันทึกความก้าวหน้ารายวัน',html:`
-<p>ใช้จดปริมาณ/ร้อยละงานที่ทำได้ในแต่ละวัน เพื่อดึงเข้ารายงานประจำวันและประจำสัปดาห์อัตโนมัติ</p>
-<ol>
-<li>กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> บันทึกงานวันนี้</span> ที่หน้าโครงการ (เปิดวันนี้ให้ทันที) หรือในหน้าต่างบันทึกสัปดาห์ กดปุ่ม <span class="k"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> บันทึกความก้าวหน้ารายวัน (สัปดาห์นี้)</span></li>
-<li>ในวันที่ต้องการ กด <span class="k">+ เพิ่มรายการ</span> เลือกรายการงาน/งานย่อย ใส่ปริมาณ (สำหรับงานย่อยที่มีหน่วย) หรือ % (สำหรับรายการหลัก) ข้างช่องกรอกแสดง "คงเหลือ" ให้ดู</li>
-<li>กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-save></use></svg> บันทึกวันนี้</span> ของวันนั้น</li>
-<li>งานที่ไม่อยู่ในรายการ BOQ (เช่น ปรับพื้นที่หน้างาน ขนย้ายวัสดุ) เลือก <b>งานอื่นนอกรายการ (พิมพ์รายละเอียดเอง)</b> แล้วพิมพ์รายละเอียด ใส่ปริมาณและหน่วยได้ (ไม่บังคับ) — แสดงในรายงานประจำวันและประจำสัปดาห์ แต่ <b>ไม่นับใน % ความก้าวหน้า</b> (เพราะไม่อยู่ในสัญญา)</li>
-</ol>
+{id:'daily-progress',title:'บันทึกงานรายวัน (รายละเอียด)',html:`
+<p>งานรายวันกรอกในหน้า <span class="k"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> + บันทึกการทำงาน</span> (ดูหัวข้อ "บันทึกความก้าวหน้า") ใช้ทั้งคำนวณ % ความก้าวหน้ารายสัปดาห์อัตโนมัติ และดึงเข้ารายงานประจำวัน / ประจำสัปดาห์</p>
+<ul>
+<li>รายการงาน (ไม่มีงานย่อย) กรอกเป็น <b>% ที่ทำได้ในวันนั้น</b> · % สะสมของสัปดาห์ = % สะสมสัปดาห์ก่อน + ผลรวม % ของทุกวันในสัปดาห์</li>
+<li>งานย่อยกรอกเป็น <b>ปริมาณ</b> (หรือ %) · % ของหมวด = มูลค่างานย่อยที่ทำแล้วสะสม ÷ มูลค่าหมวด</li>
+<li>งานที่ไม่อยู่ในรายการ BOQ (เช่น ปรับพื้นที่หน้างาน ขนย้ายวัสดุ) เลือก <b>งานอื่นนอกรายการ (พิมพ์รายละเอียดเอง)</b> — ใช้ในรายงาน ไม่นับเข้า %</li>
+</ul>
 <p>งานย่อยที่มีปริมาณ <b>กรอกช่องปริมาณหรือช่อง % ก็ได้</b> ระบบคำนวณอีกช่องให้ (ปริมาณ = % × ปริมาณทั้งหมดใน BOQ) · "คงเหลือ" ของรายการหลักคิดรวมจากงานย่อยด้วย (ถ่วงตามมูลค่างานย่อย)</p>
 <p>ถ้าตั้งค่า <b>ชิ้นส่วนโครงสร้าง</b> ไว้ กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-element></use></svg> + จากชิ้นส่วน</span> เพื่อใส่ปริมาณวัสดุของชิ้นส่วนทั้งชุด (ดูหัวข้อถัดไป)</p>
-<div class="tip">ยอดสะสมจากบันทึกรายวันเป็น <b>คนละส่วนกับ % จริงสะสมที่กรอกในหน้ารายสัปดาห์</b> โดยตั้งใจ — ระบบไม่เอามารวมให้เอง ยังต้องกรอก % สะสมรายสัปดาห์เองเพื่อให้ S-Curve ขยับ</div>`},
+<div class="tip">ข้อมูลเก่าที่เคยกรอก % รายสัปดาห์เองไว้ ยังคงเดิม ระบบเริ่มคำนวณจากรายวันให้เมื่อสัปดาห์นั้นมีบันทึกรายวัน</div>`},
 
 {id:'elems',title:'ชิ้นส่วนโครงสร้าง (ฐานราก เสา คาน …)',html:`
 <p>ใน BOQ วัสดุอย่างคอนกรีต เหล็ก ไม้แบบ ของทุกชิ้นส่วนรวมอยู่บรรทัดเดียว แต่หน้างานทำทีละชิ้นส่วน แท็บนี้ใช้จดว่าชิ้นส่วนแต่ละชนิดใช้วัสดุอะไรเท่าไหร่ แล้วให้ระบบคูณและใส่ปริมาณในบันทึกรายวันให้</p>
@@ -3070,7 +3096,7 @@ const MANUAL_SECTIONS=[
 </ol>
 <h4>ใช้ทุกวัน</h4>
 <ol>
-<li>เปิดบันทึกความก้าวหน้ารายวัน → ในวันนั้นกด <span class="k"><svg class=ic aria-hidden=true><use href=#i-element></use></svg> + จากชิ้นส่วน</span></li>
+<li>เปิด + บันทึกการทำงาน → เลือกวัน → กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-element></use></svg> + จากชิ้นส่วน</span></li>
 <li>เลือกชิ้นส่วน ใส่จำนวนที่ทำวันนี้ แล้ว <b>ติ๊กเฉพาะวัสดุที่ทำ</b> (เช่น วันที่ผูกเหล็ก + เข้าแบบ ให้ติ๊กคอนกรีตออก วันที่เทค่อยเลือกชิ้นส่วนเดิมแล้วติ๊กเฉพาะคอนกรีต)</li>
 <li>ใส่ <b>STA./GL.</b> ได้ (ไม่บังคับ) แล้วกด <span class="k">เพิ่มลงวันนี้ และบันทึก</span> — ถ้าวันนั้นมีวัสดุตัวเดียวกันอยู่แล้ว ระบบรวมปริมาณเป็นแถวเดียว แก้ตัวเลขทีหลังได้ตามปกติ</li>
 <li>ในการ์ดของวันนั้นจะมีกรอบ <b><svg class=ic aria-hidden=true><use href=#i-element></use></svg> ชิ้นส่วนที่ลงวันนี้</b> แสดงปริมาณแยกตามชิ้นส่วน (รายการวัสดุด้านล่างเป็นยอดรวมของวัน) แก้ STA./GL. ได้ที่นี่ และกด ✕ เพื่อเอาชิ้นส่วนนั้นออก (หักปริมาณออกจากรายการวัสดุให้)</li>
@@ -3281,6 +3307,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.15</b> — รวมบันทึกรายวันและบันทึกความก้าวหน้ารายสัปดาห์เป็นหน้าเดียว <b>"บันทึกการทำงาน"</b>: เลือกสัปดาห์และวันจากปฏิทิน กรอกงานรายวัน สรุปความก้าวหน้าของสัปดาห์คำนวณให้อัตโนมัติ กดบันทึกครั้งเดียว (ไม่ต้องกด "ดึงค่าจากบันทึกรายวัน" อีก) · แก้ค่าเองได้พร้อมป้าย "แก้เอง" · แก้รายวันย้อนหลังแล้ว % สะสมของสัปดาห์ถัดไปคำนวณใหม่ให้</li>
 <li><b>v11.14</b> — ออกสรุป PDF ย้อนหลัง: เส้น % จริงในกราฟ S-Curve แสดงถึงสัปดาห์ที่เลือกออกรายงานเท่านั้น (เดิมติดข้อมูลถึงสัปดาห์ล่าสุดมาด้วย)</li>
 <li><b>v11.13</b> — ปรับปรุงคู่มือให้ครบตามเวอร์ชันล่าสุด: การตั้งค่าหน้าต่างพิมพ์ ความปลอดภัยของไฟล์ที่รับมาจากคนอื่น ปัญหาที่พบบ่อยเรื่องการอนุมัติคลาวด์/การพิมพ์ และศัพท์ใหม่ (ช่วงตามแผน วงเงินตามสัญญา ราคากลาง เวลาสัญญา)</li>
 <li><b>v11.12</b> — คอลัมน์ "ระยะเวลา" ในแท็บรายการงานและรายงานสรุปเปลี่ยนเป็น "ช่วงตามแผน" คำนวณจากแผนจริงของหมวด เช่น W3–W12 (10) — เดิมแสดง 1 เมื่อแผนตั้งไว้ที่งานย่อยหรืองวดงาน</li>
@@ -5117,10 +5144,15 @@ function buildWeekItemRows(p, w, editPeriod){
     if(hasSub){
       const prevSub=(prevE&&prevE.subActuals)?(prevE.subActuals[item.id]||{}):{};
       const existSub=(existingE&&existingE.subActuals)?(existingE.subActuals[item.id]||null):null;
-      const startSub=weekDraft.sub[item.id]||(existSub?existSub:(editPeriod===null||!existingE?prevSub:{}));
-      subActualsWorking[item.id]={...startSub};
       prev=computeItemPctFromSub(item,prevSub);
-      cur=computeItemPctFromSub(item,subActualsWorking[item.id]);
+      if(!weekDraft.sub[item.id]&&existingE&&!existSub&&existingE.actuals&&(item.id in existingE.actuals)){
+        // v11.15 ข้อมูลเก่าที่บันทึกเป็น % ของหมวดโดยไม่แยกงานย่อย → แสดงค่าที่บันทึกไว้ (ไม่ตีความเป็น 0)
+        cur=Number(existingE.actuals[item.id])||0;
+      }else{
+        const startSub=weekDraft.sub[item.id]||(existSub?existSub:(editPeriod===null||!existingE?prevSub:{}));
+        subActualsWorking[item.id]={...startSub};
+        cur=computeItemPctFromSub(item,subActualsWorking[item.id]);
+      }
     } else {
       prev=prevE?Number(prevE.actuals[item.id]||0):0;
       if(weekDraft.actuals[item.id]!=null)cur=weekDraft.actuals[item.id];
@@ -5129,41 +5161,26 @@ function buildWeekItemRows(p, w, editPeriod){
     }
     const oi=(p.items||[]).find(x=>x.id===item.id);
     const ri=lr?(lr.items||[]).find(x=>x.id===item.id||x.name===item.name):null;
-    const planBadge=`<span style="font-size:10px;color:var(--gray-600)">แผน: <b style="color:#1a3a6b">${oi?fmt(getItemPlanAt(oi,w))+'%':'-'}</b>${lr?`<span style="color:var(--purple)"> / ${escH(revTitle(p,lr))}: ${ri?fmt(getItemPlanAt(ri,w))+'%':'-'}</span>`:''}</span>`;
+    const planBadge=`<span style="font-size:10px;color:var(--gray-500);display:block">แผน: <b style="color:#1a3a6b">${oi?fmt(getItemPlanAt(oi,w))+'%':'-'}</b>${lr?`<span style="color:var(--purple)"> / ${escH(revTitle(p,lr))}: ${ri?fmt(getItemPlanAt(ri,w))+'%':'-'}</span>`:''}</span>`;
     const inPlans=plans.filter(pl=>(pl.items||[]).some(x=>x.id===item.id));
     const planTag=plans.length>1&&inPlans.length<plans.length?` <span style="font-size:10px;color:var(--purple)">[${inPlans.map(pl=>escH(pl.label)).join(', ')}]</span>`:'';
-    const dpSum=sumDailyProgressForWeek(p,item.id,w);
-    let dpHint='';
-    if(dpSum){
-      const dpText=dpSum.hasSub?'มีบันทึกรายวันในสัปดาห์นี้':`บันทึกรายวันรวม ${fmt(dpSum.pct)}%`;
-      dpHint=`<div style="font-size:10.5px;color:var(--purple);margin-top:2px"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> ${dpText}
-        <button type="button" class="btn-icon" style="font-size:10px;padding:0 4px;color:var(--purple)" onclick="applyDailyProgressToItem('${escJ(item.id)}',${w})">ใช้ค่านี้</button></div>`;
-    }
     const row=document.createElement('div');
-    row.className='wk-row';
-    if(hasSub){
-      row.innerHTML=`
-        <div><div style="font-size:13px;font-weight:500">${escH(item.name)} <span style="font-size:10px;color:var(--purple)">(${item.subItems.length} งานย่อย)</span>${planTag}</div>${dpHint}</div>
-        ${planBadge}
-        <div style="font-size:11px;color:var(--gray-400)">ก่อนหน้า ${fmt(prev)}%</div>
-        <div style="display:flex;gap:5px;align-items:center;justify-content:flex-end">
+    row.className='wl-row';
+    row.dataset.id=item.id;row.dataset.prev=prev;
+    const nameCell=`<div style="min-width:0"><div style="font-weight:500;overflow-wrap:anywhere">${escH(item.name)}${hasSub?` <span style="font-size:10px;color:var(--purple)">(${item.subItems.length} งานย่อย)</span>`:''}${planTag}</div>${planBadge}</div>`;
+    const cumCell=hasSub?`<div style="display:flex;gap:3px;align-items:center;justify-content:flex-end">
           <input type="number" id="wa-${escH(item.id)}" min="0" max="100" step="0.01" value="${fmt(cur)}" readonly
-            title="คำนวณจากงานย่อยอัตโนมัติ — กดปุ่มงานย่อยเพื่อกรอก"
-            style="text-align:right;width:74px;background:var(--gray-50);color:var(--gray-600)">
-          <button class="btn-icon" type="button" title="กรอกงานย่อย" onclick="openSubWeekModal('${escJ(item.id)}')"
-            style="color:var(--purple);padding:4px 6px"><svg class=ic aria-hidden=true><use href=#i-plan></use></svg></button>
-        </div>`;
-    } else {
-      row.innerHTML=`
-        <div><div style="font-size:13px;font-weight:500">${escH(item.name)}${planTag}</div>${dpHint}</div>
-        ${planBadge}
-        <div style="font-size:11px;color:var(--gray-400)">ก่อนหน้า ${fmt(prev)}%</div>
-        <input type="number" id="wa-${escH(item.id)}" min="0" max="100" step="0.01" value="${fmt(cur)}"
-          oninput="validateActualInput(this,'${escJ(item.id)}')"
-          style="text-align:right;width:110px">`;
-    }
+            title="คำนวณจากงานย่อย — มาจากบันทึกรายวันอัตโนมัติ หรือกดปุ่มข้าง ๆ เพื่อกรอกงานย่อยเอง"
+            style="text-align:right;width:74px;padding:5px 6px;margin:0;background:var(--gray-50);color:var(--gray-800);font-weight:700">
+          <button class="btn-icon" type="button" title="กรอกงานย่อยเอง" onclick="openSubWeekModal('${escJ(item.id)}')"
+            style="color:var(--purple);padding:3px 4px"><svg class=ic aria-hidden=true><use href=#i-plan></use></svg></button></div>`
+      :`<input type="number" id="wa-${escH(item.id)}" min="0" max="100" step="0.01" value="${fmt(cur)}"
+          oninput="validateActualInput(this,'${escJ(item.id)}');wlMarkManual('${escJ(item.id)}')"
+          style="text-align:right;width:100%;padding:5px 6px;margin:0;font-weight:700">`;
+    row.innerHTML=`${nameCell}<span class="num" style="color:var(--gray-500)">${fmt(prev)}</span><span class="num wl-delta"></span>${cumCell}<span class="wl-tagcell" style="text-align:right"></span>`;
     form.appendChild(row);
   });
+  wlRecalc();
 }
 
 // ── Sub-item weekly breakdown modal ───────────────────────
@@ -5247,6 +5264,7 @@ function saveSubWeekModal(){
     doneMap[row.dataset.subId]=Number(row.querySelector('input[data-role=qty]').value)||0;
   });
   subActualsWorking[subWeekTargetItemId]=doneMap;
+  if(typeof wlMarkManual==='function')wlMarkManual(subWeekTargetItemId,true);
   const p=projects.find(x=>x.id===currentId);
   const item=p?findItemAny(p,subWeekTargetItemId):null;
   if(item){
@@ -5313,6 +5331,7 @@ function showSubBreakdownModal(itemId,period){
 function showWeekEntry(editPeriod=null){
   const p=projects.find(x=>x.id===currentId);
   if(!p)return;
+  wlDrafts={};wlDirty=false;
   const T=totalPeriods(p);
   const maxW=lastAllowedPeriod(p);
   const sel=document.getElementById('w-period');
@@ -5323,6 +5342,7 @@ function showWeekEntry(editPeriod=null){
     sel.appendChild(o);
   }
   let targetPeriod=editPeriod;
+  if(targetPeriod===null&&wlPreferDate&&p.startDate)targetPeriod=Math.max(1,periodOfDate(p,wlPreferDate));
   if(targetPeriod===null){
     const l=latestEntry(p);
     targetPeriod=l?Number(l.period)+1:1;
@@ -5341,12 +5361,10 @@ function showWeekEntry(editPeriod=null){
   if(!weekPlanSel.size)weekPlanSel.add(defaultWeekPlanId(p));
   renderWeekPlanPick(p);
   onWeekPeriodChange();
-  document.getElementById('week-modal-title').textContent=editPeriod?'แก้ไขความก้าวหน้า':'บันทึกความก้าวหน้า';
-  document.getElementById('week-modal-sub').textContent=editPeriod?`แก้ไขข้อมูล W${editPeriod}`:'กรอก % สะสมจริงแต่ละรายการงาน';
   const existingE=editPeriod?p.history.find(h=>Number(h.period)===editPeriod):null;
   document.getElementById('w-date').value=existingE?existingE.date:fmtDateInput(new Date());
-  buildWeekItemRows(p, Number(sel.value), editPeriod);
   document.getElementById('modal-week').classList.add('open');
+  wlInitWeek(p,Number(sel.value),wlPreferDate);wlPreferDate=null;
   // โหลดสถานะ completedDate
   const cbDone=document.getElementById('w-completed');
   const cbDate=document.getElementById('w-completed-date');
@@ -5371,6 +5389,20 @@ function onWeekPeriodChange(){
   if(p)setTimeout(()=>updateWeekDeleteBtn(p),0);
   if(!p)return;
   const w=Number(document.getElementById('w-period').value);
+  if(document.getElementById('modal-week').classList.contains('open')&&wlWeek&&w!==wlWeek){
+    const nw=w;
+    if(wlDirty){
+      if(confirm(`มีข้อมูลสัปดาห์ที่ ${wlWeek} ที่ยังไม่บันทึก — บันทึกก่อนเปลี่ยนสัปดาห์หรือไม่?\n\nตกลง = บันทึก · ยกเลิก = ไม่บันทึก`)){
+        document.getElementById('w-period').value=wlWeek;
+        if(saveWeekEntry({keepOpen:true})===false)return;
+        document.getElementById('w-period').value=nw;
+      }
+    }
+    wlDrafts={};wlDirty=false;
+    weekDraft={actuals:{},sub:{}};
+    wlInitWeek(p,nw,null);
+    return;
+  }
   const ws=wkStart(p.startDate,w); const we=wkEnd(p.startDate,w);
   document.getElementById('w-period-range').textContent=ws&&we?thD(ws)+' – '+thD(we):'';
   // re-render item rows เพื่ออัปเดต % แผนตามสัปดาห์ที่เลือก
@@ -5379,10 +5411,13 @@ function onWeekPeriodChange(){
     buildWeekItemRows(p, w, null);
   }
 }
-function saveWeekEntry(){
+function saveWeekEntry(opts){
+  opts=opts||{};
   const p=projects.find(x=>x.id===currentId);
-  if(!p)return;
+  if(!p)return false;
   const period=Number(document.getElementById('w-period').value);
+  wlCaptureDay();
+  if(wlDay&&wlWeek===period)document.getElementById('w-date').value=wlDay;
   const date=document.getElementById('w-date').value;
   if(!period||period<1){alert('กรุณาเลือกสัปดาห์');return}
   captureWeekDraft();
@@ -5419,14 +5454,18 @@ function saveWeekEntry(){
       const prevVal=Number(prevE.actuals[item.id]||0);
       if(newVal<prevVal)warnings.push(`"${item.name}": ${fmt(prevVal)}% → ${fmt(newVal)}% (ลดลง ${fmt(prevVal-newVal)}%)`);
     });
-    if(warnings.length&&!confirm(`% จริงสะสมลดลงจากสัปดาห์ก่อนหน้า:\n${warnings.join('\n')}\n\nยืนยันบันทึกต่อไป?`))return;
+    if(warnings.length&&!confirm(`% จริงสะสมลดลงจากสัปดาห์ก่อนหน้า:\n${warnings.join('\n')}\n\nยืนยันบันทึกต่อไป?`))return false;
   }
+  // v11.15 บันทึกงานรายวันที่กรอกไว้ (ทุกวันที่แก้ในสัปดาห์นี้) ลงข้อมูลพร้อมกัน
+  Object.keys(wlDrafts).forEach(d=>commitDpDay(p,d,wlDrafts[d]));
   // คงฟิลด์อื่นของสัปดาห์นี้ไว้ (เช่น weeklyReport รายละเอียดรายงานประจำสัปดาห์) — เดิมแก้ % แล้วรายละเอียดรายงานหาย
   const entryData={...(existing||{}),period,date,actuals};
   if(Object.keys(subActuals).length)entryData.subActuals=subActuals;else delete entryData.subActuals;
+  if(wlManual.size)entryData.manualIds=[...wlManual];else delete entryData.manualIds;
   const ex=p.history.findIndex(h=>Number(h.period)===period);
   if(ex>=0)p.history[ex]=entryData;
   else p.history.push(entryData);
+  const nLater=wlRecomputeLaterWeeks(p,period);
   const cbDone=document.getElementById('w-completed');
   const cbDate=document.getElementById('w-completed-date');
   if(cbDone&&cbDone.checked&&cbDate&&cbDate.value){
@@ -5436,10 +5475,204 @@ function saveWeekEntry(){
   }
   projects=projects.map(x=>x.id===currentId?p:x);
   save(projects);
-  closeModal('modal-week');
-  toast(`✓ บันทึก W${period} แล้ว`);
+  wlDrafts={};wlDirty=false;
+  toast(`✓ บันทึก W${period} แล้ว${nLater?` · ปรับ % สะสมของสัปดาห์ถัดไปตามบันทึกรายวันแล้ว ${nLater} สัปดาห์`:''}`);
+  if(opts.keepOpen){updateWeekDeleteBtn(p);return true}
+  closeModal('modal-week');wlDay=null;wlWeek=null;
   openDashboard(currentId);
+  return true;
 }
+// ── v11.15 บันทึกการทำงาน (รวมบันทึกรายวัน + ความก้าวหน้ารายสัปดาห์) ──
+let wlDay=null,wlWeek=null,wlDrafts={},wlManual=new Set(),wlDirty=false,wlPreferDate=null,wlRendering=false,wlRecalcTimer=null;
+const TH_WD=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+const TH_WD_FULL=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+function openWorkLog(period,date){
+  const p=projects.find(x=>x.id===currentId);
+  if(!p)return;
+  if(!p.startDate){toast('ยังไม่ได้กำหนดวันเริ่มสัญญา (กด "แก้ไข")');return}
+  wlDrafts={};wlDirty=false;wlDay=null;wlWeek=null;
+  let d=date||null;
+  if(!d&&period==null){
+    d=fmtDateInput(new Date());
+    if(p.completedDate&&d>p.completedDate)d=p.completedDate;
+    if(d<p.startDate)d=p.startDate;
+  }
+  wlPreferDate=d;
+  showWeekEntry(period==null?null:period);
+}
+function wlEffectiveDaily(p){
+  const list=(p.dailyProgress||[]).filter(e=>!(e.date in wlDrafts));
+  Object.keys(wlDrafts).forEach(k=>list.push(...wlDrafts[k]));
+  return list;
+}
+function wlDailyDerived(p,item,w,prevE,list){
+  const sm=sumDailyProgressForWeek(p,item.id,w,list);
+  if(!sm)return null;
+  if(sm.hasSub){
+    const prevSub=(prevE&&prevE.subActuals&&prevE.subActuals[item.id])||{};
+    const merged={...prevSub};
+    Object.keys(sm.subSums).forEach(k=>{merged[k]=(Number(merged[k])||0)+sm.subSums[k]});
+    return {sub:merged,pct:Math.min(100,computeItemPctFromSub(item,merged))};
+  }
+  const prev=prevE?Number((prevE.actuals||{})[item.id]||0):0;
+  return {pct:Math.min(100,prev+sm.pct)};
+}
+// แก้บันทึกรายวันย้อนหลัง → % สะสมของสัปดาห์ถัด ๆ ไปที่มาจากรายวัน คำนวณใหม่ต่อเนื่อง (ไม่แตะรายการที่แก้เอง)
+function wlRecomputeLaterWeeks(p,w){
+  let n=0;
+  const later=(p.history||[]).filter(h=>Number(h.period)>w).sort((a,b)=>a.period-b.period);
+  later.forEach(h=>{
+    const prevE=entryAtOrBefore(p,Number(h.period)-1);
+    const man=new Set(h.manualIds||[]);
+    let changed=false;
+    allPlanItems(p).forEach(item=>{
+      if(man.has(item.id))return;
+      const d=wlDailyDerived(p,item,Number(h.period),prevE,p.dailyProgress||[]);
+      if(!d)return;
+      h.actuals=h.actuals||{};
+      if(Math.abs((Number(h.actuals[item.id])||0)-d.pct)>0.0001)changed=true;
+      h.actuals[item.id]=d.pct;
+      if(d.sub){h.subActuals=h.subActuals||{};h.subActuals[item.id]=d.sub}
+    });
+    if(changed)n++;
+  });
+  return n;
+}
+function wlInitWeek(p,w,preferDate){
+  wlWeek=w;
+  dpTargetWeek=w;
+  const ex=(p.history||[]).find(h=>Number(h.period)===w);
+  wlManual=new Set(ex&&ex.manualIds||[]);
+  const ws=wkStart(p.startDate,w),we=wkEnd(p.startDate,w);
+  const inWeek=d=>d&&ws&&we&&new Date(d+'T00:00:00')>=ws&&new Date(d+'T00:00:00')<=we;
+  let day=null;
+  if(inWeek(preferDate))day=preferDate;
+  if(!day){const t=fmtDateInput(new Date());if(inWeek(t))day=t}
+  if(!day&&ex&&inWeek(ex.date))day=ex.date;
+  if(!day){const ds=(p.dailyProgress||[]).map(e=>e.date).filter(inWeek).sort();if(ds.length)day=ds[ds.length-1]}
+  if(!day&&ws)day=fmtDateInput(ws);
+  if(day&&p.completedDate&&day>p.completedDate&&inWeek(p.completedDate))day=p.completedDate;
+  if(day&&p.startDate&&day<p.startDate)day=p.startDate;
+  wlDay=day;
+  document.getElementById('wl-sum-title').textContent=`สรุปความก้าวหน้า สัปดาห์ที่ ${w}`;
+  const sel=document.getElementById('w-period');
+  document.getElementById('wl-prev').disabled=w<=1;
+  document.getElementById('wl-next').disabled=w>=sel.options.length;
+  wlRenderDay(p);
+  buildWeekItemRows(p,w,ex?w:null);
+}
+function wlRenderDays(p){
+  const box=document.getElementById('wl-days');if(!box||!wlWeek)return;
+  const ws=wkStart(p.startDate,wlWeek);if(!ws){box.innerHTML='';return}
+  const eff=wlEffectiveDaily(p),today=fmtDateInput(new Date());
+  let h='';
+  for(let i=0;i<7;i++){
+    const dt=new Date(ws.getTime()+i*864e5),ds=fmtDateInput(dt);
+    const has=eff.some(e=>e.date===ds&&e.entityId!==DP_NONE_VALUE);
+    const dis=(p.completedDate&&ds>p.completedDate)||(p.startDate&&ds<p.startDate);
+    h+=`<button type="button" class="wl-d${ds===wlDay?' on':''}${has?' has':''}${ds===today?' today':''}" ${dis?'disabled title="อยู่นอกช่วงสัญญา / หลังวันแล้วเสร็จ"':''} onclick="wlSelectDay('${ds}')">${TH_WD[dt.getDay()]}<b>${dt.getDate()}</b></button>`;
+  }
+  box.innerHTML=h;
+}
+function wlSelectDay(ds){
+  const p=projects.find(x=>x.id===currentId);if(!p)return;
+  wlCaptureDay();
+  wlDay=ds;
+  wlRenderDay(p);
+}
+function wlRenderDay(p){
+  wlRendering=true;
+  const wrap=document.getElementById('dp-days');
+  wrap.innerHTML='';
+  if(!wlDay){wlRendering=false;return}
+  const dt=new Date(wlDay+'T00:00:00');
+  document.getElementById('wl-day-title').textContent=`งานวัน${TH_WD_FULL[dt.getDay()]}ที่ ${thDate(wlDay)}`;
+  document.getElementById('wl-day-btns').innerHTML=`<button class="btn-secondary btn-sm" type="button" onclick="addDpEntryRow('${wlDay}')">+ เพิ่มรายการ</button>
+    <button class="btn-purple btn-sm" type="button" onclick="openElemPick('${wlDay}')" title="เลือกชิ้นส่วนโครงสร้าง (เช่น F1 ฐานราก × 3) แล้วระบบคำนวณปริมาณวัสดุให้"><svg class=ic aria-hidden=true><use href=#i-element></use></svg> + จากชิ้นส่วน</button>`;
+  const card=document.createElement('div');
+  card.className='dp-day-card';
+  card.innerHTML=`<div class="dp-elem-sum" data-date="${wlDay}"></div><div class="dp-entries" data-date="${wlDay}"></div>`;
+  wrap.appendChild(card);
+  const list=(wlDay in wlDrafts)?wlDrafts[wlDay]:(p.dailyProgress||[]).filter(e=>e.date===wlDay);
+  list.forEach(e=>addDpEntryRow(wlDay,e));
+  if(!list.length)addDpEntryRow(wlDay);
+  renderDpElemSum(p,wlDay);
+  wlRenderDays(p);
+  wlRendering=false;
+}
+function wlCaptureDay(){
+  if(!wlDay||!document.querySelector(`#dp-days .dp-entries[data-date="${wlDay}"]`))return;
+  wlDrafts[wlDay]=collectDpDayEntries(wlDay);
+}
+function wlMarkManual(id,silentRecalc){
+  wlManual.add(id);wlDirty=true;
+  wlScheduleRecalc(!silentRecalc);
+}
+function wlUnmanual(id){
+  wlManual.delete(id);wlDirty=true;
+  wlRecalc();
+}
+function wlScheduleRecalc(capture){
+  clearTimeout(wlRecalcTimer);
+  wlRecalcTimer=setTimeout(()=>{if(capture!==false)wlCaptureDay();wlRecalc()},180);
+}
+function wlRecalc(){
+  const p=projects.find(x=>x.id===currentId);
+  if(!p||!wlWeek||!document.getElementById('modal-week').classList.contains('open'))return;
+  const w=wlWeek,prevE=entryAtOrBefore(p,w-1),list=wlEffectiveDaily(p);
+  document.querySelectorAll('#week-items-form .wl-row').forEach(row=>{
+    const id=row.dataset.id,item=findItemAny(p,id),inp=document.getElementById('wa-'+id);
+    if(!item||!inp)return;
+    const d=wlDailyDerived(p,item,w,prevE,list);
+    const man=wlManual.has(id);
+    if(d&&!man){
+      if(d.sub)subActualsWorking[id]={...d.sub};
+      inp.value=fmt(d.pct,2);
+    }
+    const prev=Number(row.dataset.prev)||0,delta=(parseFloat(inp.value)||0)-prev;
+    const dc=row.querySelector('.wl-delta');
+    dc.textContent=Math.abs(delta)<0.005?'–':(delta>0?'+':'−')+fmt(Math.abs(delta));
+    dc.style.color=Math.abs(delta)<0.005?'var(--gray-400)':(delta>0?'#1D9E75':'#c0392b');
+    dc.style.fontWeight=Math.abs(delta)<0.005?'400':'600';
+    const tc=row.querySelector('.wl-tagcell');
+    tc.innerHTML=d?(man?`<button type="button" class="wl-tag man" onclick="wlUnmanual('${escJ(id)}')" title="ค่านี้แก้เอง — กดเพื่อกลับไปใช้ค่าจากบันทึกรายวัน (${fmt(d.pct)}%)">แก้เอง ↺</button>`:`<span class="wl-tag auto" title="คำนวณจากบันทึกรายวันของสัปดาห์นี้">จากรายวัน</span>`)
+      :(man?`<span class="wl-tag none">กรอกเอง</span>`:'');
+  });
+  wlRenderTotal(p,w);
+  wlRenderDays(p);
+}
+function wlRenderTotal(p,w){
+  const el=document.getElementById('wl-total');if(!el)return;
+  const ex=(p.history||[]).find(h=>Number(h.period)===w),prevE=entryAtOrBefore(p,w-1);
+  const base=ex||prevE;
+  const actuals={...((base&&base.actuals)||{})};
+  document.querySelectorAll('#week-items-form input[id^="wa-"]').forEach(inp=>{actuals[inp.id.slice(3)]=Math.min(100,Math.max(0,parseFloat(inp.value)||0))});
+  const act=getActualWeighted(p,{actuals});
+  const S=computeProgressSummary(p,w);
+  if(p.planNotSubmitted){el.innerHTML=`<span>รวมทั้งโครงการ: จริง <b>${fmt(act)}%</b></span><span style="color:var(--gray-400)">ยังไม่ส่งแผนงาน</span>`;return}
+  const diff=act-S.cmpNow;
+  el.innerHTML=`<span>รวมทั้งโครงการ ณ สัปดาห์ที่ ${w}: แผน <b style="color:#1a6fc4">${fmt(S.cmpNow)}%</b> · จริง <b style="color:${diff>=0?'#1D9E75':'#c0392b'}">${fmt(act)}%</b></span><span style="font-weight:700;color:${diff>=0?'#1D9E75':'#c0392b'}">${diff>=0?'+':'−'}${fmt(Math.abs(diff))}%</span>`;
+}
+function wlShiftWeek(dlt){
+  const sel=document.getElementById('w-period');
+  const nv=Number(sel.value)+dlt;
+  if(nv<1||nv>sel.options.length)return;
+  sel.value=nv;onWeekPeriodChange();
+}
+function wlClose(){
+  if(wlDirty&&!confirm('มีข้อมูลที่ยังไม่บันทึก — ปิดโดยไม่บันทึกหรือไม่?'))return;
+  wlDrafts={};wlDirty=false;wlDay=null;wlWeek=null;
+  closeModal('modal-week');
+}
+document.addEventListener('input',e=>{
+  if(!e.target||!e.target.closest)return;
+  if(e.target.closest('#modal-week #dp-days')){wlDirty=true;wlScheduleRecalc(true)}
+  else if(e.target.closest('#modal-week')&&e.target.id!=='w-period')wlDirty=true;
+});
+document.addEventListener('change',e=>{
+  if(e.target&&e.target.closest&&e.target.closest('#modal-week #dp-days')){wlDirty=true;wlScheduleRecalc(true)}
+});
+(()=>{try{const t=document.getElementById('dp-days');if(t)new MutationObserver(()=>{if(!wlRendering&&wlDay){wlDirty=true;wlScheduleRecalc(true)}}).observe(t,{childList:true,subtree:true})}catch(e){}})();
 
 function deleteWeekEntry(period,fromModal){
   const p=projects.find(x=>x.id===currentId);
@@ -5665,6 +5898,7 @@ function removeDpElemFromDay(date,elId){
   if(p.dpElemSta)delete p.dpElemSta[date+'|'+elId];
   p.dpDone=recomputeDpDone(p);
   save(projects);
+  if(typeof wlDrafts!=='undefined')delete wlDrafts[date];
   renderDailyProgressDays();
   toast(`เอา ${el?elemLabel(el):'ชิ้นส่วน'} ออกจากวันที่ ${thDate(date)} แล้ว`);
 }
@@ -5845,14 +6079,9 @@ function buildDpEntityOptionsHtml(p,selected){
   return html;
 }
 let dpTargetWeek=null;
-function openDailyProgressModal(){
-  const p=projects.find(x=>x.id===currentId);
-  if(!p)return;
-  const w=Number(document.getElementById('w-period').value);
-  if(!w){toast('กรุณาเลือกสัปดาห์ก่อน');return}
-  openDailyProgressForWeek(p,w,null);
-}
-function openDailyProgressToday(){
+function openDailyProgressModal(){openWorkLog()}
+function openDailyProgressToday(){openWorkLog()}
+function openDailyProgressTodayOld(){
   const p=projects.find(x=>x.id===currentId);
   if(!p)return;
   if(!p.startDate){toast('ยังไม่ได้กำหนดวันเริ่มสัญญา (กด "แก้ไข")');return}
@@ -5885,8 +6114,9 @@ function openDailyProgressForWeek(p,w,focusDate){
 function renderDailyProgressDays(){
   const p=projects.find(x=>x.id===currentId);
   if(!p||!dpTargetWeek)return;
+  if(wlDay&&document.getElementById('modal-week').classList.contains('open'))return wlRenderDay(p);
   const ws=wkStart(p.startDate,dpTargetWeek);
-  const wrap=document.getElementById('dp-days');
+  const wrap=document.getElementById('dp-days-old');
   wrap.innerHTML='';
   if(!ws){wrap.innerHTML='<div style="color:var(--gray-400);font-size:12px">ไม่พบวันที่เริ่มโครงการ</div>';return}
   for(let i=0;i<7;i++){
@@ -6492,10 +6722,10 @@ function onDpPctInput(inp){
   const v=Math.min(100,Math.max(0,Number(inp.value)||0));
   qtyInp.value=inp.value===''?'':String(Math.round(v/100*totalQty*100)/100);
 }
-function saveDpDay(dateStr){
+// v11.15 แยก: อ่านแถวงานรายวันจากหน้าจอ (collect) / เขียนลงข้อมูล (commit)
+function collectDpDayEntries(dateStr){
   const p=projects.find(x=>x.id===currentId);
-  if(!p)return;
-  p.dpDone=p.dpDone||{};
+  if(!p)return [];
   const rows=[...document.querySelectorAll(`.dp-entries[data-date="${dateStr}"] .dp-row`)];
   const entries=[];
   rows.forEach(row=>{
@@ -6513,14 +6743,14 @@ function saveDpDay(dateStr){
       const otherRec={id:existingId||uid(),date:dateStr,entityId,text,qty:oq,unit:(row.querySelector('.dp-other-unit').value||'').trim(),pct:0};
       if(existingMode)otherRec.displayMode=existingMode;
       if(existingSta)otherRec.sta=existingSta;
-      entries.push(otherRec);
+      otherRec._row=row;entries.push(otherRec);
       return;
     }
     if(entityId===DP_NONE_VALUE){
       const noneRec={id:existingId||uid(),date:dateStr,entityId,qty:0,pct:0};
       if(existingMode)noneRec.displayMode=existingMode;
       if(existingSta)noneRec.sta=existingSta;
-      entries.push(noneRec);
+      noneRec._row=row;entries.push(noneRec);
       return;
     }
     const qtyInp=row.querySelector('.dp-qty');
@@ -6537,29 +6767,42 @@ function saveDpDay(dateStr){
     if(row.dataset.elems){try{const el=JSON.parse(row.dataset.elems);if(el&&el.length)rec.elems=el}catch(e){}}
     if(existingMode)rec.displayMode=existingMode;
     if(existingSta)rec.sta=existingSta;
-    entries.push(rec);
+    rec._row=row;entries.push(rec);
   });
+  // ให้ id คงที่ระหว่างเก็บร่างหลายครั้ง
+  rows.forEach(row=>{if(!row.dataset.entryId){const e=entries.find(x=>x._row===row);if(e)row.dataset.entryId=e.id}});
+  entries.forEach(e=>{delete e._row});
+  return entries;
+}
+function commitDpDay(p,dateStr,entries){
+  p.dpDone=p.dpDone||{};
   const oldEntries=(p.dailyProgress||[]).filter(e=>e.date===dateStr);
   applyDpDoneDelta(p,oldEntries,-1);
   applyDpDoneDelta(p,entries,1);
   p.dailyProgress=(p.dailyProgress||[]).filter(e=>e.date!==dateStr);
   p.dailyProgress.push(...entries);
+}
+function saveDpDay(dateStr){
+  const p=projects.find(x=>x.id===currentId);
+  if(!p)return;
+  const entries=collectDpDayEntries(dateStr);
+  commitDpDay(p,dateStr,entries);
   save(projects);
   toast(`บันทึกความก้าวหน้ารายวัน (${thDate(dateStr)}) แล้ว`);
   renderDailyProgressDays();
   // หน้าบันทึกรายสัปดาห์เปิดอยู่ที่สัปดาห์เดียวกัน → รีเฟรชคำแนะนำ "ใช้ค่านี้" โดยไม่ทิ้งค่าที่กรอกค้างไว้
-  if(document.getElementById('modal-week').classList.contains('open')&&Number(document.getElementById('w-period').value)===dpTargetWeek){
+  if(false&&document.getElementById('modal-week').classList.contains('open')&&Number(document.getElementById('w-period').value)===dpTargetWeek){
     captureWeekDraft();
     buildWeekItemRows(p,dpTargetWeek,weekEditPeriod);
   }
 }
 // รวม % ความก้าวหน้ารายวันของ item หนึ่งตัว ภายในสัปดาห์ w (ไม่รวมรายการที่ถูกลบไปแล้ว)
-function sumDailyProgressForWeek(p,itemId,w){
+function sumDailyProgressForWeek(p,itemId,w,list){
   const ws=wkStart(p.startDate,w),we=wkEnd(p.startDate,w);
   if(!ws||!we)return null;
   const item=findItemAny(p,itemId);
   if(!item)return null;
-  const entries=(p.dailyProgress||[]).filter(e=>{
+  const entries=(list||p.dailyProgress||[]).filter(e=>{
     if(!(e.entityId===itemId||e.entityId.indexOf(itemId+'::')===0))return false;
     const d=new Date(e.date+'T00:00:00');
     return d>=ws&&d<=we;
@@ -8622,7 +8865,7 @@ function doPrintWeeklyReport(){
   const p=projects.find(x=>x.id===currentId);
   const wk=Number(document.getElementById('reports-week-select').value);
   if(!p||!wk){toast('กรุณาเลือกสัปดาห์ที่มีข้อมูล');return}
-  if(!(p.history||[]).some(h=>Number(h.period)===wk)){toast('สัปดาห์นี้ยังไม่ได้บันทึกความก้าวหน้า — กด "+ บันทึกสัปดาห์นี้" ก่อน');return}
+  if(!(p.history||[]).some(h=>Number(h.period)===wk)){toast('สัปดาห์นี้ยังไม่ได้บันทึกความก้าวหน้า — กด "+ บันทึกการทำงาน" ก่อน');return}
   printWeeklyReport(p,wk);
 }
 function buildPctBar(prevValue,currValue,color){
