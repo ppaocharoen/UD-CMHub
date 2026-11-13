@@ -243,6 +243,20 @@ tr:hover td{background:var(--gray-50)}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--gray-800);color:#fff;padding:10px 18px;border-radius:var(--radius-sm);font-size:13px;z-index:999;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none}
 .toast.show{opacity:1;transform:translateY(0)}
 .modal-xl{width:1180px}
+.wl-sec{border-top:1px dashed var(--gray-200);margin-top:12px;padding-top:10px}
+.wl-sec-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-weight:700;font-size:13px;margin-bottom:8px}
+.wl-labor{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 10px}
+.wl-labor label{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:0;font-size:12px;font-weight:400;color:var(--gray-600)}
+.wl-labor input{width:58px;margin:0;padding:4px 6px;text-align:right}
+.wl-eq{display:grid;grid-template-columns:1fr 80px 26px;gap:6px;margin-bottom:5px}.wl-eq input{margin:0;padding:5px 7px}
+.wl-wx{display:grid;grid-template-columns:minmax(220px,auto) 1fr;gap:5px 10px;align-items:center;font-size:12px}
+.wl-wx label{display:flex;align-items:center;justify-content:flex-start;text-align:left;gap:6px;margin:0;font-weight:400;font-size:12px;white-space:nowrap}
+.wl-wx label input{width:15px;height:15px;margin:0;flex:none}
+@media(max-width:600px){.wl-wx{grid-template-columns:1fr}.wl-wx label{white-space:normal}}.wl-wx input[type=text]{margin:0;padding:4px 7px}
+.wl-txt textarea{width:100%;font-family:inherit;padding:6px 8px;border:1px solid var(--gray-200);border-radius:6px;font-size:12.5px;margin-top:3px}
+.wl-txt label{font-size:12px;margin:6px 0 0}
+.wl-ro{opacity:.65;pointer-events:none}
+@media(max-width:600px){.wl-labor{grid-template-columns:repeat(2,1fr)}}
 .wl-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0 12px}
 .wl-wk{display:flex;align-items:stretch;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden;background:#fff}
 .wl-wk>button{border:none;background:var(--gray-50);padding:0 12px;cursor:pointer;font-size:13px;color:var(--gray-600)}
@@ -765,6 +779,7 @@ tr:hover td{background:var(--gray-50)}
         <div class="wl-h"><span id="wl-day-title">งานประจำวัน</span><span style="display:flex;gap:6px" id="wl-day-btns"></span></div>
         <div id="dp-days"></div>
         <div style="font-size:11px;color:var(--gray-400);margin-top:6px">กรอกปริมาณ (งานย่อย) หรือ % ที่ทำได้ในวันนี้ · งานอื่นนอกรายการเลือก "งานอื่น" ในช่องรายการ · วันที่มีบันทึกแล้วมีจุดสีเขียวที่ปฏิทิน</div>
+        <div id="wl-dr"></div>
       </div>
       <div class="wl-card">
         <div class="wl-h"><span id="wl-sum-title">สรุปความก้าวหน้าประจำสัปดาห์</span><span style="font-size:11px;font-weight:500;color:var(--gray-400)">% สะสม (0–100)</span></div>
@@ -1282,7 +1297,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.15';
+const APP_VERSION='11.16';
 let scurveCutoffWeek=null; // v11.14 ใช้ตอนออกรายงานย้อนหลัง: เส้น % จริงแสดงถึงสัปดาห์ที่ออกรายงานเท่านั้น
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
@@ -3054,6 +3069,7 @@ const MANUAL_SECTIONS=[
 <ol>
 <li>เปิดโครงการ → กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-calendar></use></svg> + บันทึกการทำงาน</span> ระบบเปิดสัปดาห์และวันของวันนี้ให้ (เปลี่ยนสัปดาห์ด้วยปุ่ม ◀ ▶ หรือช่องเลือก · เลือกวันจากปฏิทิน 7 วัน — วันที่มีบันทึกแล้วมีจุดสีเขียว วันนี้มีขีดเหลือง)</li>
 <li><b>ฝั่งซ้าย — งานของวันที่เลือก:</b> กด <span class="k">+ เพิ่มรายการ</span> เลือกรายการงาน/งานย่อย ใส่ปริมาณหรือ % ที่ทำได้ในวันนั้น หรือ <span class="k">+ จากชิ้นส่วน</span> · งานนอกรายการ BOQ เลือก "งานอื่นนอกรายการ" · กรอกหลายวันแล้วค่อยบันทึกทีเดียวได้ (ระบบเก็บร่างของแต่ละวันไว้)</li>
+<li><b>ใต้งานของวัน — แรงงาน · เครื่องจักร · สภาพอากาศ · ปัญหา-อุปสรรค:</b> กรอกจำนวนคนแต่ละประเภท (มียอดรวม) เครื่องจักร สภาพอากาศพร้อมช่วงเวลา ปัญหา วิธีแก้ไข และหมายเหตุ · ปุ่ม <span class="k">คัดลอกจากวันก่อน</span> ดึงแรงงานและเครื่องจักรของวันล่าสุดมาใส่ · ข้อมูลชุดเดียวกับ <b>รายงานประจำวัน</b> ของวันนั้น (กรอกที่ไหนก็ตรงกัน ถ้ายังไม่มีรายงานวันนั้น ระบบสร้างให้ตอนบันทึก) · วันที่อยู่ในรายงานแบบช่วงวันที่ แสดงให้ดูอย่างเดียว</li>
 <li><b>ฝั่งขวา — สรุปความก้าวหน้าของสัปดาห์:</b> แต่ละรายการแสดง % ก่อนหน้า, + สัปดาห์นี้ และ % สะสม คำนวณจากงานรายวันทันทีที่กรอก (ป้าย <b>จากรายวัน</b>) · รายการที่ไม่ได้บันทึกรายวัน กรอก % สะสมเองในช่องเดียวกัน · ด้านล่างแสดงรวมทั้งโครงการเทียบแผน</li>
 <li>ถ้าต้องการใช้ค่าอื่นแทนค่าจากรายวัน พิมพ์ทับได้เลย ป้ายจะเป็น <b>แก้เอง ↺</b> และระบบจะไม่เขียนทับครั้งต่อไป · กดป้ายนั้นเพื่อกลับไปใช้ค่าจากรายวัน · รายการที่มีงานย่อยกดปุ่ม <span class="k"><svg class=ic aria-hidden=true><use href=#i-plan></use></svg></span> เพื่อกรอกงานย่อยเอง</li>
 <li>กด <span class="k">บันทึก</span> ครั้งเดียว = บันทึกงานรายวันทุกวันที่กรอก + ความก้าวหน้าของสัปดาห์ · เปลี่ยนสัปดาห์หรือปิดหน้าต่างระหว่างกรอก ระบบถามก่อนเสมอ</li>
@@ -3307,6 +3323,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.16</b> — หน้าบันทึกการทำงาน: เพิ่มแรงงาน (9 ประเภท + ยอดรวม) เครื่องจักร สภาพอากาศ ปัญหา-อุปสรรค วิธีแก้ไข และหมายเหตุของแต่ละวัน ใช้ข้อมูลชุดเดียวกับรายงานประจำวัน · ปุ่มคัดลอกแรงงาน/เครื่องจักรจากวันก่อน</li>
 <li><b>v11.15</b> — รวมบันทึกรายวันและบันทึกความก้าวหน้ารายสัปดาห์เป็นหน้าเดียว <b>"บันทึกการทำงาน"</b>: เลือกสัปดาห์และวันจากปฏิทิน กรอกงานรายวัน สรุปความก้าวหน้าของสัปดาห์คำนวณให้อัตโนมัติ กดบันทึกครั้งเดียว (ไม่ต้องกด "ดึงค่าจากบันทึกรายวัน" อีก) · แก้ค่าเองได้พร้อมป้าย "แก้เอง" · แก้รายวันย้อนหลังแล้ว % สะสมของสัปดาห์ถัดไปคำนวณใหม่ให้</li>
 <li><b>v11.14</b> — ออกสรุป PDF ย้อนหลัง: เส้น % จริงในกราฟ S-Curve แสดงถึงสัปดาห์ที่เลือกออกรายงานเท่านั้น (เดิมติดข้อมูลถึงสัปดาห์ล่าสุดมาด้วย)</li>
 <li><b>v11.13</b> — ปรับปรุงคู่มือให้ครบตามเวอร์ชันล่าสุด: การตั้งค่าหน้าต่างพิมพ์ ความปลอดภัยของไฟล์ที่รับมาจากคนอื่น ปัญหาที่พบบ่อยเรื่องการอนุมัติคลาวด์/การพิมพ์ และศัพท์ใหม่ (ช่วงตามแผน วงเงินตามสัญญา ราคากลาง เวลาสัญญา)</li>
@@ -5331,7 +5348,7 @@ function showSubBreakdownModal(itemId,period){
 function showWeekEntry(editPeriod=null){
   const p=projects.find(x=>x.id===currentId);
   if(!p)return;
-  wlDrafts={};wlDirty=false;
+  wlDrafts={};wlDrDrafts={};wlDirty=false;
   const T=totalPeriods(p);
   const maxW=lastAllowedPeriod(p);
   const sel=document.getElementById('w-period');
@@ -5398,7 +5415,7 @@ function onWeekPeriodChange(){
         document.getElementById('w-period').value=nw;
       }
     }
-    wlDrafts={};wlDirty=false;
+    wlDrafts={};wlDrDrafts={};wlDirty=false;
     weekDraft={actuals:{},sub:{}};
     wlInitWeek(p,nw,null);
     return;
@@ -5458,6 +5475,7 @@ function saveWeekEntry(opts){
   }
   // v11.15 บันทึกงานรายวันที่กรอกไว้ (ทุกวันที่แก้ในสัปดาห์นี้) ลงข้อมูลพร้อมกัน
   Object.keys(wlDrafts).forEach(d=>commitDpDay(p,d,wlDrafts[d]));
+  wlCommitDr(p);
   // คงฟิลด์อื่นของสัปดาห์นี้ไว้ (เช่น weeklyReport รายละเอียดรายงานประจำสัปดาห์) — เดิมแก้ % แล้วรายละเอียดรายงานหาย
   const entryData={...(existing||{}),period,date,actuals};
   if(Object.keys(subActuals).length)entryData.subActuals=subActuals;else delete entryData.subActuals;
@@ -5475,7 +5493,7 @@ function saveWeekEntry(opts){
   }
   projects=projects.map(x=>x.id===currentId?p:x);
   save(projects);
-  wlDrafts={};wlDirty=false;
+  wlDrafts={};wlDrDrafts={};wlDirty=false;
   toast(`✓ บันทึก W${period} แล้ว${nLater?` · ปรับ % สะสมของสัปดาห์ถัดไปตามบันทึกรายวันแล้ว ${nLater} สัปดาห์`:''}`);
   if(opts.keepOpen){updateWeekDeleteBtn(p);return true}
   closeModal('modal-week');wlDay=null;wlWeek=null;
@@ -5483,6 +5501,7 @@ function saveWeekEntry(opts){
   return true;
 }
 // ── v11.15 บันทึกการทำงาน (รวมบันทึกรายวัน + ความก้าวหน้ารายสัปดาห์) ──
+let wlDrDrafts={},wlDrRange=null;
 let wlDay=null,wlWeek=null,wlDrafts={},wlManual=new Set(),wlDirty=false,wlPreferDate=null,wlRendering=false,wlRecalcTimer=null;
 const TH_WD=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
 const TH_WD_FULL=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
@@ -5490,7 +5509,7 @@ function openWorkLog(period,date){
   const p=projects.find(x=>x.id===currentId);
   if(!p)return;
   if(!p.startDate){toast('ยังไม่ได้กำหนดวันเริ่มสัญญา (กด "แก้ไข")');return}
-  wlDrafts={};wlDirty=false;wlDay=null;wlWeek=null;
+  wlDrafts={};wlDrDrafts={};wlDirty=false;wlDay=null;wlWeek=null;
   let d=date||null;
   if(!d&&period==null){
     d=fmtDateInput(new Date());
@@ -5568,7 +5587,8 @@ function wlRenderDays(p){
   let h='';
   for(let i=0;i<7;i++){
     const dt=new Date(ws.getTime()+i*864e5),ds=fmtDateInput(dt);
-    const has=eff.some(e=>e.date===ds&&e.entityId!==DP_NONE_VALUE);
+    const drd=(ds in wlDrDrafts)?wlDrDrafts[ds]:wlDrRecordFor(p,ds);
+    const has=eff.some(e=>e.date===ds&&e.entityId!==DP_NONE_VALUE)||!wlDrIsEmpty(drd);
     const dis=(p.completedDate&&ds>p.completedDate)||(p.startDate&&ds<p.startDate);
     h+=`<button type="button" class="wl-d${ds===wlDay?' on':''}${has?' has':''}${ds===today?' today':''}" ${dis?'disabled title="อยู่นอกช่วงสัญญา / หลังวันแล้วเสร็จ"':''} onclick="wlSelectDay('${ds}')">${TH_WD[dt.getDay()]}<b>${dt.getDate()}</b></button>`;
   }
@@ -5597,12 +5617,86 @@ function wlRenderDay(p){
   list.forEach(e=>addDpEntryRow(wlDay,e));
   if(!list.length)addDpEntryRow(wlDay);
   renderDpElemSum(p,wlDay);
+  wlRenderDr(p);
   wlRenderDays(p);
   wlRendering=false;
 }
 function wlCaptureDay(){
+  wlCaptureDr();
   if(!wlDay||!document.querySelector(`#dp-days .dp-entries[data-date="${wlDay}"]`))return;
   wlDrafts[wlDay]=collectDpDayEntries(wlDay);
+}
+// ── v11.16 แรงงาน · เครื่องจักร · สภาพอากาศ · ปัญหา (ข้อมูลชุดเดียวกับรายงานประจำวันของวันนั้น) ──
+const WL_WX=[['clear','ท้องฟ้าแจ่มใส'],['cloudy','ท้องฟ้ามืดครึ้มหรือมีเมฆมาก'],['lightrain','ฝนตกเล็กน้อย (ไม่เป็นอุปสรรค)'],['heavyrain','ฝนตกหนัก (ไม่สามารถทำงานได้)'],['other','อื่นๆ']];
+function wlDrRecordFor(p,day){return (p.dailyReports||[]).find(r=>r.date===day&&!r.dateTo)||null}
+function wlDrRangeFor(p,day){return (p.dailyReports||[]).find(r=>r.dateTo&&r.date<=day&&r.dateTo>=day)||null}
+function wlDrIsEmpty(d){
+  if(!d)return true;
+  const lab=Object.values(d.labor||{}).some(v=>Number(v)>0);
+  const eq=(d.equipment||[]).some(x=>x.name||x.qty);
+  const wx=WL_WX.some(([k])=>d.weather&&d.weather[k]);
+  return !lab&&!eq&&!wx&&!d.issue&&!d.solution&&!d.comment;
+}
+function wlRenderDr(p){
+  const box=document.getElementById('wl-dr');if(!box)return;
+  if(!wlDay){box.innerHTML='';return}
+  const rng=wlDrRangeFor(p,wlDay);
+  wlDrRange=rng&&!(wlDay in wlDrDrafts)&&!wlDrRecordFor(p,wlDay)?rng:null;
+  const d=(wlDay in wlDrDrafts)?wlDrDrafts[wlDay]:(wlDrRecordFor(p,wlDay)||wlDrRange||{});
+  const lab=d.labor||{},wx=d.weather||{},eq=(d.equipment&&d.equipment.length)?d.equipment:[{name:'',qty:''}];
+  const tot=LABOR_FIELDS.reduce((s,[k])=>s+(Number(lab[k])||0),0);
+  box.innerHTML=`<div class="wl-sec${wlDrRange?' ':''}">
+    ${wlDrRange?`<div style="font-size:11.5px;color:#8a5a00;background:var(--amber-light);border-radius:6px;padding:6px 9px;margin-bottom:8px">วันนี้อยู่ในรายงานประจำวันแบบช่วงวันที่ ${thDate(wlDrRange.date)} – ${thDate(wlDrRange.dateTo)} — แสดงให้ดูอย่างเดียว แก้ได้ที่แท็บรายงานราชการ → รายงานประจำวัน</div>`:''}
+    <div class="${wlDrRange?'wl-ro':''}">
+    <div class="wl-sec-h"><span>แรงงาน <span style="font-weight:400;color:var(--gray-400)" id="wl-lab-tot">(รวม ${tot} คน)</span></span>
+      <button type="button" class="btn-secondary btn-sm" onclick="wlCopyPrevDr()" title="คัดลอกแรงงานและเครื่องจักรจากวันล่าสุดที่บันทึกไว้">คัดลอกจากวันก่อน</button></div>
+    <div class="wl-labor">${LABOR_FIELDS.map(([k,l])=>`<label>${l}<input type="number" min="0" step="1" id="wl-lab-${k}" value="${Number(lab[k])||''}" placeholder="0" oninput="wlLabTotal()"></label>`).join('')}</div>
+    <div class="wl-sec-h" style="margin-top:10px"><span>เครื่องจักร / เครื่องมือ</span><button type="button" class="btn-secondary btn-sm" onclick="wlAddEq()">+ เพิ่ม</button></div>
+    <div id="wl-eq">${eq.map(x=>wlEqRow(x)).join('')}</div>
+    <div class="wl-sec-h" style="margin-top:10px"><span>สภาพอากาศ</span><span style="font-size:11px;font-weight:400;color:var(--gray-400)">ช่วงเวลา เช่น 08.00–12.00</span></div>
+    <div class="wl-wx">${WL_WX.map(([k,l])=>`<label><input type="checkbox" id="wl-wx-${k}" ${wx[k]?'checked':''}> ${l}</label><input type="text" id="wl-wx-${k}-time" value="${escH(wx[k+'Time']||'')}" placeholder="ช่วงเวลา">`).join('')}</div>
+    <div class="wl-txt">
+      <label>ปัญหา - อุปสรรค <span style="font-weight:400;color:var(--gray-400)">(ขึ้นบรรทัดใหม่ = ขึ้นข้อใหม่)</span></label><textarea id="wl-issue" rows="2">${escH(d.issue||'')}</textarea>
+      <label>วิธีการแก้ไข</label><textarea id="wl-solution" rows="2">${escH(d.solution||'')}</textarea>
+      <label>หมายเหตุ / ความเห็นผู้ควบคุมงาน</label><textarea id="wl-comment" rows="2">${escH(d.comment||'')}</textarea>
+    </div></div></div>`;
+}
+function wlEqRow(x){return `<div class="wl-eq"><input type="text" placeholder="เช่น รถแบ็คโฮ" value="${escH(x.name||'')}" data-f="name"><input type="text" placeholder="จำนวน" value="${escH(x.qty||'')}" data-f="qty"><button type="button" class="btn-icon" onclick="this.parentElement.remove();wlDirty=true" title="ลบ">✕</button></div>`}
+function wlAddEq(){document.getElementById('wl-eq').insertAdjacentHTML('beforeend',wlEqRow({}));wlDirty=true}
+function wlLabTotal(){
+  const t=LABOR_FIELDS.reduce((s,[k])=>s+(Number((document.getElementById('wl-lab-'+k)||{}).value)||0),0);
+  const el=document.getElementById('wl-lab-tot');if(el)el.textContent=`(รวม ${t} คน)`;
+}
+function wlCaptureDr(){
+  if(!wlDay||wlDrRange||!document.getElementById('wl-lab-eng'))return;
+  const v=id=>(document.getElementById(id)||{}).value||'';
+  const labor={};LABOR_FIELDS.forEach(([k])=>{labor[k]=Number(v('wl-lab-'+k))||0});
+  const equipment=[...document.querySelectorAll('#wl-eq .wl-eq')].map(r=>({name:r.querySelector('[data-f=name]').value.trim(),qty:r.querySelector('[data-f=qty]').value.trim()})).filter(x=>x.name||x.qty);
+  const weather={};WL_WX.forEach(([k])=>{weather[k]=!!(document.getElementById('wl-wx-'+k)||{}).checked;weather[k+'Time']=v('wl-wx-'+k+'-time').trim()});
+  wlDrDrafts[wlDay]={labor,equipment,weather,issue:v('wl-issue').trim(),solution:v('wl-solution').trim(),comment:v('wl-comment').trim()};
+}
+function wlCopyPrevDr(){
+  const p=projects.find(x=>x.id===currentId);if(!p||!wlDay)return;
+  const cand=[...(p.dailyReports||[]).filter(r=>!r.dateTo&&r.date<wlDay).map(r=>({date:r.date,d:r})),
+    ...Object.keys(wlDrDrafts).filter(k=>k<wlDay).map(k=>({date:k,d:wlDrDrafts[k]}))]
+    .filter(x=>Object.values(x.d.labor||{}).some(v=>Number(v)>0)||(x.d.equipment||[]).length)
+    .sort((a,b)=>a.date<b.date?1:-1);
+  if(!cand.length){toast('ไม่พบข้อมูลแรงงาน/เครื่องจักรของวันก่อนหน้า');return}
+  const src=cand[0].d;
+  LABOR_FIELDS.forEach(([k])=>{const el=document.getElementById('wl-lab-'+k);if(el)el.value=Number((src.labor||{})[k])||''});
+  document.getElementById('wl-eq').innerHTML=((src.equipment||[]).length?src.equipment:[{}]).map(x=>wlEqRow(x)).join('');
+  wlLabTotal();wlDirty=true;
+  toast(`คัดลอกแรงงานและเครื่องจักรจากวันที่ ${thDate(cand[0].date)} แล้ว`);
+}
+function wlCommitDr(p){
+  Object.keys(wlDrDrafts).forEach(day=>{
+    const d=wlDrDrafts[day];
+    p.dailyReports=p.dailyReports||[];
+    const ex=wlDrRecordFor(p,day);
+    if(ex){Object.assign(ex,d);return}
+    if(wlDrIsEmpty(d))return;
+    p.dailyReports.push({id:uid(),date:day,dateTo:'',items:[],...d});
+  });
 }
 function wlMarkManual(id,silentRecalc){
   wlManual.add(id);wlDirty=true;
@@ -5661,7 +5755,7 @@ function wlShiftWeek(dlt){
 }
 function wlClose(){
   if(wlDirty&&!confirm('มีข้อมูลที่ยังไม่บันทึก — ปิดโดยไม่บันทึกหรือไม่?'))return;
-  wlDrafts={};wlDirty=false;wlDay=null;wlWeek=null;
+  wlDrafts={};wlDrDrafts={};wlDirty=false;wlDay=null;wlWeek=null;
   closeModal('modal-week');
 }
 document.addEventListener('input',e=>{
