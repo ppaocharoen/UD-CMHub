@@ -800,9 +800,9 @@ tr:hover td{background:var(--gray-50)}
     </div>
     <div class="modal-footer" style="align-items:center">
       <button class="btn-danger" type="button" id="w-delete-btn" onclick="deleteWeekEntry(Number(document.getElementById('w-period').value),true)" style="display:none;margin-right:auto"><svg class=ic aria-hidden=true><use href=#i-trash></use></svg> ลบความก้าวหน้าสัปดาห์นี้</button>
-      <span style="font-size:11px;color:var(--gray-400);margin-right:auto" id="wl-foot-note">กด "บันทึก" ครั้งเดียว = บันทึกงานรายวันที่กรอก + ความก้าวหน้าของสัปดาห์</span>
+      <span style="font-size:11px;color:var(--gray-400);margin-right:auto" id="wl-foot-note">"บันทึกวันนี้" = บันทึกแล้วกรอกวันอื่นต่อ · "บันทึกและปิด" = บันทึกทุกวันที่กรอกแล้วปิดหน้าต่าง</span>
       <button class="btn-secondary" type="button" onclick="wlClose()">ปิด</button>
-      <button class="btn-primary" type="button" onclick="saveWeekEntry()">บันทึก</button>
+      <button class="btn-primary" type="button" onclick="saveWeekEntry()">บันทึกและปิด</button>
     </div>
   </div>
 </div>
@@ -1297,7 +1297,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.17';
+const APP_VERSION='11.18';
 let scurveCutoffWeek=null; // v11.14 ใช้ตอนออกรายงานย้อนหลัง: เส้น % จริงแสดงถึงสัปดาห์ที่ออกรายงานเท่านั้น
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
@@ -3072,7 +3072,7 @@ const MANUAL_SECTIONS=[
 <li><b>ใต้งานของวัน — แรงงาน · เครื่องจักร · สภาพอากาศ · ปัญหา-อุปสรรค:</b> กรอกจำนวนคนแต่ละประเภท (มียอดรวม) เครื่องจักร สภาพอากาศพร้อมช่วงเวลา ปัญหา วิธีแก้ไข และหมายเหตุ · ปุ่ม <span class="k">คัดลอกจากวันก่อน</span> ดึงแรงงานและเครื่องจักรของวันล่าสุดมาใส่ · ข้อมูลชุดเดียวกับ <b>รายงานประจำวัน</b> ของวันนั้น (กรอกที่ไหนก็ตรงกัน ถ้ายังไม่มีรายงานวันนั้น ระบบสร้างให้ตอนบันทึก) · วันที่อยู่ในรายงานแบบช่วงวันที่ แสดงให้ดูอย่างเดียว</li>
 <li><b>ฝั่งขวา — สรุปความก้าวหน้าของสัปดาห์:</b> แต่ละรายการแสดง % ก่อนหน้า, + สัปดาห์นี้ และ % สะสม คำนวณจากงานรายวันทันทีที่กรอก (ป้าย <b>จากรายวัน</b>) · รายการที่ไม่ได้บันทึกรายวัน กรอก % สะสมเองในช่องเดียวกัน · ด้านล่างแสดงรวมทั้งโครงการเทียบแผน</li>
 <li>ถ้าต้องการใช้ค่าอื่นแทนค่าจากรายวัน พิมพ์ทับได้เลย ป้ายจะเป็น <b>แก้เอง ↺</b> และระบบจะไม่เขียนทับครั้งต่อไป · กดป้ายนั้นเพื่อกลับไปใช้ค่าจากรายวัน · รายการที่มีงานย่อยกดปุ่ม <span class="k"><svg class=ic aria-hidden=true><use href=#i-plan></use></svg></span> เพื่อกรอกงานย่อยเอง</li>
-<li>กด <span class="k">บันทึก</span> ครั้งเดียว = บันทึกงานรายวันทุกวันที่กรอก + ความก้าวหน้าของสัปดาห์ · เปลี่ยนสัปดาห์หรือปิดหน้าต่างระหว่างกรอก ระบบถามก่อนเสมอ</li>
+<li>กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-save></use></svg> บันทึกวันนี้</span> (หัวการ์ดของวัน) เพื่อบันทึกแล้วกรอกวันอื่นต่อโดยไม่ปิดหน้าต่าง หรือ <span class="k">บันทึกและปิด</span> ด้านล่าง — ทั้งสองปุ่มบันทึกงานรายวันทุกวันที่กรอกไว้ + ความก้าวหน้าของสัปดาห์ · เปลี่ยนสัปดาห์หรือปิดหน้าต่างระหว่างกรอก ระบบถามก่อนเสมอ</li>
 <li>แก้งานรายวันของสัปดาห์ย้อนหลัง → % สะสมของสัปดาห์ถัด ๆ ไปที่มาจากรายวันจะคำนวณใหม่ต่อเนื่องให้เอง (รายการที่แก้เองไม่ถูกแตะ)</li>
 <li>ถ้าโครงการมีแผน Rev. จะมีแถบ <b>แสดงรายการงานของแผน</b> ติ๊กเลือกได้หลายแผน · ติ๊ก <b>การก่อสร้างแล้วเสร็จ</b> และระบุวันที่ → ระบบหยุดนับระยะเวลา และบันทึกได้ถึงสัปดาห์ที่แล้วเสร็จเท่านั้น</li>
 </ol>
@@ -3323,6 +3323,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.18</b> — บันทึกการทำงาน: ปุ่ม <b>บันทึกวันนี้</b> ที่หัวการ์ดของแต่ละวัน บันทึกแล้วหน้าต่างยังเปิดอยู่ เลือกวันอื่นกรอกต่อได้ทันที · ปุ่มด้านล่างเปลี่ยนเป็น "บันทึกและปิด"</li>
 <li><b>v11.17</b> — บันทึกการทำงาน: งานย่อยแสดง % คงเหลือคู่กับปริมาณคงเหลือ เช่น "คงเหลือ 1,300.00 กก. (86.67%)" ทั้งในช่องเลือกรายการและใต้ช่องกรอก</li>
 <li><b>v11.16</b> — หน้าบันทึกการทำงาน: เพิ่มแรงงาน (9 ประเภท + ยอดรวม) เครื่องจักร สภาพอากาศ ปัญหา-อุปสรรค วิธีแก้ไข และหมายเหตุของแต่ละวัน ใช้ข้อมูลชุดเดียวกับรายงานประจำวัน · ปุ่มคัดลอกแรงงาน/เครื่องจักรจากวันก่อน</li>
 <li><b>v11.15</b> — รวมบันทึกรายวันและบันทึกความก้าวหน้ารายสัปดาห์เป็นหน้าเดียว <b>"บันทึกการทำงาน"</b>: เลือกสัปดาห์และวันจากปฏิทิน กรอกงานรายวัน สรุปความก้าวหน้าของสัปดาห์คำนวณให้อัตโนมัติ กดบันทึกครั้งเดียว (ไม่ต้องกด "ดึงค่าจากบันทึกรายวัน" อีก) · แก้ค่าเองได้พร้อมป้าย "แก้เอง" · แก้รายวันย้อนหลังแล้ว % สะสมของสัปดาห์ถัดไปคำนวณใหม่ให้</li>
@@ -5608,7 +5609,8 @@ function wlRenderDay(p){
   if(!wlDay){wlRendering=false;return}
   const dt=new Date(wlDay+'T00:00:00');
   document.getElementById('wl-day-title').textContent=`งานวัน${TH_WD_FULL[dt.getDay()]}ที่ ${thDate(wlDay)}`;
-  document.getElementById('wl-day-btns').innerHTML=`<button class="btn-secondary btn-sm" type="button" onclick="addDpEntryRow('${wlDay}')">+ เพิ่มรายการ</button>
+  document.getElementById('wl-day-btns').innerHTML=`<button class="btn-primary btn-sm" type="button" onclick="wlSaveDay()" title="บันทึกงานของวันนี้และความก้าวหน้าของสัปดาห์ โดยไม่ปิดหน้าต่าง — เลือกวันอื่นกรอกต่อได้เลย"><svg class=ic aria-hidden=true><use href=#i-save></use></svg> บันทึกวันนี้</button>
+    <button class="btn-secondary btn-sm" type="button" onclick="addDpEntryRow('${wlDay}')">+ เพิ่มรายการ</button>
     <button class="btn-purple btn-sm" type="button" onclick="openElemPick('${wlDay}')" title="เลือกชิ้นส่วนโครงสร้าง (เช่น F1 ฐานราก × 3) แล้วระบบคำนวณปริมาณวัสดุให้"><svg class=ic aria-hidden=true><use href=#i-element></use></svg> + จากชิ้นส่วน</button>`;
   const card=document.createElement('div');
   card.className='dp-day-card';
@@ -5620,7 +5622,8 @@ function wlRenderDay(p){
   renderDpElemSum(p,wlDay);
   wlRenderDr(p);
   wlRenderDays(p);
-  wlRendering=false;
+  // ให้ MutationObserver (ทำงานเป็น microtask) เห็นว่ากำลังวาดอยู่ — ไม่นับเป็นการแก้ไข
+  queueMicrotask(()=>{wlRendering=false});
 }
 function wlCaptureDay(){
   wlCaptureDr();
@@ -5747,6 +5750,16 @@ function wlRenderTotal(p,w){
   if(p.planNotSubmitted){el.innerHTML=`<span>รวมทั้งโครงการ: จริง <b>${fmt(act)}%</b></span><span style="color:var(--gray-400)">ยังไม่ส่งแผนงาน</span>`;return}
   const diff=act-S.cmpNow;
   el.innerHTML=`<span>รวมทั้งโครงการ ณ สัปดาห์ที่ ${w}: แผน <b style="color:#1a6fc4">${fmt(S.cmpNow)}%</b> · จริง <b style="color:${diff>=0?'#1D9E75':'#c0392b'}">${fmt(act)}%</b></span><span style="font-weight:700;color:${diff>=0?'#1D9E75':'#c0392b'}">${diff>=0?'+':'−'}${fmt(Math.abs(diff))}%</span>`;
+}
+function wlSaveDay(){
+  const p=projects.find(x=>x.id===currentId);if(!p)return;
+  const day=wlDay;
+  if(saveWeekEntry({keepOpen:true})===false)return;
+  const q=projects.find(x=>x.id===currentId)||p;
+  // วาดใหม่จากข้อมูลที่บันทึกแล้ว (ค่าก่อนหน้า/จุดในปฏิทิน/ปุ่มลบ) — คงวันเดิมไว้
+  wlInitWeek(q,wlWeek,day);
+  toast(`✓ บันทึกวันที่ ${thDate(day)} แล้ว — เลือกวันอื่นกรอกต่อได้`);
+  try{renderMetrics(q);renderScurve(q)}catch(e){} // อัปเดตหน้าโครงการด้านหลังด้วย
 }
 function wlShiftWeek(dlt){
   const sel=document.getElementById('w-period');
