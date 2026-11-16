@@ -1297,7 +1297,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.16';
+const APP_VERSION='11.17';
 let scurveCutoffWeek=null; // v11.14 ใช้ตอนออกรายงานย้อนหลัง: เส้น % จริงแสดงถึงสัปดาห์ที่ออกรายงานเท่านั้น
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
@@ -3096,7 +3096,7 @@ const MANUAL_SECTIONS=[
 <li>งานย่อยกรอกเป็น <b>ปริมาณ</b> (หรือ %) · % ของหมวด = มูลค่างานย่อยที่ทำแล้วสะสม ÷ มูลค่าหมวด</li>
 <li>งานที่ไม่อยู่ในรายการ BOQ (เช่น ปรับพื้นที่หน้างาน ขนย้ายวัสดุ) เลือก <b>งานอื่นนอกรายการ (พิมพ์รายละเอียดเอง)</b> — ใช้ในรายงาน ไม่นับเข้า %</li>
 </ul>
-<p>งานย่อยที่มีปริมาณ <b>กรอกช่องปริมาณหรือช่อง % ก็ได้</b> ระบบคำนวณอีกช่องให้ (ปริมาณ = % × ปริมาณทั้งหมดใน BOQ) · "คงเหลือ" ของรายการหลักคิดรวมจากงานย่อยด้วย (ถ่วงตามมูลค่างานย่อย)</p>
+<p>งานย่อยที่มีปริมาณ <b>กรอกช่องปริมาณหรือช่อง % ก็ได้</b> ระบบคำนวณอีกช่องให้ (ปริมาณ = % × ปริมาณทั้งหมดใน BOQ) · "คงเหลือ" ของรายการหลักคิดรวมจากงานย่อยด้วย (ถ่วงตามมูลค่างานย่อย) · งานย่อยแสดงทั้งปริมาณคงเหลือและ % คงเหลือ เช่น "คงเหลือ 1,300.00 กก. (86.67%)"</p>
 <p>ถ้าตั้งค่า <b>ชิ้นส่วนโครงสร้าง</b> ไว้ กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-element></use></svg> + จากชิ้นส่วน</span> เพื่อใส่ปริมาณวัสดุของชิ้นส่วนทั้งชุด (ดูหัวข้อถัดไป)</p>
 <div class="tip">ข้อมูลเก่าที่เคยกรอก % รายสัปดาห์เองไว้ ยังคงเดิม ระบบเริ่มคำนวณจากรายวันให้เมื่อสัปดาห์นั้นมีบันทึกรายวัน</div>`},
 
@@ -3323,6 +3323,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.17</b> — บันทึกการทำงาน: งานย่อยแสดง % คงเหลือคู่กับปริมาณคงเหลือ เช่น "คงเหลือ 1,300.00 กก. (86.67%)" ทั้งในช่องเลือกรายการและใต้ช่องกรอก</li>
 <li><b>v11.16</b> — หน้าบันทึกการทำงาน: เพิ่มแรงงาน (9 ประเภท + ยอดรวม) เครื่องจักร สภาพอากาศ ปัญหา-อุปสรรค วิธีแก้ไข และหมายเหตุของแต่ละวัน ใช้ข้อมูลชุดเดียวกับรายงานประจำวัน · ปุ่มคัดลอกแรงงาน/เครื่องจักรจากวันก่อน</li>
 <li><b>v11.15</b> — รวมบันทึกรายวันและบันทึกความก้าวหน้ารายสัปดาห์เป็นหน้าเดียว <b>"บันทึกการทำงาน"</b>: เลือกสัปดาห์และวันจากปฏิทิน กรอกงานรายวัน สรุปความก้าวหน้าของสัปดาห์คำนวณให้อัตโนมัติ กดบันทึกครั้งเดียว (ไม่ต้องกด "ดึงค่าจากบันทึกรายวัน" อีก) · แก้ค่าเองได้พร้อมป้าย "แก้เอง" · แก้รายวันย้อนหลังแล้ว % สะสมของสัปดาห์ถัดไปคำนวณใหม่ให้</li>
 <li><b>v11.14</b> — ออกสรุป PDF ย้อนหลัง: เส้น % จริงในกราฟ S-Curve แสดงถึงสัปดาห์ที่เลือกออกรายงานเท่านั้น (เดิมติดข้อมูลถึงสัปดาห์ล่าสุดมาด้วย)</li>
@@ -5881,7 +5882,8 @@ function getDpRemainInfo(p,entityId,excludeEntryId){
   const total=info.isSub?info.qtyTotal:100;
   done=Math.min(done,info.isSub?Math.max(done,0):100);
   const remain=Math.max(0,total-done);
-  return{done,total,remain,isSub:info.isSub,unit:info.unit};
+  const remainPct=total>0?remain/total*100:0;
+  return{done,total,remain,remainPct,isSub:info.isSub,unit:info.unit};
 }
 // ข้อความแสดงผลของ entry หนึ่ง ตาม displayMode ('name'|'pct'|'qty', ไม่ระบุ = 'pct' เพื่อคงพฤติกรรมเดิม)
 // v10.6: รายงานประจำวัน — รายการที่ลงผ่าน จัดเป็นหัวข้อตามกลุ่มชิ้นส่วน (กลุ่มเดียวกันรวมหัวข้อเดียว) แล้วต่อท้ายด้วยวัสดุ
@@ -6161,12 +6163,12 @@ function buildDpEntityOptionsHtml(p,selected){
   html+=`<option value="${DP_OTHER_VALUE}" ${selected===DP_OTHER_VALUE?'selected':''}>งานอื่นนอกรายการ (พิมพ์รายละเอียดเอง)</option>`;
   allPlanItems(p).forEach(item=>{
     const mainRemain=getDpRemainInfo(p,item.id,null);
-    const mainSuffix=mainRemain?` (คงเหลือ ${fmt(mainRemain.remain,1)}%)`:'';
+    const mainSuffix=mainRemain?` (คงเหลือ ${fmt(mainRemain.remain,2)}%)`:'';
     html+=`<option value="${escH(item.id)}" ${selected===item.id?'selected':''}>${escH(item.name)}${mainSuffix}</option>`;
     (item.subItems||[]).forEach(s=>{
       const val=item.id+'::'+s.id;
       const subRemain=getDpRemainInfo(p,val,null);
-      const subSuffix=subRemain?` (คงเหลือ ${fmt(subRemain.remain,2)} ${escH(s.unit||'')})`:'';
+      const subSuffix=subRemain?` (คงเหลือ ${fmt(subRemain.remain,2)} ${escH(s.unit||'')} · ${fmt(subRemain.remainPct,2)}%)`:'';
       html+=`<option value="${val}" data-qty="${Number(s.qty||0)}" data-unit="${escH(s.unit||'')}" ${selected===val?'selected':''}>— ${escH(s.name)}${subSuffix}</option>`;
     });
   });
@@ -6305,7 +6307,7 @@ function updateDpRemainHint(row){
   const sel=row.querySelector('.dp-entity-select');
   const entityId=sel?sel.value:'';
   const info=getDpRemainInfo(p,entityId,row.dataset.entryId||null);
-  hintSpan.textContent=info?(info.isSub?`คงเหลือ ${fmt(info.remain,2)} ${info.unit}`:`คงเหลือ ${fmt(info.remain,1)}%`):'';
+  hintSpan.textContent=info?(info.isSub?`คงเหลือ ${fmt(info.remain,2)} ${info.unit} (${fmt(info.remainPct,2)}%)`:`คงเหลือ ${fmt(info.remain,2)}%`):'';
 }
 function onDpQtyInput(inp){
   const row=inp.closest('.dp-row');
