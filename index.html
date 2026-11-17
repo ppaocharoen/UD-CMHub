@@ -270,6 +270,14 @@ tr:hover td{background:var(--gray-50)}
 .wl-d.on.has:after{background:#FFC000}
 .wl-d.today{box-shadow:inset 0 -3px 0 #FFC000}
 .wl-d:disabled{opacity:.35;cursor:not-allowed}
+.wl-d.off{background:var(--gray-100);border-color:var(--gray-200);color:var(--gray-400)}.wl-d.off b{color:var(--gray-400)}.wl-d.off:before{content:'หยุด';position:absolute;left:0;right:0;bottom:-1px;font-size:8.5px;color:var(--gray-500)}
+.wl-d.off.on{background:var(--gray-500);border-color:var(--gray-500);color:#eee}.wl-d.off.on b{color:#fff}.wl-d.off.on:before{color:#eee}.wl-d.off.has:after{display:none}
+.wl-nw{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:6px 9px;margin-bottom:8px;font-size:12.5px}
+.wl-nw.on{background:#eceff1;border-color:#b0bec5}
+.wl-nw label{display:flex;align-items:center;gap:5px;margin:0;font-weight:600;font-size:12.5px;cursor:pointer}
+.wl-nw select,.wl-nw input[type=text]{font-size:12px;padding:3px 6px;width:auto;min-width:0}
+.wl-nw .lnk{margin-left:auto;font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0}
+#modal-week.nw .dp-day-card,#modal-week.nw .wl-nw-hide{display:none}
 .wl-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;align-items:start}
 .wl-card{border:1px solid var(--gray-200);border-radius:10px;padding:12px 14px;min-width:0}
 .wl-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-weight:700;font-size:14px;margin-bottom:8px}
@@ -778,7 +786,7 @@ tr:hover td{background:var(--gray-50)}
       <div class="wl-card">
         <div class="wl-h"><span id="wl-day-title">งานประจำวัน</span><span style="display:flex;gap:6px" id="wl-day-btns"></span></div>
         <div id="dp-days"></div>
-        <div style="font-size:11px;color:var(--gray-400);margin-top:6px">กรอกปริมาณ (งานย่อย) หรือ % ที่ทำได้ในวันนี้ · งานอื่นนอกรายการเลือก "งานอื่น" ในช่องรายการ · วันที่มีบันทึกแล้วมีจุดสีเขียวที่ปฏิทิน</div>
+        <div class="wl-nw-hide" style="font-size:11px;color:var(--gray-400);margin-top:6px">กรอกปริมาณ (งานย่อย) หรือ % ที่ทำได้ในวันนี้ · งานอื่นนอกรายการเลือก "งานอื่น" ในช่องรายการ · วันที่มีบันทึกแล้วมีจุดสีเขียวที่ปฏิทิน</div>
         <div id="wl-dr"></div>
       </div>
       <div class="wl-card">
@@ -1297,7 +1305,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.18';
+const APP_VERSION='11.19';
 let scurveCutoffWeek=null; // v11.14 ใช้ตอนออกรายงานย้อนหลัง: เส้น % จริงแสดงถึงสัปดาห์ที่ออกรายงานเท่านั้น
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
@@ -3074,6 +3082,7 @@ const MANUAL_SECTIONS=[
 <li>ถ้าต้องการใช้ค่าอื่นแทนค่าจากรายวัน พิมพ์ทับได้เลย ป้ายจะเป็น <b>แก้เอง ↺</b> และระบบจะไม่เขียนทับครั้งต่อไป · กดป้ายนั้นเพื่อกลับไปใช้ค่าจากรายวัน · รายการที่มีงานย่อยกดปุ่ม <span class="k"><svg class=ic aria-hidden=true><use href=#i-plan></use></svg></span> เพื่อกรอกงานย่อยเอง</li>
 <li>กด <span class="k"><svg class=ic aria-hidden=true><use href=#i-save></use></svg> บันทึกวันนี้</span> (หัวการ์ดของวัน) เพื่อบันทึกแล้วกรอกวันอื่นต่อโดยไม่ปิดหน้าต่าง หรือ <span class="k">บันทึกและปิด</span> ด้านล่าง — ทั้งสองปุ่มบันทึกงานรายวันทุกวันที่กรอกไว้ + ความก้าวหน้าของสัปดาห์ · เปลี่ยนสัปดาห์หรือปิดหน้าต่างระหว่างกรอก ระบบถามก่อนเสมอ</li>
 <li>แก้งานรายวันของสัปดาห์ย้อนหลัง → % สะสมของสัปดาห์ถัด ๆ ไปที่มาจากรายวันจะคำนวณใหม่ต่อเนื่องให้เอง (รายการที่แก้เองไม่ถูกแตะ)</li>
+<li><b>วันไม่มีการดำเนินงาน:</b> ติ๊ก <b>ไม่มีการดำเนินงานในวันนี้</b> ที่หัวงานของวัน แล้วเลือกเหตุผล (วันหยุด · ฝนตกหนัก · ผู้รับจ้างหยุดงาน · รอวัสดุ · อื่นๆ พิมพ์เอง) — ช่องรายการงาน แรงงาน และเครื่องจักรจะซ่อนไป ยังกรอกสภาพอากาศและหมายเหตุได้ · ในปฏิทินวันนั้นเป็นสีเทามีคำว่า "หยุด" · ลิงก์ <span class="k">ใช้กับวันที่ยังว่างในสัปดาห์นี้</span> ทำเครื่องหมายหยุดให้ทุกวันที่ผ่านมาแล้วและยังไม่ได้กรอก ด้วยเหตุผลเดียวกัน (แล้วกดบันทึก)</li>
 <li>ถ้าโครงการมีแผน Rev. จะมีแถบ <b>แสดงรายการงานของแผน</b> ติ๊กเลือกได้หลายแผน · ติ๊ก <b>การก่อสร้างแล้วเสร็จ</b> และระบุวันที่ → ระบบหยุดนับระยะเวลา และบันทึกได้ถึงสัปดาห์ที่แล้วเสร็จเท่านั้น</li>
 </ol>
 <p><b>แก้ไขสัปดาห์ที่บันทึกแล้ว:</b> แท็บ <b>ประวัติย้อนหลัง</b> → กดปุ่ม <svg class=ic aria-hidden=true><use href=#i-edit></use></svg> ท้ายแถวของสัปดาห์นั้น</p>
@@ -3164,6 +3173,8 @@ const MANUAL_SECTIONS=[
 <li><span class="k">+7 เพิ่มทั้งสัปดาห์ (7 วัน)</span> สร้างครบทั้งสัปดาห์ในครั้งเดียว · <span class="k"><svg class=ic aria-hidden=true><use href=#i-printer></use></svg> พิมพ์ทั้งสัปดาห์</span> พิมพ์ต่อเนื่อง</li>
 <li>ชื่อโครงการและวันที่ในหัวรายงานอยู่บรรทัดเดียวไม่ตัดแถว — ชื่อที่ยาวมากระบบย่อตัวอักษรให้อัตโนมัติ</li>
 <li>รายการที่ลงผ่าน <span class="k"><svg class=ic aria-hidden=true><use href=#i-element></use></svg> + จากชิ้นส่วน</span> แสดงเป็นหัวข้อตาม <b>กลุ่มชิ้นส่วน</b> แล้วต่อท้ายด้วยวัสดุในบรรทัดเดียว เช่น "งานฐานราก (F1 × 3, F2 × 1 ต้น) — เหล็ก DB 16 มม. 340.00 กก., ไม้แบบ 19.20 ตร.ม." · ชิ้นส่วนกลุ่มเดียวกันในวันเดียวกันรวมเป็นหัวข้อเดียว · ในหน้าต่างทำรายงาน หัวข้อ <svg class=ic aria-hidden=true><use href=#i-element></use></svg> มีช่อง STA. เลือกไม่แสดงได้ วัสดุในหัวข้อแสดงเป็น <b>ชื่ออย่างเดียว</b> เป็นค่าเริ่มต้น (เปลี่ยนค่าเริ่มต้นของโครงการได้ที่แถบเหนือหัวข้อ <svg class=ic aria-hidden=true><use href=#i-element></use></svg>) · แต่ละหัวข้อกด "ชื่อทั้งหมด / ปริมาณทั้งหมด / %ทั้งหมด" ได้ครั้งเดียว หรือ "ปรับรายตัว" เพื่อเลือกต่อวัสดุ (ปริมาณ / % / ชื่ออย่างเดียว / ไม่แสดง) · รายการวัสดุที่อยู่ในหัวข้อ <svg class=ic aria-hidden=true><use href=#i-element></use></svg> ครบแล้วจะไม่แสดงซ้ำในรายการอัตโนมัติ · ถ้าแก้ปริมาณในบันทึกรายวันเพิ่มเอง ส่วนที่เกินแสดงเป็นบรรทัดปกติแยกต่างหาก · <b>รายงานประจำสัปดาห์</b> จัดหัวข้อแบบเดียวกันจากยอดรวมทั้งสัปดาห์ (เช่น งานฐานราก (F1 × 7 ต้น) — …) หัวข้อ <svg class=ic aria-hidden=true><use href=#i-element></use></svg> มีช่องหมายเหตุและเลือกไม่แสดงได้</li>
+<li><b>ตัวเลขที่แสดงต่อรายการ</b> (ทั้งรายงานประจำวันและประจำสัปดาห์) — ใต้แต่ละรายการมีปุ่ม <span class="k">ทำเพิ่ม</span> <span class="k">สะสม</span> <span class="k">ทั้งหมด</span> <span class="k">คงเหลือ</span> กดเลือกได้หลายอย่าง เช่น "เหล็กเสริม DB16 (ทำเพิ่ม 50.00 กก. · สะสม 350.00 / 1500.00 กก. · คงเหลือ 1150.00 กก.)" · หน่วยเป็น % หรือปริมาณตามช่องเลือกเดิม · สะสมคิด ณ วันที่ของรายงาน (สัปดาห์ = ณ วันสุดท้ายของสัปดาห์) · แถบด้านบนตั้ง <b>ค่าเริ่มต้นของโครงการ</b> และปุ่ม <span class="k">ใช้กับทุกรายการ</span> ล้างที่ตั้งรายตัวให้ทุกรายการใช้ค่าเริ่มต้น · โครงการใหม่ตั้งต้นเป็น ทำเพิ่ม + สะสม</li>
+<li><b>วันไม่มีการดำเนินงาน</b> (ติ๊กในบันทึกการทำงาน) — วันที่ติดกันและเหตุผลเดียวกัน รายการรายงานจะรวมเป็นฉบับเดียวแบบช่วงวันที่ให้เอง (พื้นสีเทา "รวม n วันเป็นฉบับเดียว") ทั้งพิมพ์ทีละฉบับและพิมพ์ทั้งสัปดาห์ · ถ้าเหตุผลต่างกันจะแยกฉบับ · กด "แก้ไข" เพื่อไปแก้ในหน้าบันทึกการทำงาน</li>
 </ul>
 <h4>5) รายงานภาพถ่ายงานก่อสร้าง</h4>
 <ul>
@@ -3323,6 +3334,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.19</b> — รายงานประจำวัน/ประจำสัปดาห์: เลือกได้ว่าตัวเลขของแต่ละรายการแสดง <b>ทำเพิ่ม · สะสม · ทั้งหมด · คงเหลือ</b> (กดปุ่มใต้แต่ละรายการ หรือตั้งค่าเริ่มต้นของโครงการแล้วกด "ใช้กับทุกรายการ") · โครงการใหม่ตั้งต้นเป็น ทำเพิ่ม + สะสม · <b>วันไม่มีการดำเนินงาน</b> ในบันทึกการทำงาน พร้อมเหตุผล ปฏิทินแสดงสีเทา และวันหยุดที่ติดกันเหตุผลเดียวกันรวมเป็นรายงานประจำวันฉบับเดียวแบบช่วงวันที่ให้อัตโนมัติ</li>
 <li><b>v11.18</b> — บันทึกการทำงาน: ปุ่ม <b>บันทึกวันนี้</b> ที่หัวการ์ดของแต่ละวัน บันทึกแล้วหน้าต่างยังเปิดอยู่ เลือกวันอื่นกรอกต่อได้ทันที · ปุ่มด้านล่างเปลี่ยนเป็น "บันทึกและปิด"</li>
 <li><b>v11.17</b> — บันทึกการทำงาน: งานย่อยแสดง % คงเหลือคู่กับปริมาณคงเหลือ เช่น "คงเหลือ 1,300.00 กก. (86.67%)" ทั้งในช่องเลือกรายการและใต้ช่องกรอก</li>
 <li><b>v11.16</b> — หน้าบันทึกการทำงาน: เพิ่มแรงงาน (9 ประเภท + ยอดรวม) เครื่องจักร สภาพอากาศ ปัญหา-อุปสรรค วิธีแก้ไข และหมายเหตุของแต่ละวัน ใช้ข้อมูลชุดเดียวกับรายงานประจำวัน · ปุ่มคัดลอกแรงงาน/เครื่องจักรจากวันก่อน</li>
@@ -5582,6 +5594,67 @@ function wlInitWeek(p,w,preferDate){
   wlRenderDay(p);
   buildWeekItemRows(p,w,ex?w:null);
 }
+// ── v11.19 วันไม่มีการดำเนินงาน (เก็บใน dailyReports: noWork, noWorkReason) ──
+const NW_REASONS=['วันหยุด','ฝนตกหนัก','ผู้รับจ้างหยุดงาน','รอวัสดุ'];
+function wlNoWorkOf(p,ds){
+  const d=(ds in wlDrDrafts)?wlDrDrafts[ds]:wlDrRecordFor(p,ds);
+  if(d&&d.noWork)return{on:true,reason:d.noWorkReason||''};
+  if(d&&('noWork' in d))return{on:false,reason:''};
+  // ข้อมูลเดิม: วันที่มีแค่ "ไม่มีการดำเนินงาน" ในบันทึกรายวัน
+  const list=(ds in wlDrafts)?wlDrafts[ds]:(p.dailyProgress||[]).filter(e=>e.date===ds);
+  if(list.length&&list.every(e=>e.entityId===DP_NONE_VALUE))return{on:true,reason:(list[0].reason)||''};
+  return{on:false,reason:''};
+}
+function wlNwHtml(nw){
+  const known=NW_REASONS.includes(nw.reason)||!nw.reason;
+  const sel=known?(nw.reason||NW_REASONS[0]):'__o';
+  return `<div class="wl-nw${nw.on?' on':''}" id="wl-nw">
+    <label><input type="checkbox" id="wl-nw-on" ${nw.on?'checked':''} onchange="wlNwToggle()" style="width:15px;height:15px;margin:0"> ไม่มีการดำเนินงานในวันนี้</label>
+    <span id="wl-nw-r" style="display:${nw.on?'flex':'none'};gap:5px;align-items:center">เหตุผล
+      <select id="wl-nw-sel" onchange="document.getElementById('wl-nw-txt').style.display=this.value==='__o'?'':'none';wlDirty=true">${NW_REASONS.map(r=>`<option ${r===sel?'selected':''}>${r}</option>`).join('')}<option value="__o" ${sel==='__o'?'selected':''}>อื่นๆ (ระบุ)</option></select>
+      <input type="text" id="wl-nw-txt" placeholder="ระบุเหตุผล" value="${escH(known?'':nw.reason)}" style="display:${sel==='__o'?'':'none'};width:130px" oninput="wlDirty=true"></span>
+    <button type="button" class="lnk" onclick="wlNwFillWeek()" title="ทำเครื่องหมาย &quot;ไม่มีการดำเนินงาน&quot; ให้ทุกวันในสัปดาห์นี้ที่ยังไม่ได้กรอกอะไร (ถึงวันนี้)">ใช้กับวันที่ยังว่างในสัปดาห์นี้</button>
+  </div>`;
+}
+function wlNwRead(){
+  const on=!!(document.getElementById('wl-nw-on')||{}).checked;
+  const sv=(document.getElementById('wl-nw-sel')||{}).value||NW_REASONS[0];
+  const reason=sv==='__o'?((document.getElementById('wl-nw-txt')||{}).value||'').trim()||'อื่นๆ':sv;
+  return{on,reason};
+}
+function wlNwApplyUi(){
+  const nw=wlNwRead();
+  document.getElementById('modal-week').classList.toggle('nw',nw.on);
+  const b=document.getElementById('wl-nw');if(b)b.classList.toggle('on',nw.on);
+  const r=document.getElementById('wl-nw-r');if(r)r.style.display=nw.on?'flex':'none';
+}
+function wlNwToggle(){
+  wlDirty=true;wlNwApplyUi();
+  const p=projects.find(x=>x.id===currentId);if(!p)return;
+  wlCaptureDay();wlRenderDays(p);
+}
+function wlNwFillWeek(){
+  const p=projects.find(x=>x.id===currentId);if(!p||!wlWeek)return;
+  wlCaptureDay();
+  const cur=wlNwRead();
+  const reason=cur.on?cur.reason:NW_REASONS[0];
+  const ws=wkStart(p.startDate,wlWeek),today=fmtDateInput(new Date());
+  const eff=wlEffectiveDaily(p);let n=0;
+  for(let i=0;i<7;i++){
+    const ds=fmtDateInput(new Date(ws.getTime()+i*864e5));
+    if(ds>today||(p.completedDate&&ds>p.completedDate)||(p.startDate&&ds<p.startDate))continue;
+    if(wlDrRangeFor(p,ds)&&!wlDrRecordFor(p,ds))continue;
+    const drd=(ds in wlDrDrafts)?wlDrDrafts[ds]:wlDrRecordFor(p,ds);
+    if(eff.some(e=>e.date===ds)||!wlDrIsEmpty(drd))continue;
+    wlDrafts[ds]=[{id:uid(),date:ds,entityId:DP_NONE_VALUE,qty:0,pct:0,reason}];
+    wlDrDrafts[ds]={...(drd||{}),labor:{},equipment:[],weather:(drd&&drd.weather)||{},issue:'',solution:'',comment:'',noWork:true,noWorkReason:reason};
+    n++;
+  }
+  if(!n){toast('ไม่มีวันว่างที่ผ่านมาแล้วในสัปดาห์นี้');return}
+  wlDirty=true;
+  wlRenderDay(p);
+  toast(`ทำเครื่องหมาย "ไม่มีการดำเนินงาน (${reason})" ${n} วัน — กดบันทึกเพื่อยืนยัน`);
+}
 function wlRenderDays(p){
   const box=document.getElementById('wl-days');if(!box||!wlWeek)return;
   const ws=wkStart(p.startDate,wlWeek);if(!ws){box.innerHTML='';return}
@@ -5590,9 +5663,10 @@ function wlRenderDays(p){
   for(let i=0;i<7;i++){
     const dt=new Date(ws.getTime()+i*864e5),ds=fmtDateInput(dt);
     const drd=(ds in wlDrDrafts)?wlDrDrafts[ds]:wlDrRecordFor(p,ds);
-    const has=eff.some(e=>e.date===ds&&e.entityId!==DP_NONE_VALUE)||!wlDrIsEmpty(drd);
+    const off=wlNoWorkOf(p,ds).on;
+    const has=!off&&(eff.some(e=>e.date===ds&&e.entityId!==DP_NONE_VALUE)||!wlDrIsEmpty(drd));
     const dis=(p.completedDate&&ds>p.completedDate)||(p.startDate&&ds<p.startDate);
-    h+=`<button type="button" class="wl-d${ds===wlDay?' on':''}${has?' has':''}${ds===today?' today':''}" ${dis?'disabled title="อยู่นอกช่วงสัญญา / หลังวันแล้วเสร็จ"':''} onclick="wlSelectDay('${ds}')">${TH_WD[dt.getDay()]}<b>${dt.getDate()}</b></button>`;
+    h+=`<button type="button" class="wl-d${ds===wlDay?' on':''}${has?' has':''}${off?' off':''}${ds===today?' today':''}" ${off?`title="ไม่มีการดำเนินงาน${escH(wlNoWorkOf(p,ds).reason?' — '+wlNoWorkOf(p,ds).reason:'')}"`:''} ${dis?'disabled title="อยู่นอกช่วงสัญญา / หลังวันแล้วเสร็จ"':''} onclick="wlSelectDay('${ds}')">${TH_WD[dt.getDay()]}<b>${dt.getDate()}</b></button>`;
   }
   box.innerHTML=h;
 }
@@ -5610,13 +5684,18 @@ function wlRenderDay(p){
   const dt=new Date(wlDay+'T00:00:00');
   document.getElementById('wl-day-title').textContent=`งานวัน${TH_WD_FULL[dt.getDay()]}ที่ ${thDate(wlDay)}`;
   document.getElementById('wl-day-btns').innerHTML=`<button class="btn-primary btn-sm" type="button" onclick="wlSaveDay()" title="บันทึกงานของวันนี้และความก้าวหน้าของสัปดาห์ โดยไม่ปิดหน้าต่าง — เลือกวันอื่นกรอกต่อได้เลย"><svg class=ic aria-hidden=true><use href=#i-save></use></svg> บันทึกวันนี้</button>
-    <button class="btn-secondary btn-sm" type="button" onclick="addDpEntryRow('${wlDay}')">+ เพิ่มรายการ</button>
-    <button class="btn-purple btn-sm" type="button" onclick="openElemPick('${wlDay}')" title="เลือกชิ้นส่วนโครงสร้าง (เช่น F1 ฐานราก × 3) แล้วระบบคำนวณปริมาณวัสดุให้"><svg class=ic aria-hidden=true><use href=#i-element></use></svg> + จากชิ้นส่วน</button>`;
+    <button class="btn-secondary btn-sm wl-nw-hide" type="button" onclick="addDpEntryRow('${wlDay}')">+ เพิ่มรายการ</button>
+    <button class="btn-purple btn-sm wl-nw-hide" type="button" onclick="openElemPick('${wlDay}')" title="เลือกชิ้นส่วนโครงสร้าง (เช่น F1 ฐานราก × 3) แล้วระบบคำนวณปริมาณวัสดุให้"><svg class=ic aria-hidden=true><use href=#i-element></use></svg> + จากชิ้นส่วน</button>`;
+  const nw=wlNoWorkOf(p,wlDay);
+  const rngOnly=wlDrRangeFor(p,wlDay)&&!wlDrRecordFor(p,wlDay)&&!(wlDay in wlDrDrafts);
+  if(!rngOnly)wrap.insertAdjacentHTML('beforeend',wlNwHtml(nw));
+  document.getElementById('modal-week').classList.toggle('nw',!rngOnly&&nw.on);
   const card=document.createElement('div');
   card.className='dp-day-card';
   card.innerHTML=`<div class="dp-elem-sum" data-date="${wlDay}"></div><div class="dp-entries" data-date="${wlDay}"></div>`;
   wrap.appendChild(card);
-  const list=(wlDay in wlDrafts)?wlDrafts[wlDay]:(p.dailyProgress||[]).filter(e=>e.date===wlDay);
+  let list=(wlDay in wlDrafts)?wlDrafts[wlDay]:(p.dailyProgress||[]).filter(e=>e.date===wlDay);
+  if(nw.on)list=list.filter(e=>e.entityId!==DP_NONE_VALUE); // วันหยุด: แถว "ไม่มีการดำเนินงาน" จัดการด้วยช่องติ๊กด้านบนแทน
   list.forEach(e=>addDpEntryRow(wlDay,e));
   if(!list.length)addDpEntryRow(wlDay);
   renderDpElemSum(p,wlDay);
@@ -5628,7 +5707,16 @@ function wlRenderDay(p){
 function wlCaptureDay(){
   wlCaptureDr();
   if(!wlDay||!document.querySelector(`#dp-days .dp-entries[data-date="${wlDay}"]`))return;
-  wlDrafts[wlDay]=collectDpDayEntries(wlDay);
+  if(document.getElementById('wl-nw-on')){
+    const nw=wlNwRead();
+    if(nw.on){
+      const p=projects.find(x=>x.id===currentId);
+      const old=((wlDay in wlDrafts)?wlDrafts[wlDay]:(p?(p.dailyProgress||[]):[]).filter(e=>e.date===wlDay)).find(e=>e.entityId===DP_NONE_VALUE);
+      wlDrafts[wlDay]=[{id:old?old.id:uid(),date:wlDay,entityId:DP_NONE_VALUE,qty:0,pct:0,reason:nw.reason}];
+      return;
+    }
+  }
+  wlDrafts[wlDay]=collectDpDayEntries(wlDay).filter(e=>!(e.entityId===DP_NONE_VALUE&&e.reason)); // เลิกติ๊กวันหยุด → ทิ้งแถวหยุดที่ระบบสร้าง
 }
 // ── v11.16 แรงงาน · เครื่องจักร · สภาพอากาศ · ปัญหา (ข้อมูลชุดเดียวกับรายงานประจำวันของวันนั้น) ──
 const WL_WX=[['clear','ท้องฟ้าแจ่มใส'],['cloudy','ท้องฟ้ามืดครึ้มหรือมีเมฆมาก'],['lightrain','ฝนตกเล็กน้อย (ไม่เป็นอุปสรรค)'],['heavyrain','ฝนตกหนัก (ไม่สามารถทำงานได้)'],['other','อื่นๆ']];
@@ -5639,7 +5727,7 @@ function wlDrIsEmpty(d){
   const lab=Object.values(d.labor||{}).some(v=>Number(v)>0);
   const eq=(d.equipment||[]).some(x=>x.name||x.qty);
   const wx=WL_WX.some(([k])=>d.weather&&d.weather[k]);
-  return !lab&&!eq&&!wx&&!d.issue&&!d.solution&&!d.comment;
+  return !lab&&!eq&&!wx&&!d.issue&&!d.solution&&!d.comment&&!d.noWork;
 }
 function wlRenderDr(p){
   const box=document.getElementById('wl-dr');if(!box)return;
@@ -5652,11 +5740,11 @@ function wlRenderDr(p){
   box.innerHTML=`<div class="wl-sec${wlDrRange?' ':''}">
     ${wlDrRange?`<div style="font-size:11.5px;color:#8a5a00;background:var(--amber-light);border-radius:6px;padding:6px 9px;margin-bottom:8px">วันนี้อยู่ในรายงานประจำวันแบบช่วงวันที่ ${thDate(wlDrRange.date)} – ${thDate(wlDrRange.dateTo)} — แสดงให้ดูอย่างเดียว แก้ได้ที่แท็บรายงานราชการ → รายงานประจำวัน</div>`:''}
     <div class="${wlDrRange?'wl-ro':''}">
-    <div class="wl-sec-h"><span>แรงงาน <span style="font-weight:400;color:var(--gray-400)" id="wl-lab-tot">(รวม ${tot} คน)</span></span>
+    <div class="wl-nw-hide"><div class="wl-sec-h"><span>แรงงาน <span style="font-weight:400;color:var(--gray-400)" id="wl-lab-tot">(รวม ${tot} คน)</span></span>
       <button type="button" class="btn-secondary btn-sm" onclick="wlCopyPrevDr()" title="คัดลอกแรงงานและเครื่องจักรจากวันล่าสุดที่บันทึกไว้">คัดลอกจากวันก่อน</button></div>
     <div class="wl-labor">${LABOR_FIELDS.map(([k,l])=>`<label>${l}<input type="number" min="0" step="1" id="wl-lab-${k}" value="${Number(lab[k])||''}" placeholder="0" oninput="wlLabTotal()"></label>`).join('')}</div>
     <div class="wl-sec-h" style="margin-top:10px"><span>เครื่องจักร / เครื่องมือ</span><button type="button" class="btn-secondary btn-sm" onclick="wlAddEq()">+ เพิ่ม</button></div>
-    <div id="wl-eq">${eq.map(x=>wlEqRow(x)).join('')}</div>
+    <div id="wl-eq">${eq.map(x=>wlEqRow(x)).join('')}</div></div>
     <div class="wl-sec-h" style="margin-top:10px"><span>สภาพอากาศ</span><span style="font-size:11px;font-weight:400;color:var(--gray-400)">ช่วงเวลา เช่น 08.00–12.00</span></div>
     <div class="wl-wx">${WL_WX.map(([k,l])=>`<label><input type="checkbox" id="wl-wx-${k}" ${wx[k]?'checked':''}> ${l}</label><input type="text" id="wl-wx-${k}-time" value="${escH(wx[k+'Time']||'')}" placeholder="ช่วงเวลา">`).join('')}</div>
     <div class="wl-txt">
@@ -5677,7 +5765,8 @@ function wlCaptureDr(){
   const labor={};LABOR_FIELDS.forEach(([k])=>{labor[k]=Number(v('wl-lab-'+k))||0});
   const equipment=[...document.querySelectorAll('#wl-eq .wl-eq')].map(r=>({name:r.querySelector('[data-f=name]').value.trim(),qty:r.querySelector('[data-f=qty]').value.trim()})).filter(x=>x.name||x.qty);
   const weather={};WL_WX.forEach(([k])=>{weather[k]=!!(document.getElementById('wl-wx-'+k)||{}).checked;weather[k+'Time']=v('wl-wx-'+k+'-time').trim()});
-  wlDrDrafts[wlDay]={labor,equipment,weather,issue:v('wl-issue').trim(),solution:v('wl-solution').trim(),comment:v('wl-comment').trim()};
+  const nw=document.getElementById('wl-nw-on')?wlNwRead():{on:false,reason:''};
+  wlDrDrafts[wlDay]={labor:nw.on?{}:labor,equipment:nw.on?[]:equipment,weather,issue:v('wl-issue').trim(),solution:v('wl-solution').trim(),comment:v('wl-comment').trim(),noWork:nw.on,noWorkReason:nw.on?nw.reason:''};
 }
 function wlCopyPrevDr(){
   const p=projects.find(x=>x.id===currentId);if(!p||!wlDay)return;
@@ -5697,6 +5786,7 @@ function wlCommitDr(p){
     const d=wlDrDrafts[day];
     p.dailyReports=p.dailyReports||[];
     const ex=wlDrRecordFor(p,day);
+    if(ex&&wlDrIsEmpty(d)&&!(ex.items||[]).length){p.dailyReports=p.dailyReports.filter(r=>r!==ex);return} // เลิกติ๊กวันหยุด/ล้างข้อมูล → ไม่เหลือรายงานเปล่า
     if(ex){Object.assign(ex,d);return}
     if(wlDrIsEmpty(d))return;
     p.dailyReports.push({id:uid(),date:day,dateTo:'',items:[],...d});
@@ -5770,6 +5860,7 @@ function wlShiftWeek(dlt){
 function wlClose(){
   if(wlDirty&&!confirm('มีข้อมูลที่ยังไม่บันทึก — ปิดโดยไม่บันทึกหรือไม่?'))return;
   wlDrafts={};wlDrDrafts={};wlDirty=false;wlDay=null;wlWeek=null;
+  document.getElementById('modal-week').classList.remove('nw');
   closeModal('modal-week');
 }
 document.addEventListener('input',e=>{
@@ -5840,9 +5931,9 @@ function resolveDpEntityInfo(p,entityId){
 }
 // สรุปรายการที่มีบันทึกความก้าวหน้ารายวัน ในช่วงวันที่ ws–we (ใช้แสดงในรายงานราชการรายสัปดาห์) → [{desc,note}]
 // modes = { [entityId]: 'pct'|'qty'|'name'|'hide' }, notes = { [entityId]: text } ทั้งคู่มาจาก entry.weeklyReport — เลือก/กรอกได้ต่อรายการเหมือนรายงานประจำวัน ไม่ระบุ = 'pct'/ว่าง
-function buildDailyProgressSummaryRows(p,ws,we,modes,notes,gmeta){
+function buildDailyProgressSummaryRows(p,ws,we,modes,notes,gmeta,partsMap){
   if(!ws||!we||!(p.dailyProgress&&p.dailyProgress.length))return[];
-  return buildDpWeekLines(p,ws,we,modes,notes,gmeta).filter(l=>!l.hidden&&l.text).map(l=>({desc:l.text,note:l.note||''}));
+  return buildDpWeekLines(p,ws,we,modes,notes,gmeta,partsMap).filter(l=>!l.hidden&&l.text).map(l=>({desc:l.text,note:l.note||''}));
 }
 const DP_NONE_VALUE='__NONE__';
 const DP_OTHER_VALUE='__OTHER__'; // v11.3: งานอื่นนอกรายการ BOQ (พิมพ์เอง) — แสดงในรายงาน แต่ไม่นับ % ความก้าวหน้า
@@ -5906,11 +5997,58 @@ function dpElemShareQty(p,e,x){
   const m=el&&(el.mats||[]).find(mm=>mm.entityId===e.entityId);
   return m?(Number(m.qtyPer)||0)*(Number(x.n)||0):0;
 }
-function dpQtyLabel(e,info,qty,modeOverride){
+// ── v11.19 ส่วนที่แสดงของตัวเลขในรายงาน: add=ทำเพิ่ม · cum=สะสม · total=ทั้งหมด · remain=คงเหลือ ──
+const DP_PARTS=[['add','ทำเพิ่ม'],['cum','สะสม'],['total','ทั้งหมด'],['remain','คงเหลือ']];
+function dpDefaultParts(p){return (p&&Array.isArray(p.reportParts)&&p.reportParts.length)?p.reportParts:['add']}
+function dpNormParts(a){a=(a||[]).filter(x=>DP_PARTS.some(([k])=>k===x));return a.length?a:['add']}
+// ยอดสะสม ณ วันที่ (คิดแบบเดียวกับหน้าบันทึกการทำงาน: สะสมสัปดาห์ก่อน + งานรายวันถึงวันนั้น · ถึงสิ้นสัปดาห์ใช้ค่าที่บันทึกในสัปดาห์นั้น)
+function dpCumAsOf(p,entityId,asOf){
+  const info=resolveDpEntityInfo(p,entityId);if(!info||!p.startDate)return null;
+  const item=findItemAny(p,info.itemId);if(!item)return null;
+  const w=Math.max(1,periodOfDate(p,asOf));
+  const we=wkEnd(p.startDate,w),weStr=we?fmtDateInput(we):'';
+  const ent=(p.history||[]).find(h=>Number(h.period)===w);
+  const prevE=entryAtOrBefore(p,w-1);
+  let pct=null,sub=null;
+  if(ent&&asOf>=weStr){
+    pct=Number((ent.actuals||{})[item.id])||0;
+    sub=(ent.subActuals||{})[item.id]||null;
+  }else{
+    const list=(p.dailyProgress||[]).filter(e=>e.date<=asOf);
+    const d=wlDailyDerived(p,item,w,prevE,list);
+    if(d){pct=d.pct;sub=d.sub||null}
+    else{pct=prevE?Number((prevE.actuals||{})[item.id])||0:0;sub=prevE&&prevE.subActuals?prevE.subActuals[item.id]||null:null}
+  }
+  if(info.isSub){
+    const q=sub?Number(sub[info.subId])||0:(info.qtyTotal>0?(pct/100)*info.qtyTotal:0);
+    return{qty:q,pct:info.qtyTotal>0?q/info.qtyTotal*100:0};
+  }
+  return{qty:0,pct};
+}
+// ข้อความตัวเลข: mode 'qty'|'pct' · add = ปริมาณ (qty) หรือ % ที่ทำเพิ่มในช่วงนั้น
+function dpAmountText(p,entityId,info,mode,addQty,addPct,parts,asOf){
+  parts=dpNormParts(parts);
+  const isQty=mode==='qty'&&info.isSub,u=isQty?(info.unit?' '+info.unit:''):'%';
+  const add=isQty?addQty:addPct;
+  const f=v=>fmt(v,2)+u;
+  if(parts.length===1&&parts[0]==='add')return f(add); // แบบเดิม
+  const c=(parts.includes('cum')||parts.includes('remain'))&&asOf?dpCumAsOf(p,entityId,asOf):null;
+  const cum=c?(isQty?c.qty:c.pct):null,tot=isQty?info.qtyTotal:100;
+  const out=[];
+  if(parts.includes('add'))out.push('ทำเพิ่ม '+f(add));
+  const cumShown=parts.includes('cum')&&cum!=null;
+  if(cumShown)out.push('สะสม '+fmt(cum,2)+(parts.includes('total')?(isQty?'':'%')+' / '+f(tot):u));
+  if(parts.includes('total')&&!cumShown)out.push('ทั้งหมด '+f(tot));
+  if(parts.includes('remain')&&cum!=null)out.push('คงเหลือ '+f(Math.max(0,tot-cum)));
+  return out.join(' · ');
+}
+function dpQtyLabel(e,info,qty,modeOverride,ctx){
   const mode=modeOverride||e.displayMode||'pct';
   if(mode==='name')return '';
+  const pct=info.qtyTotal>0?qty/info.qtyTotal*100:0;
+  if(ctx)return dpAmountText(ctx.p,e.entityId,info,mode,qty,pct,ctx.parts,ctx.asOf);
   if(mode==='qty')return fmt(qty,2)+' '+info.unit;
-  return fmt(info.qtyTotal>0?qty/info.qtyTotal*100:0,1)+'%';
+  return fmt(pct,1)+'%';
 }
 // รวบรวมส่วนของแต่ละชิ้นส่วนจากแถวบันทึกรายวัน → กลุ่ม (กลุ่มเดียวกันรวมหัวข้อเดียว) + ลำดับบรรทัด
 function dpCollectGroups(p,entries){
@@ -5940,14 +6078,14 @@ function dpCollectGroups(p,entries){
   return{groups,raw,els};
 }
 // ข้อความหัวข้อ เช่น "งานฐานราก (F1 × 4, F2 × 1 ต้น) — เหล็ก DB 16 มม. 400.00 กก., …" · modeOf(entityId,e) = รูปแบบปริมาณของวัสดุ
-function dpGroupText(g,els,modeOf){
+function dpGroupText(g,els,modeOf,ctx){
   // จำนวนชิ้น = ค่ามากสุดของ (ยอดรวมทั้งช่วงต่อวัสดุ) — ชิ้นเดียวกันทำหลายขั้น (ผูกเหล็กวันหนึ่ง เทคอนกรีตอีกวัน) ไม่นับซ้ำ
   const parts=Object.keys(g.els).map(id=>({el:els[id],n:Math.max(...Object.values(g.els[id]))}));
   const units=[...new Set(parts.map(x=>x.el.unit||'ชิ้น'))];
   const elTxt=parts.map(x=>`${x.el.name} × ${fmt(x.n,0)}${units.length>1?' '+(x.el.unit||'ชิ้น'):''}`).join(', ')+(units.length===1?' '+units[0]:'');
   const title=/^งาน/.test(g.title)?g.title:'งาน'+g.title;
   const head=g.isGroup?`${title} (${elTxt})`:`งาน${elTxt}`;
-  const mats=g.matOrder.filter(id=>modeOf(id,g.mats[id].e)!=='hide').map(id=>{const mm=g.mats[id];const q=dpQtyLabel(mm.e,mm.info,mm.qty,modeOf(id,mm.e));return mm.info.name+(q?' '+q:'')}).join(', ');
+  const mats=g.matOrder.filter(id=>modeOf(id,g.mats[id].e)!=='hide').map(id=>{const mm=g.mats[id];const q=dpQtyLabel(mm.e,mm.info,mm.qty,modeOf(id,mm.e),ctx);return mm.info.name+(q?' '+q:'')}).join(', ');
   return head+(mats?' — '+mats:'');
 }
 // v10.9: ปริมาณของแต่ละชิ้นส่วนในวันหนึ่ง (แยกจากยอดรวมวัสดุ)
@@ -6072,7 +6210,7 @@ function buildDpReportLines(p,dFrom,dTo){
       const g=groups[l.key],m=meta[dFrom+'|'+g.key]||{},gm=m.modes||{};
       const gMode=(id,e)=>gm[id]||dpGroupMatDefault(p); // v10.8: เลือกรูปแบบแยกต่อวัสดุในแต่ละหัวข้อ (ไม่ได้เลือก = ตามรายการวัสดุ)
       const staAuto=dpGroupStaAuto(p,g,els);
-      return{kind:'group',key:g.key,metaKey:dFrom+'|'+g.key,text:dpGroupText(g,els,gMode),sta:m.sta||staAuto,staTyped:m.sta||'',staAuto,hidden:!!m.hide,mats:dpGroupMatList(g,gMode)};
+      return{kind:'group',key:g.key,metaKey:dFrom+'|'+g.key,text:dpGroupText(g,els,gMode,{p,parts:dpDefaultParts(p),asOf:dTo}),sta:m.sta||staAuto,staTyped:m.sta||'',staAuto,hidden:!!m.hide,mats:dpGroupMatList(g,gMode)};
     }
     const e=l.e;
     if(e.entityId!==DP_NONE_VALUE&&e.entityId!==DP_OTHER_VALUE&&!l.info)return null;
@@ -6080,16 +6218,41 @@ function buildDpReportLines(p,dFrom,dTo){
     if(l.covered>0){
       const rem=(Number(e.qty)||0)-l.covered;
       if(rem<=0.005)return{kind:'entry',e,text:null,covered:'full',hidden};
-      const q=dpQtyLabel(e,l.info,rem);
+      const q=dpQtyLabel(e,l.info,rem,null,{p,parts:e.displayParts||dpDefaultParts(p),asOf:e.date});
       return{kind:'entry',e,text:l.info.name+(q?' ('+q+')':''),covered:'part',sta:e.sta||'',hidden};
     }
     const disp=formatDpDisplayText(p,e);
     if(!disp)return null;
     return{kind:'entry',e,text:disp.qtyText?disp.name+' ('+disp.qtyText+')':disp.name,covered:null,sta:e.sta||'',hidden};
-  }).filter(Boolean);
+  }).filter(Boolean).filter((l,i,a)=>!(l.e&&l.e.entityId===DP_NONE_VALUE&&a.findIndex(x=>x.e&&x.e.entityId===DP_NONE_VALUE&&x.text===l.text)<i)); // ช่วงวันหยุด: ไม่ซ้ำบรรทัด
+}
+// v11.19 รวมวันไม่มีการดำเนินงานที่ติดกันและเหตุผลเดียวกัน เป็นรายงานช่วงวันที่ (เสมือน ไม่แก้ข้อมูลจริง)
+function drNextDay(ds){const d=new Date(ds+'T00:00:00');d.setDate(d.getDate()+1);return fmtDateInput(d)}
+function drMergeNoWork(p){
+  const all=(p.dailyReports||[]).slice().sort((a,b)=>a.date<b.date?-1:1),out=[];
+  all.forEach(d=>{
+    const last=out[out.length-1];
+    if(d.noWork&&!d.dateTo&&last&&last._nw&&(last.noWorkReason||'')===(d.noWorkReason||'')&&drNextDay(last.dateTo||last.date)===d.date){
+      last.dateTo=d.date;last._ids.push(d.id);
+      if(d.issue&&!String(last.issue||'').split('\n').includes(d.issue))last.issue=(last.issue?last.issue+'\n':'')+d.issue;
+      if(d.comment&&!String(last.comment||'').split('\n').includes(d.comment))last.comment=(last.comment?last.comment+'\n':'')+d.comment;
+      return;
+    }
+    if(d.noWork&&!d.dateTo)out.push({...d,_nw:true,_ids:[d.id]});
+    else out.push(d);
+  });
+  out.forEach(d=>{if(d._nw&&d._ids.length===1){d.dateTo=''}});
+  return out;
+}
+function drListInWeek(p,ws,we){
+  return drMergeNoWork(p).filter(d=>{
+    const dd=new Date(d.date+'T00:00:00');
+    const dEnd=d.dateTo?new Date(d.dateTo+'T00:00:00'):dd;
+    return dd<=we&&dEnd>=ws;
+  });
 }
 // v10.7: รายงานประจำสัปดาห์ — ยอดรวมทั้งสัปดาห์ต่อรายการ + หัวข้อชิ้นส่วน (รูปแบบปริมาณ/หมายเหตุ ตั้งต่อรายการใน weeklyReport)
-function buildDpWeekLines(p,ws,we,modes,notes,gmeta){
+function buildDpWeekLines(p,ws,we,modes,notes,gmeta,partsMap){
   if(!ws||!we)return[];
   const entries=(p.dailyProgress||[]).filter(e=>{
     if(e.entityId===DP_NONE_VALUE)return false;
@@ -6097,7 +6260,8 @@ function buildDpWeekLines(p,ws,we,modes,notes,gmeta){
     return d>=ws&&d<=we;
   });
   const {groups,raw,els}=dpCollectGroups(p,entries);
-  modes=modes||{};notes=notes||{};gmeta=gmeta||{};
+  modes=modes||{};notes=notes||{};gmeta=gmeta||{};partsMap=partsMap||{};
+  const weStr=fmtDateInput(we);
   const modeOf=id=>modes[id]||'pct';
   const sums={},order=[];
   raw.forEach(l=>{
@@ -6121,7 +6285,7 @@ function buildDpWeekLines(p,ws,we,modes,notes,gmeta){
       const g=groups[o.key],m=gmeta[g.key]||{},gm=m.modes||{};
       const gMode=(id,e)=>gm[id]||dpGroupMatDefault(p);
       const staAuto=dpGroupStaAuto(p,g,els);
-      return{kind:'group',key:g.key,text:dpGroupText(g,els,gMode),note:m.note||staAuto,noteTyped:m.note||'',staAuto,hidden:!!m.hide,mats:dpGroupMatList(g,gMode)};
+      return{kind:'group',key:g.key,text:dpGroupText(g,els,gMode,{p,parts:dpDefaultParts(p),asOf:weStr}),note:m.note||staAuto,noteTyped:m.note||'',staAuto,hidden:!!m.hide,mats:dpGroupMatList(g,gMode)};
     }
     const sm=sums[o.id],info=sm.info,mode=modeOf(o.id);
     if(sm.other){
@@ -6136,9 +6300,12 @@ function buildDpWeekLines(p,ws,we,modes,notes,gmeta){
       pct=info.qtyTotal>0?qty/info.qtyTotal*100:0;covered='part';
     }
     let qtyText='';
-    if(mode==='qty'&&info.isSub)qtyText=fmt(qty,2)+' '+info.unit;
-    else if(mode!=='name')qtyText=fmt(pct,1)+'%';
-    return{kind:'entity',entityId:o.id,isSub:info.isSub,name:info.name,text:info.name+(qtyText?' ('+qtyText+')':''),covered,note:notes[o.id]||'',hidden};
+    const parts=partsMap[o.id]||dpDefaultParts(p);
+    if(mode!=='name'){
+      const m=mode==='qty'&&info.isSub?'qty':'pct';
+      qtyText=(parts.length===1&&parts[0]==='add')?(m==='qty'?fmt(qty,2)+' '+info.unit:fmt(pct,1)+'%'):dpAmountText(p,o.id,info,m,qty,pct,parts,weStr);
+    }
+    return{kind:'entity',entityId:o.id,isSub:info.isSub,name:info.name,parts,text:info.name+(qtyText?' ('+qtyText+')':''),covered,note:notes[o.id]||'',hidden};
   });
 }
 function onDrGroupMetaChange(key,field,val){
@@ -6152,7 +6319,7 @@ function onDrGroupMetaChange(key,field,val){
   if(rerender)refreshDrAutoItemsPreview();
 }
 function formatDpDisplayText(p,e){
-  if(e.entityId===DP_NONE_VALUE)return{name:'ไม่มีการดำเนินงาน',qtyText:'',isSub:false};
+  if(e.entityId===DP_NONE_VALUE)return{name:'ไม่มีการดำเนินงาน'+(e.reason?' ('+e.reason+')':''),qtyText:'',isSub:false};
   if(e.entityId===DP_OTHER_VALUE){
     const q=(e.displayMode||'pct')!=='name'&&Number(e.qty)>0?fmt(e.qty,2)+(e.unit?' '+e.unit:''):'';
     return{name:e.text||'งานอื่น',qtyText:q,isSub:false,isOther:true};
@@ -6161,12 +6328,10 @@ function formatDpDisplayText(p,e){
   if(!info)return null;
   const mode=e.displayMode||'pct';
   let qtyText='';
-  if(mode==='name'){
-    qtyText='';
-  } else if(mode==='qty'&&info.isSub){
-    qtyText=fmt(e.qty,2)+' '+info.unit;
-  } else {
-    qtyText=fmt(e.pct,1)+'%';
+  if(mode!=='name'){
+    const parts=e.displayParts||dpDefaultParts(p);
+    const m=mode==='qty'&&info.isSub?'qty':'pct';
+    qtyText=(parts.length===1&&parts[0]==='add')?(m==='qty'?fmt(e.qty,2)+' '+info.unit:fmt(e.pct,1)+'%'):dpAmountText(p,e.entityId,info,m,Number(e.qty)||0,Number(e.pct)||0,parts,e.date);
   }
   return{name:info.name,qtyText,isSub:info.isSub};
 }
@@ -7440,6 +7605,7 @@ function saveProject(){
     docItems:old?(old.docItems||[]):buildDocItemsFromTemplate(),
     createdAt:old?old.createdAt:new Date().toISOString(),
   };
+  if(!old&&!proj.reportParts)proj.reportParts=['add','cum']; // v11.19 โครงการใหม่: ทำเพิ่ม + สะสม
   if(boqRemapPending&&editingId&&boqRemapPending.projectId===editingId){
     downloadProjectBackup(old,'ก่อนนำเข้าBOQ');
     applyBoqRemap(proj,boqRemapPending);
@@ -8874,7 +9040,7 @@ function refreshWrAutoItemsPreview(){
   if(!entry){wrap.innerHTML='';return}
   const ws=wkStart(p.startDate,wk),we=wkEnd(p.startDate,wk);
   const wr=entry.weeklyReport||{};
-  const lines=buildDpWeekLines(p,ws,we,wr.dpDisplayModes,wr.dpNotes,wr.dpGroupMeta);
+  const lines=buildDpWeekLines(p,ws,we,wr.dpDisplayModes,wr.dpNotes,wr.dpGroupMeta,wr.dpDisplayParts);
   if(!lines.length){wrap.innerHTML='<div style="font-size:11.5px;color:var(--gray-400)">ไม่มีบันทึกความก้าวหน้ารายวันในสัปดาห์นี้</div>';return}
   const modes=wr.dpDisplayModes||{};
   const groupHtml=lines.filter(l=>l.kind==='group').map(l=>`<div style="padding:6px 8px;margin:4px 0;background:var(--purple-light);border-radius:6px">
@@ -8886,7 +9052,7 @@ function refreshWrAutoItemsPreview(){
       ${dpGroupMatsHtml(l,'onWrGroupMetaChange',escJ(l.key))}
       <div style="font-size:10.5px;color:var(--gray-400);margin-top:2px">ยอดรวมทั้งสัปดาห์</div>
     </div>`).join('');
-  wrap.innerHTML=(groupHtml?dpGroupDefaultBar(p,'wr')+groupHtml:'')+lines.filter(l=>l.kind==='entity'&&l.covered!=='full').map(l=>{
+  wrap.innerHTML=dpPartsDefaultBar(p,'wr')+(groupHtml?dpGroupDefaultBar(p,'wr')+groupHtml:'')+lines.filter(l=>l.kind==='entity'&&l.covered!=='full').map(l=>{
     const mode=modes[l.entityId]||'pct';
     const hidden=mode==='hide';
     const lineText=l.covered==='full'?l.name+' — อยู่ในหัวข้อชิ้นส่วนด้านบน':l.covered==='part'?l.text+' + ส่วนที่เหลืออยู่ในหัวข้อชิ้นส่วน':l.text;
@@ -8904,6 +9070,7 @@ function refreshWrAutoItemsPreview(){
         </select>
         <input type="text" data-entity-id="${escH(l.entityId)}" onchange="onWrNoteChange(this)" value="${escH(l.note||'')}" placeholder="หมายเหตุ" style="flex:1;font-size:11px;padding:2px 4px;min-width:0" ${l.covered==='full'?'disabled title="รายการนี้อยู่ในหัวข้อชิ้นส่วนทั้งหมด — ใส่หมายเหตุที่หัวข้อ "':''}>
       </div>
+      ${l.isOther?'':dpPartsChips('wr',l.entityId,l.parts,mode==='name'||hidden)}
     </div>`;
   }).join('');
 }
@@ -9013,7 +9180,7 @@ function printWeeklyReport(p,wk){
   const remainDaysReal=remainDaysFromWeek(p,wk);
   const elapsedPct=totalDaysReal?(elapsedDaysReal/totalDaysReal*100):0;
   const wr=(entry&&entry.weeklyReport)||{workItems:[],hasIssue:null,issueDetail:''};
-  const dpWeekRows=buildDailyProgressSummaryRows(p,ws,we,wr.dpDisplayModes,wr.dpNotes,wr.dpGroupMeta);
+  const dpWeekRows=buildDailyProgressSummaryRows(p,ws,we,wr.dpDisplayModes,wr.dpNotes,wr.dpGroupMeta,wr.dpDisplayParts);
   const workRows=(wr.workItems&&wr.workItems.length?wr.workItems:[]).concat(dpWeekRows);
   const minRows=Math.max(6,workRows.length);
   let workRowsHtml='';
@@ -9214,14 +9381,18 @@ function renderDailyReportList(){
   const wrap=document.getElementById('dr-list');
   if(!ctx){wrap.innerHTML='<div style="color:var(--gray-400);font-size:12px;padding:10px 0">เลือกสัปดาห์ที่มีการบันทึกความก้าวหน้าก่อน</div>';return}
   const {p,ws,we}=ctx;
-  const list=(p.dailyReports||[]).filter(d=>{
-    const dd=new Date(d.date+'T00:00:00');
-    const dEnd=d.dateTo?new Date(d.dateTo+'T00:00:00'):dd;
-    return dd<=we&&dEnd>=ws;
-  }).sort((a,b)=>a.date<b.date?-1:1);
+  const list=drListInWeek(p,ws,we);
   if(!list.length){wrap.innerHTML='<div style="color:var(--gray-400);font-size:12px;padding:10px 0">ยังไม่มีรายงานประจำวันในสัปดาห์นี้</div>';return}
   wrap.innerHTML=list.map(d=>{
     const dEndDate=d.dateTo||d.date;
+    if(d._nw)return`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid var(--gray-200);background:var(--gray-50);border-radius:6px;margin-bottom:6px">
+      <div style="font-size:12.5px"><strong>${thDate(d.date)}${d.dateTo?' – '+thDate(d.dateTo):''}</strong> <span style="color:var(--gray-500)">· ไม่มีการดำเนินงาน${d.noWorkReason?' ('+escH(d.noWorkReason)+')':''}${d._ids.length>1?` · รวม ${d._ids.length} วันเป็นฉบับเดียว`:''}</span></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-secondary btn-sm" onclick="openWorkLog(null,'${escJ(d.date)}')" title="แก้ไขในหน้าบันทึกการทำงาน">แก้ไข</button>
+        <button class="btn-purple btn-sm" onclick="printDailyReportSingle('${escJ(d.id)}')"><svg class=ic aria-hidden=true><use href=#i-printer></use></svg></button>
+      </div>
+    </div>`;
     const dpCount=(p.dailyProgress||[]).filter(e=>e.date>=d.date&&e.date<=dEndDate).length;
     return`
     <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid var(--gray-100);border-radius:6px;margin-bottom:6px">
@@ -9299,7 +9470,7 @@ function refreshDrAutoItemsPreview(){
       </div>
       ${dpGroupMatsHtml(l,'onDrGroupMetaChange',escJ(l.metaKey))}
     </div>`).join('');
-  wrap.innerHTML=(groupHtml?dpGroupDefaultBar(p,'dr')+groupHtml:'')+entries.map(e=>{
+  wrap.innerHTML=dpPartsDefaultBar(p,'dr')+(groupHtml?dpGroupDefaultBar(p,'dr')+groupHtml:'')+entries.map(e=>{
     const disp=formatDpDisplayText(p,e);
     if(!disp)return '';
     const isNone=e.entityId===DP_NONE_VALUE;
@@ -9329,8 +9500,69 @@ function refreshDrAutoItemsPreview(){
         </select>
         <input type="text" data-entry-id="${escH(e.id)}" onchange="onDrStaChange(this)" value="${escH(e.sta||'')}" placeholder="STA." style="flex:1;font-size:11px;padding:2px 4px;min-width:0">
       </div>
+      ${!isNone&&!disp.isOther?dpPartsChips('dr',e.id,e.displayParts||dpDefaultParts(p),modeVal==='name'||hidden):''}
     </div>`;
   }).join('');
+}
+// ปุ่มติ๊กส่วนที่แสดง (ทำเพิ่ม/สะสม/ทั้งหมด/คงเหลือ) ต่อรายการ · which='dr'|'wr'
+function dpPartsChips(which,key,parts,disabled){
+  parts=dpNormParts(parts);
+  return `<div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:3px${disabled?';opacity:.4;pointer-events:none':''}">${DP_PARTS.map(([k,l])=>{const on=parts.includes(k);
+    return `<button type="button" onclick="dpTogglePart('${which}','${escJ(key)}','${k}')" style="font-size:10.5px;padding:1px 7px;border-radius:9px;border:1px solid ${on?'var(--blue)':'var(--gray-200)'};background:${on?'var(--blue)':'#fff'};color:${on?'#fff':'var(--gray-500)'};cursor:pointer;font-family:inherit">${on?'✓ ':''}${l}</button>`}).join('')}</div>`;
+}
+function dpPartsDefaultBar(p,which){
+  const d=dpDefaultParts(p);
+  return `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--gray-600);background:var(--gray-50);border-radius:6px;padding:5px 8px;margin:2px 0 6px">
+    <span>ตัวเลขที่แสดง (ค่าเริ่มต้นของโครงการ):</span>
+    ${DP_PARTS.map(([k,l])=>`<label style="display:flex;align-items:center;gap:3px;margin:0;font-weight:400;font-size:11px"><input type="checkbox" ${d.includes(k)?'checked':''} onchange="dpSetDefaultPart('${which}','${k}',this.checked)" style="width:13px;height:13px;margin:0">${l}</label>`).join('')}
+    <button type="button" class="btn-secondary btn-sm" style="font-size:10.5px;padding:2px 8px" onclick="dpApplyPartsAll('${which}')" title="ล้างที่ตั้งรายตัวของรายงานนี้ ให้ทุกรายการใช้ค่าเริ่มต้น">ใช้กับทุกรายการ</button></div>`;
+}
+function dpSetDefaultPart(which,k,on){
+  const p=projects.find(x=>x.id===currentId);if(!p)return;
+  let d=[...dpDefaultParts(p)];
+  if(on&&!d.includes(k))d.push(k);
+  if(!on)d=d.filter(x=>x!==k);
+  if(!d.length){toast('ต้องเลือกอย่างน้อย 1 อย่าง');d=['add']}
+  p.reportParts=DP_PARTS.map(([x])=>x).filter(x=>d.includes(x));
+  save(projects);
+  if(which==='wr')refreshWrAutoItemsPreview();else refreshDrAutoItemsPreview();
+}
+function dpApplyPartsAll(which){
+  const p=projects.find(x=>x.id===currentId);if(!p)return;
+  if(which==='wr'){
+    const wk=Number(document.getElementById('reports-week-select').value);
+    const entry=(p.history||[]).find(h=>Number(h.period)===wk);
+    if(entry&&entry.weeklyReport)delete entry.weeklyReport.dpDisplayParts;
+  }else{
+    const r=drCurrentRange();
+    (p.dailyProgress||[]).forEach(e=>{if(!r||(e.date>=r.from&&e.date<=r.to))delete e.displayParts});
+  }
+  save(projects);
+  if(which==='wr')refreshWrAutoItemsPreview();else refreshDrAutoItemsPreview();
+  toast('ทุกรายการใช้ค่าเริ่มต้นแล้ว');
+}
+function drCurrentRange(){
+  const f=(document.getElementById('dr-date')||{}).value;if(!f)return null;
+  const isR=(document.getElementById('dr-is-range')||{}).checked,t=(document.getElementById('dr-dateto')||{}).value;
+  return{from:f,to:isR&&t?t:f};
+}
+function dpTogglePart(which,key,k){
+  const p=projects.find(x=>x.id===currentId);if(!p)return;
+  const tog=a=>{a=[...dpNormParts(a)];a=a.includes(k)?a.filter(x=>x!==k):[...a,k];return a.length?DP_PARTS.map(([x])=>x).filter(x=>a.includes(x)):null};
+  if(which==='wr'){
+    const wk=Number(document.getElementById('reports-week-select').value);
+    const entry=(p.history||[]).find(h=>Number(h.period)===wk);if(!entry)return;
+    entry.weeklyReport=entry.weeklyReport||{};
+    const m=(entry.weeklyReport.dpDisplayParts=entry.weeklyReport.dpDisplayParts||{});
+    const nv=tog(m[key]||dpDefaultParts(p));if(!nv){toast('ต้องเลือกอย่างน้อย 1 อย่าง');return}
+    m[key]=nv;
+  }else{
+    const e=(p.dailyProgress||[]).find(x=>x.id===key);if(!e)return;
+    const nv=tog(e.displayParts||dpDefaultParts(p));if(!nv){toast('ต้องเลือกอย่างน้อย 1 อย่าง');return}
+    e.displayParts=nv;
+  }
+  save(projects);
+  if(which==='wr')refreshWrAutoItemsPreview();else refreshDrAutoItemsPreview();
 }
 function onDrAutoModeChange(sel){
   const p=projects.find(x=>x.id===currentId);
@@ -9578,7 +9810,7 @@ function buildDailyReportHtml(p,list){
 }
 function printDailyReportSingle(id){
   const p=projects.find(x=>x.id===currentId);
-  const d=(p.dailyReports||[]).find(x=>x.id===id);
+  const d=drMergeNoWork(p).find(x=>x.id===id||(x._ids&&x._ids.includes(id)));
   if(!d)return;
   openPrint(buildDailyReportHtml(p,[d]));
 }
@@ -9586,11 +9818,7 @@ function doPrintDailyReportRange(){
   const ctx=drWeekRange();
   if(!ctx){toast('กรุณาเลือกสัปดาห์ที่มีข้อมูล');return}
   const {p,ws,we}=ctx;
-  const list=(p.dailyReports||[]).filter(d=>{
-    const dd=new Date(d.date+'T00:00:00');
-    const dEnd=d.dateTo?new Date(d.dateTo+'T00:00:00'):dd;
-    return dd<=we&&dEnd>=ws;
-  }).sort((a,b)=>a.date<b.date?-1:1);
+  const list=drListInWeek(p,ws,we);
   if(!list.length){toast('ยังไม่มีรายงานประจำวันในสัปดาห์นี้');return}
   openPrint(buildDailyReportHtml(p,list));
 }
