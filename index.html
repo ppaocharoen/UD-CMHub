@@ -1312,7 +1312,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.22';
+const APP_VERSION='11.23';
 let scurveCutoffWeek=null; // v11.14 ใช้ตอนออกรายงานย้อนหลัง: เส้น % จริงแสดงถึงสัปดาห์ที่ออกรายงานเท่านั้น
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
@@ -3341,6 +3341,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.23</b> — แก้ v11.22: หน้าพิมพ์รายงานวัดความกว้างช่องตามกระดาษ A4 (เดิมวัดตามความกว้างหน้าต่าง ทำให้จอกว้างแล้วไม่ตัดแถว)</li>
 <li><b>v11.22</b> — พิมพ์รายงานประจำวัน/ประจำสัปดาห์: รายการที่ยาวเกินช่องจะตัดลงไปแถวถัดไป (ตัดตามคำ ไม่ตัดกลางคำ) ทุกแถวสูงเท่ากัน · รายงานประจำวันใช้แถวว่างท้ายตารางแทน จึงไม่ยาวขึ้น</li>
 <li><b>v11.21</b> — บันทึกการทำงาน: ช่องเลือกรายการแยกสีตามสถานะ — <b>ครบ 100% แล้ว</b> เป็นสีเทาพร้อมคำว่า "ครบแล้ว" · <b>ทำแล้วแต่ยังไม่ครบ</b> เป็นสีเขียวหัวเป็ดตัวหนา · <b>ยังไม่เริ่ม</b> สีปกติ · หัวข้องานหลักที่มีงานย่อยเป็นตัวหนา (แสดงสีบน Windows/Android · Mac/iPhone เห็นเป็นข้อความ)</li>
 <li><b>v11.20</b> — แก้บั๊ก บันทึกการทำงาน: วัสดุที่เพิ่มด้วย <b>+ จากชิ้นส่วน</b> หายเมื่อกดบันทึก ในกรณีที่เคยกรอกวันนั้นแล้วสลับไปวันอื่นก่อนกลับมาเพิ่มชิ้นส่วน</li>
@@ -9702,6 +9703,8 @@ function ruledDiv(text,lineCount){
 // ฟังก์ชันนี้ถูกฝังลงหน้าพิมพ์ผ่าน toString() — ห้ามอ้างตัวแปร/ฟังก์ชันอื่นของแอป
 // rowSel = แถวรายการ · cols = index คอลัมน์ข้อความที่ตัดได้ · blankSel = แถวว่างท้ายตาราง (ใช้แทนที่ ตารางจะได้ไม่ยาวขึ้น)
 function splitLongReportRows(rowSel,cols,blankSel){
+  // หน้าต่างพิมพ์เปิดกว้างเท่าจอ → ล็อกความกว้างเป็น A4 ก่อนวัด ให้ช่องกว้างเท่าตอนพิมพ์จริง (@page margin 0, padding อยู่ใน body)
+  document.body.style.width='210mm';
   var seg=null;try{seg=new Intl.Segmenter('th',{granularity:'word'})}catch(e){}
   var meas=document.createElement('span');
   meas.style.cssText='position:absolute;visibility:hidden;white-space:pre;left:-9999px;top:0';
@@ -9878,7 +9881,7 @@ function buildDailyReportHtml(p,list){
     });
   }
   window.onload=function(){
-    var go=function(){try{fitHeaderLines()}catch(e){}try{splitLongReportRows('tr.dr-item',[1,2],'tr.dr-blank')}catch(e){}window.print()};
+    var go=function(){try{splitLongReportRows('tr.dr-item',[1,2],'tr.dr-blank')}catch(e){}try{fitHeaderLines()}catch(e){}window.print()};
     if(document.fonts&&document.fonts.ready)document.fonts.ready.then(go);else go();
   };
   <\/script></body></html>`;
