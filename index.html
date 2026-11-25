@@ -1312,7 +1312,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.21';
+const APP_VERSION='11.22';
 let scurveCutoffWeek=null; // v11.14 ใช้ตอนออกรายงานย้อนหลัง: เส้น % จริงแสดงถึงสัปดาห์ที่ออกรายงานเท่านั้น
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
@@ -3341,6 +3341,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.22</b> — พิมพ์รายงานประจำวัน/ประจำสัปดาห์: รายการที่ยาวเกินช่องจะตัดลงไปแถวถัดไป (ตัดตามคำ ไม่ตัดกลางคำ) ทุกแถวสูงเท่ากัน · รายงานประจำวันใช้แถวว่างท้ายตารางแทน จึงไม่ยาวขึ้น</li>
 <li><b>v11.21</b> — บันทึกการทำงาน: ช่องเลือกรายการแยกสีตามสถานะ — <b>ครบ 100% แล้ว</b> เป็นสีเทาพร้อมคำว่า "ครบแล้ว" · <b>ทำแล้วแต่ยังไม่ครบ</b> เป็นสีเขียวหัวเป็ดตัวหนา · <b>ยังไม่เริ่ม</b> สีปกติ · หัวข้องานหลักที่มีงานย่อยเป็นตัวหนา (แสดงสีบน Windows/Android · Mac/iPhone เห็นเป็นข้อความ)</li>
 <li><b>v11.20</b> — แก้บั๊ก บันทึกการทำงาน: วัสดุที่เพิ่มด้วย <b>+ จากชิ้นส่วน</b> หายเมื่อกดบันทึก ในกรณีที่เคยกรอกวันนั้นแล้วสลับไปวันอื่นก่อนกลับมาเพิ่มชิ้นส่วน</li>
 <li><b>v11.19</b> — รายงานประจำวัน/ประจำสัปดาห์: เลือกได้ว่าตัวเลขของแต่ละรายการแสดง <b>ทำเพิ่ม · สะสม · ทั้งหมด · คงเหลือ</b> (กดปุ่มใต้แต่ละรายการ หรือตั้งค่าเริ่มต้นของโครงการแล้วกด "ใช้กับทุกรายการ") · โครงการใหม่ตั้งต้นเป็น ทำเพิ่ม + สะสม · <b>วันไม่มีการดำเนินงาน</b> ในบันทึกการทำงาน พร้อมเหตุผล ปฏิทินแสดงสีเทา และวันหยุดที่ติดกันเหตุผลเดียวกันรวมเป็นรายงานประจำวันฉบับเดียวแบบช่วงวันที่ให้อัตโนมัติ</li>
@@ -9210,7 +9211,7 @@ function printWeeklyReport(p,wk){
   for(let i=0;i<minRows;i++){
     const it=workRows[i]||{desc:'',note:''};
     const blank=!(it.desc||it.note);
-    workRowsHtml+=`<tr${blank?' class="wr-blank"':''}><td style="text-align:center;width:36px">${blank?'&nbsp;':i+1}</td><td>${escH(it.desc||'')||'&nbsp;'}</td><td>${escH(it.note||'')||'&nbsp;'}</td></tr>`;
+    workRowsHtml+=`<tr class="${blank?'wr-blank':'wr-item'}"><td style="text-align:center;width:36px">${blank?'&nbsp;':i+1}</td><td>${escH(it.desc||'')||'&nbsp;'}</td><td>${escH(it.note||'')||'&nbsp;'}</td></tr>`;
   }
   const soPeople=getSignoffPeople(s);
   const supervisorsHtml=soPeople.sups.map(sv=>`
@@ -9327,6 +9328,7 @@ function printWeeklyReport(p,wk){
     </div>
   </div>
   <script>
+  ${splitLongReportRows.toString()}
   function fillWeeklyReportToBottom(){
     var tbody=document.getElementById('wr-fill-tbody');
     var box=document.querySelector('.boxwrap');
@@ -9359,7 +9361,7 @@ function printWeeklyReport(p,wk){
     }
   }
   window.onload=function(){
-    var go=function(){try{fillWeeklyReportToBottom();}catch(e){}window.print();};
+    var go=function(){try{splitLongReportRows('#wr-fill-tbody tr.wr-item',[1,2],null);}catch(e){}try{fillWeeklyReportToBottom();}catch(e){}window.print();};
     // วัดหลังฟอนต์ Sarabun โหลดเสร็จ (วัดก่อนฟอนต์มา ความสูงจะคลาด → ล้นเป็น 2 หน้า) · กันค้างไม่เกิน 2.5 วินาที
     var done=false,once=function(){if(!done){done=true;go();}};
     try{document.fonts.ready.then(once);}catch(e){once();}
@@ -9696,6 +9698,55 @@ function ruledDiv(text,lineCount){
   }
   return `<table style="width:100%;border-collapse:collapse;table-layout:fixed">${rows}</table>`;
 }
+// v11.22 หน้าพิมพ์รายงาน: ข้อความที่ยาวเกินช่อง ตัดลงแถวถัดไป (ตัดตามคำไทยด้วย Intl.Segmenter) ให้ทุกแถวสูงเท่ากัน
+// ฟังก์ชันนี้ถูกฝังลงหน้าพิมพ์ผ่าน toString() — ห้ามอ้างตัวแปร/ฟังก์ชันอื่นของแอป
+// rowSel = แถวรายการ · cols = index คอลัมน์ข้อความที่ตัดได้ · blankSel = แถวว่างท้ายตาราง (ใช้แทนที่ ตารางจะได้ไม่ยาวขึ้น)
+function splitLongReportRows(rowSel,cols,blankSel){
+  var seg=null;try{seg=new Intl.Segmenter('th',{granularity:'word'})}catch(e){}
+  var meas=document.createElement('span');
+  meas.style.cssText='position:absolute;visibility:hidden;white-space:pre;left:-9999px;top:0';
+  document.body.appendChild(meas);
+  function w(t,font){meas.style.font=font;meas.textContent=t;return meas.getBoundingClientRect().width}
+  function toks(t){
+    if(seg){var a=[],it=seg.segment(t)[Symbol.iterator](),r;while(!(r=it.next()).done)a.push(r.value.segment);return a}
+    return t.split(/(\s+)/);
+  }
+  function cut(td){
+    var t=(td.textContent||'').replace(/ /g,' ').trim();
+    if(!t)return null;
+    var cs=getComputedStyle(td),font=cs.font;
+    var avail=td.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-1;
+    if(avail<20||w(t,font)<=avail)return null;
+    var tk=toks(t),line='',i=0;
+    for(;i<tk.length;i++){if(w(line+tk[i],font)>avail)break;line+=tk[i]}
+    if(!line.trim()){ // คำเดียวยาวเกินช่อง → ตัดทีละตัวอักษร
+      var ch=Array.from(t),j=0;line='';
+      for(;j<ch.length;j++){if(w(line+ch[j],font)>avail&&line)break;line+=ch[j]}
+      return [line,ch.slice(j).join('').trim()];
+    }
+    // ตัดที่ช่องว่างก่อน ถ้ายังเต็มบรรทัดอย่างน้อย 60% (คำไทยบางคำ Segmenter แยก เช่น ติด|ตั้ง และกันตัดกลางรหัส เช่น C-125)
+    if(i<tk.length&&!/^\s/.test(tk[i])){
+      for(var b=i-1;b>0;b--){
+        if(/^\s+$/.test(tk[b])){var head=tk.slice(0,b).join('');if(w(head,font)>=avail*0.6)return [head.replace(/\s+$/,''),tk.slice(b).join('').trim()];break}
+      }
+    }
+    return [line.replace(/\s+$/,''),tk.slice(i).join('').trim()];
+  }
+  Array.prototype.slice.call(document.querySelectorAll(rowSel)).forEach(function(tr){
+    var guard=0;
+    while(tr&&guard++<50){
+      var rests={},any=false;
+      cols.forEach(function(c){var td=tr.cells[c];if(!td)return;var r=cut(td);if(r&&r[1]){td.textContent=r[0];rests[c]=r[1];any=true}});
+      if(!any)break;
+      var nt=document.createElement('tr');nt.className='rpt-cont';
+      for(var k=0;k<tr.cells.length;k++){var c=tr.cells[k].cloneNode(false);if(rests[k])c.textContent=rests[k];else c.innerHTML='&nbsp;';nt.appendChild(c)}
+      tr.parentNode.insertBefore(nt,tr.nextSibling);
+      if(blankSel){var bl=tr.parentNode.querySelectorAll(blankSel);if(bl.length)bl[bl.length-1].parentNode.removeChild(bl[bl.length-1])}
+      tr=nt;
+    }
+  });
+  document.body.removeChild(meas);
+}
 function buildDailyReportHtml(p,list){
   const s=getSignoff(p);
   const soPeople=getSignoffPeople(s);
@@ -9716,7 +9767,7 @@ function buildDailyReportHtml(p,list){
     const minRows=16;
     for(let i=0;i<Math.max(minRows,itemRows.length);i++){
       const it=itemRows[i]||{name:'',sta:''};
-      itemsHtml+=`<tr><td style="width:26px;text-align:center">&nbsp;</td><td>${escH(it.name||'')||'&nbsp;'}</td><td style="width:90px">${escH(it.sta||'')||'&nbsp;'}</td></tr>`;
+      itemsHtml+=`<tr class="${i<itemRows.length?'dr-item':'dr-blank'}"><td style="width:26px;text-align:center">&nbsp;</td><td>${escH(it.name||'')||'&nbsp;'}</td><td style="width:90px">${escH(it.sta||'')||'&nbsp;'}</td></tr>`;
     }
     const laborRows=LABOR_FIELDS.map(([k,lbl],i)=>`<tr><td style="width:24px;text-align:center;white-space:nowrap">${i+1}</td><td>${lbl}</td><td style="width:52px;text-align:center;white-space:nowrap">${d.labor&&d.labor[k]?d.labor[k]:''}</td></tr>`).join('');
     const equip=d.equipment||[];
@@ -9815,6 +9866,7 @@ function buildDailyReportHtml(p,list){
   </style></head><body>
   ${pages}
   <script>
+  ${splitLongReportRows.toString()}
   // ชื่อโครงการ/ผู้รับจ้าง: ให้อยู่บรรทัดเดียว — ย่อตัวอักษรทีละ 0.25pt จนพอดี (ไม่ต่ำกว่า data-min) ถ้ายังไม่พอค่อยยอมตัดบรรทัด
   function fitHeaderLines(){
     document.querySelectorAll('.fitline').forEach(function(el){
@@ -9826,7 +9878,7 @@ function buildDailyReportHtml(p,list){
     });
   }
   window.onload=function(){
-    var go=function(){try{fitHeaderLines()}catch(e){}window.print()};
+    var go=function(){try{fitHeaderLines()}catch(e){}try{splitLongReportRows('tr.dr-item',[1,2],'tr.dr-blank')}catch(e){}window.print()};
     if(document.fonts&&document.fonts.ready)document.fonts.ready.then(go);else go();
   };
   <\/script></body></html>`;
