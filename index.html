@@ -436,6 +436,13 @@ tr:hover td{background:var(--gray-50)}
 #help-fab:hover{background:#1555b0}
 @media (max-width:760px){.mn-body{flex-direction:column}.mn-toc{width:auto;max-height:34%;border-right:none;border-bottom:1px solid #eee}}
 @media print{#help-fab{display:none!important}}
+/* v11.21 สถานะรายการในช่องเลือกของบันทึกการทำงาน: ครบ=เทา · กำลังทำ=สีธีมตัวหนา · ยังไม่เริ่ม=ปกติ */
+.dp-entity-select option{color:var(--gray-800);font-weight:normal}
+.dp-entity-select option.dpo-main{font-weight:700}
+.dp-entity-select option.dpo-prog{color:var(--blue);font-weight:700}
+.dp-entity-select option.dpo-done{color:var(--gray-400)}
+.dp-entity-select.dpo-prog{color:var(--blue);font-weight:600}
+.dp-entity-select.dpo-done{color:var(--gray-500)}
 </style>
 </head>
 <body>
@@ -1305,7 +1312,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.20';
+const APP_VERSION='11.21';
 let scurveCutoffWeek=null; // v11.14 ใช้ตอนออกรายงานย้อนหลัง: เส้น % จริงแสดงถึงสัปดาห์ที่ออกรายงานเท่านั้น
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
@@ -3334,6 +3341,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.21</b> — บันทึกการทำงาน: ช่องเลือกรายการแยกสีตามสถานะ — <b>ครบ 100% แล้ว</b> เป็นสีเทาพร้อมคำว่า "ครบแล้ว" · <b>ทำแล้วแต่ยังไม่ครบ</b> เป็นสีเขียวหัวเป็ดตัวหนา · <b>ยังไม่เริ่ม</b> สีปกติ · หัวข้องานหลักที่มีงานย่อยเป็นตัวหนา (แสดงสีบน Windows/Android · Mac/iPhone เห็นเป็นข้อความ)</li>
 <li><b>v11.20</b> — แก้บั๊ก บันทึกการทำงาน: วัสดุที่เพิ่มด้วย <b>+ จากชิ้นส่วน</b> หายเมื่อกดบันทึก ในกรณีที่เคยกรอกวันนั้นแล้วสลับไปวันอื่นก่อนกลับมาเพิ่มชิ้นส่วน</li>
 <li><b>v11.19</b> — รายงานประจำวัน/ประจำสัปดาห์: เลือกได้ว่าตัวเลขของแต่ละรายการแสดง <b>ทำเพิ่ม · สะสม · ทั้งหมด · คงเหลือ</b> (กดปุ่มใต้แต่ละรายการ หรือตั้งค่าเริ่มต้นของโครงการแล้วกด "ใช้กับทุกรายการ") · โครงการใหม่ตั้งต้นเป็น ทำเพิ่ม + สะสม · <b>วันไม่มีการดำเนินงาน</b> ในบันทึกการทำงาน พร้อมเหตุผล ปฏิทินแสดงสีเทา และวันหยุดที่ติดกันเหตุผลเดียวกันรวมเป็นรายงานประจำวันฉบับเดียวแบบช่วงวันที่ให้อัตโนมัติ</li>
 <li><b>v11.18</b> — บันทึกการทำงาน: ปุ่ม <b>บันทึกวันนี้</b> ที่หัวการ์ดของแต่ละวัน บันทึกแล้วหน้าต่างยังเปิดอยู่ เลือกวันอื่นกรอกต่อได้ทันที · ปุ่มด้านล่างเปลี่ยนเป็น "บันทึกและปิด"</li>
@@ -6336,19 +6344,28 @@ function formatDpDisplayText(p,e){
   }
   return{name:info.name,qtyText,isSub:info.isSub};
 }
+// v11.21 สถานะของรายการจากยอดสะสม: '' = ยังไม่เริ่ม · 'prog' = ทำแล้วยังไม่ครบ · 'done' = ครบ 100%
+function dpRemainStatus(r){
+  if(!r)return '';
+  if(r.remainPct<0.005)return 'done';
+  return r.done>0.0001?'prog':'';
+}
 function buildDpEntityOptionsHtml(p,selected){
   let html='<option value="">— เลือกรายการ —</option>';
   html+=`<option value="${DP_NONE_VALUE}" ${selected===DP_NONE_VALUE?'selected':''}>ไม่มีการดำเนินงาน (วันหยุด/ไม่ได้ปฏิบัติงาน)</option>`;
   html+=`<option value="${DP_OTHER_VALUE}" ${selected===DP_OTHER_VALUE?'selected':''}>งานอื่นนอกรายการ (พิมพ์รายละเอียดเอง)</option>`;
   allPlanItems(p).forEach(item=>{
     const mainRemain=getDpRemainInfo(p,item.id,null);
-    const mainSuffix=mainRemain?` (คงเหลือ ${fmt(mainRemain.remain,2)}%)`:'';
-    html+=`<option value="${escH(item.id)}" ${selected===item.id?'selected':''}>${escH(item.name)}${mainSuffix}</option>`;
+    const mst=dpRemainStatus(mainRemain);
+    const mainSuffix=mainRemain?(mst==='done'?' (ครบแล้ว)':` (คงเหลือ ${fmt(mainRemain.remain,2)}%)`):'';
+    const mcls=[(item.subItems&&item.subItems.length)?'dpo-main':'',mst?'dpo-'+mst:''].filter(Boolean).join(' ');
+    html+=`<option value="${escH(item.id)}"${mcls?` class="${mcls}"`:''} ${selected===item.id?'selected':''}>${escH(item.name)}${mainSuffix}</option>`;
     (item.subItems||[]).forEach(s=>{
       const val=item.id+'::'+s.id;
       const subRemain=getDpRemainInfo(p,val,null);
-      const subSuffix=subRemain?` (คงเหลือ ${fmt(subRemain.remain,2)} ${escH(s.unit||'')} · ${fmt(subRemain.remainPct,2)}%)`:'';
-      html+=`<option value="${val}" data-qty="${Number(s.qty||0)}" data-unit="${escH(s.unit||'')}" ${selected===val?'selected':''}>— ${escH(s.name)}${subSuffix}</option>`;
+      const sst=dpRemainStatus(subRemain);
+      const subSuffix=subRemain?(sst==='done'?' (ครบแล้ว)':` (คงเหลือ ${fmt(subRemain.remain,2)} ${escH(s.unit||'')} · ${fmt(subRemain.remainPct,2)}%)`):'';
+      html+=`<option value="${val}"${sst?` class="dpo-${sst}"`:''} data-qty="${Number(s.qty||0)}" data-unit="${escH(s.unit||'')}" ${selected===val?'selected':''}>— ${escH(s.name)}${subSuffix}</option>`;
     });
   });
   return html;
@@ -6444,6 +6461,9 @@ function addDpEntryRow(dateStr,existing){
 function onDpEntitySelectChange(sel){
   const row=sel.closest('.dp-row');
   const opt=sel.selectedOptions[0];
+  sel.classList.remove('dpo-prog','dpo-done');
+  if(opt&&opt.classList.contains('dpo-prog'))sel.classList.add('dpo-prog');
+  else if(opt&&opt.classList.contains('dpo-done'))sel.classList.add('dpo-done');
   const val=opt?opt.value:'';
   const isSub=!!(val&&val.indexOf('::')>=0);
   const isNone=val===DP_NONE_VALUE;
