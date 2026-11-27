@@ -1312,7 +1312,7 @@ tr:hover td{background:var(--gray-50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION='11.23';
+const APP_VERSION='11.24';
 let scurveCutoffWeek=null; // v11.14 ใช้ตอนออกรายงานย้อนหลัง: เส้น % จริงแสดงถึงสัปดาห์ที่ออกรายงานเท่านั้น
 document.addEventListener('input',e=>{if(e.target&&e.target.closest&&e.target.closest('#item-rows')){updateFormDiscountNote();onContractValInput();}});
 const APP_NAME='UD-CM Hub ระบบบริหารงานก่อสร้าง';
@@ -3341,6 +3341,7 @@ const MANUAL_SECTIONS=[
 
 {id:'changelog',title:'มีอะไรใหม่ในแต่ละเวอร์ชัน',html:`
 <ul class="cl">
+<li><b>v11.24</b> — แก้บั๊ก: ลบงานรายวันของรายการหนึ่งออกจนหมดในสัปดาห์นั้น แล้ว % ความก้าวหน้าไม่ลดตาม — ตอนนี้กลับไปเท่าสัปดาห์ก่อนหน้า (เฉพาะสัปดาห์ที่มีบันทึกรายวัน · รายการที่กรอก % เองไม่กระทบ)</li>
 <li><b>v11.23</b> — แก้ v11.22: หน้าพิมพ์รายงานวัดความกว้างช่องตามกระดาษ A4 (เดิมวัดตามความกว้างหน้าต่าง ทำให้จอกว้างแล้วไม่ตัดแถว)</li>
 <li><b>v11.22</b> — พิมพ์รายงานประจำวัน/ประจำสัปดาห์: รายการที่ยาวเกินช่องจะตัดลงไปแถวถัดไป (ตัดตามคำ ไม่ตัดกลางคำ) ทุกแถวสูงเท่ากัน · รายงานประจำวันใช้แถวว่างท้ายตารางแทน จึงไม่ยาวขึ้น</li>
 <li><b>v11.21</b> — บันทึกการทำงาน: ช่องเลือกรายการแยกสีตามสถานะ — <b>ครบ 100% แล้ว</b> เป็นสีเทาพร้อมคำว่า "ครบแล้ว" · <b>ทำแล้วแต่ยังไม่ครบ</b> เป็นสีเขียวหัวเป็ดตัวหนา · <b>ยังไม่เริ่ม</b> สีปกติ · หัวข้องานหลักที่มีงานย่อยเป็นตัวหนา (แสดงสีบน Windows/Android · Mac/iPhone เห็นเป็นข้อความ)</li>
@@ -5551,7 +5552,16 @@ function wlEffectiveDaily(p){
 }
 function wlDailyDerived(p,item,w,prevE,list){
   const sm=sumDailyProgressForWeek(p,item.id,w,list);
-  if(!sm)return null;
+  if(!sm){
+    // v11.24 สัปดาห์ที่บันทึกรายวันแล้ว แต่รายการนี้ไม่มีงาน (เช่น เพิ่มแล้วลบออก) → ค่าสะสม = สัปดาห์ก่อนหน้า
+    // เดิมคืน null แล้วคงค่าเก่าไว้ % จึงไม่ลดตามเมื่อลบงานรายวัน · สัปดาห์ที่ไม่มีบันทึกรายวันเลย (กรอก % เอง) ยังคงค่าเดิม
+    const ws=wkStart(p.startDate,w),we=wkEnd(p.startDate,w);
+    const weekHasDaily=ws&&we&&(list||p.dailyProgress||[]).some(e=>{const d=new Date(e.date+'T00:00:00');return d>=ws&&d<=we});
+    if(!weekHasDaily)return null;
+    const r={pct:prevE?Math.min(100,Number((prevE.actuals||{})[item.id])||0):0,carried:true};
+    if(item.subItems&&item.subItems.length)r.sub={...((prevE&&prevE.subActuals&&prevE.subActuals[item.id])||{})};
+    return r;
+  }
   if(sm.hasSub){
     const prevSub=(prevE&&prevE.subActuals&&prevE.subActuals[item.id])||{};
     const merged={...prevSub};
